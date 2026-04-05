@@ -90,13 +90,15 @@ export abstract class MagxPanelBaseElement extends LitElement {
 
     // Base styles that need to be brought in to panel elements
     protected static _baseStyle = css`
-        .container_base {                        
+        .container_base {
             margin: var(--magx-panel-container-margin);
             padding: var(--magx-panel-container-padding);
             background-color: var(--magx-panel-container-bg);
             border: var(--magx-panel-common-border);
             position: relative;
             overflow: hidden;
+            touch-action: manipulation;
+            min-height: 44px;
         }
 
         .container_base_selected {            

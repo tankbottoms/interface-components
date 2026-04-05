@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
+import { MagxHaptics } from './Haptics';
 
 // File chooser dialog
 @customElement(MagxPanelConstants.PANEL_FILECHOOSER)
@@ -30,6 +31,7 @@ export class MagxPanelFileChooser extends MagxPanelBaseElement {
     private _valueChanged(): void {
         if (!this._fcLabel || !this._fileChooser?.files || !this._fileChooser?.files.length) { return };
         this._fcLabel.textContent = this._fileChooser.files[0].name;
+        MagxHaptics.trigger('success');
         this._notifyOnValueChange();
     }
 

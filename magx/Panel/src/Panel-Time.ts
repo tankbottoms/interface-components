@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
+import { MagxHaptics } from './Haptics';
 
 // Element for choosing time. There is a separate element for choosing a date
 @customElement(MagxPanelConstants.PANEL_TIME)
@@ -48,7 +49,8 @@ export class MagxPanelTime extends MagxPanelBaseElement {
     // Called when time value is changed
     private _valueChanged(): void {
         this._timeValue = this._timeInput?.value ?? this._createTimeString(new Date());
-        this._notifyOnValueChange();           
+        MagxHaptics.trigger('light');
+        this._notifyOnValueChange();
     }
         
     // Renders the element

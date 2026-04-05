@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
+import { MagxHaptics } from './Haptics';
 
 // Range element, shows slider user can interact with
 @customElement(MagxPanelConstants.PANEL_RANGE)
@@ -44,11 +45,17 @@ export class MagxPanelRange extends MagxPanelBaseElement {
         } catch {}
     }
 
+    private _lastHapticValue: number = -1;
+
     // Whenever user moves the slider, event is sent
     private _valueChanged(): void {
         if (!this._inputField) { return; }
         const oldVal = this._value;
         this._value = parseInt(this._inputField.value);
+        if (this._value !== this._lastHapticValue) {
+            this._lastHapticValue = this._value;
+            MagxHaptics.trigger('light');
+        }
         this.requestUpdate("value", oldVal);
         this._notifyOnValueChange();
     }

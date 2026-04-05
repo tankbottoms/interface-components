@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
+import { MagxHaptics } from './Haptics';
 
 // Checkbox with text on the right side of it
 @customElement(MagxPanelConstants.PANEL_CHECKBOX)
@@ -31,6 +32,7 @@ export class MagxPanelCheckbox extends MagxPanelBaseElement {
     // Value changed due to user interaction, going to update internal state and send notification
     private _valueChanged(): void {
         this._checked = this._checkbox?.checked ?? false;
+        MagxHaptics.trigger('medium');
         this._notifyOnValueChange();
     }
 

@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
+import { MagxHaptics } from './Haptics';
 
 // Data structure used with getValue()
 export interface MagxSelectValueCallback {
@@ -41,6 +42,7 @@ export class MagxPanelDropdown extends MagxPanelBaseElement {
     // Sends value changed event when user selects new item on dropdown
     private _valueChanged(): void {
         this._index = this._dropdown?.selectedIndex ?? 0;
+        MagxHaptics.trigger('light');
         this._notifyOnValueChange();
     }
 

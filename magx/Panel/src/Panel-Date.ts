@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
+import { MagxHaptics } from './Haptics';
 
 // Date picker element
 @customElement(MagxPanelConstants.PANEL_DATE)
@@ -50,7 +51,8 @@ export class MagxPanelDate extends MagxPanelBaseElement {
     // Sends value changed notification
     private _valueChanged(): void {
         this._dateValue = this._dateInput?.value ?? this._createDateString(new Date());
-        this._notifyOnValueChange();           
+        MagxHaptics.trigger('light');
+        this._notifyOnValueChange();
     }
 
     // Sets minimum date user can choose

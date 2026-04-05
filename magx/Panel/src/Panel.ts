@@ -2,6 +2,7 @@ import { LitElement, css, html, PropertyValueMap } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 import { MagxPanelBaseElement } from "./Panel-BaseElement";
 import { MagxPanelConstants } from "./Panel-Constants";
+import { MagxHaptics } from "./Haptics";
 
 // Panel gathers all elements into a single whole that can be move around / collapsed
 @customElement(MagxPanelConstants.PANEL)
@@ -19,6 +20,7 @@ export class MagxPanel extends LitElement {
     private _maxX: number = 0;
     private _maxY: number = 0;
     private _outOfBoundsCheck: boolean = true;
+    private _activePointerId: number = -1;
 
     private _showCloseButton: boolean = true;
     private _draggable: boolean = true;
@@ -218,46 +220,48 @@ export class MagxPanel extends LitElement {
         }
     }
 
-    // Starts dragging
-    private _startDrag(event: any) {
+    // Starts dragging via pointer events (works for mouse + touch)
+    private _startDrag(event: PointerEvent) {
         if (!this._panel) { return; }
 
         if (this._draggable && this._titleBar) {
             ++MagxPanel._topZ;
             this._panel.style.zIndex = MagxPanel._topZ.toString();
-            document.addEventListener("mousemove", this._drag);
-            document.addEventListener("mouseup", this._endDrag);
+            this._activePointerId = event.pointerId;
+            (event.target as HTMLElement).setPointerCapture(event.pointerId);
             this._startX = event.clientX;
             this._startY = event.clientY;
             this._overlay = this._createElement("div", "overlay", "overlay", this._panel) as HTMLDivElement;
             document.body.style.cursor = "none";
+            MagxHaptics.trigger('light');
         }
         event.preventDefault();
     }
 
-    // Called during drag events (mouse move) to move the panel around
-    private _drag(event: any): void {
-        if (!this._panel) { return; }
+    // Called during pointer move to drag the panel
+    private _drag(event: PointerEvent): void {
+        if (!this._panel || event.pointerId !== this._activePointerId) { return; }
 
         let x = parseInt(this._panel.style.left),
             y = parseInt(this._panel.style.top),
-            mouseX = event.clientX,
-            mouseY = event.clientY;
+            pointerX = event.clientX,
+            pointerY = event.clientY;
 
-        const newXPos = x + mouseX - this._startX;
-        const newYPos = y + mouseY - this._startY;
+        const newXPos = x + pointerX - this._startX;
+        const newYPos = y + pointerY - this._startY;
 
         this.setPosition(newXPos, newYPos);
-        this._startX = mouseX;
-        this._startY = mouseY;
+        this._startX = pointerX;
+        this._startY = pointerY;
 
         event.preventDefault();
     }
 
     // Called when dragging ends
-    private _endDrag(event: any): void {
-        document.removeEventListener("mousemove", this._drag);
-        document.removeEventListener("mouseup", this._endDrag);
+    private _endDrag(event: PointerEvent): void {
+        if (event.pointerId !== this._activePointerId) { return; }
+        (event.target as HTMLElement).releasePointerCapture(event.pointerId);
+        this._activePointerId = -1;
         event.preventDefault();
 
         if (!this._panel || !this._overlay) { return; }
@@ -275,9 +279,9 @@ export class MagxPanel extends LitElement {
         return html`
         <div id="panel" class="main_panel" @click=${this._panelClicked}>
             <div class="title_bar_container">
-                <div class="title_bar" id="title_bar" draggable="true" @dblclick=${this._doubleClickTitle} @dragstart=${this._startDrag}>${this.title}</div>
-                <div class="title_bar_filler" draggable="true" @dblclick=${this._doubleClickTitle} @dragstart=${this._startDrag}></div>
-                <div class="title_bar_close_button_container" draggable="true" @dblclick=${this._doubleClickTitle} @dragstart=${this._startDrag}>
+                <div class="title_bar" id="title_bar" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag} @pointermove=${this._drag} @pointerup=${this._endDrag} @pointercancel=${this._endDrag}>${this.title}</div>
+                <div class="title_bar_filler" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag} @pointermove=${this._drag} @pointerup=${this._endDrag} @pointercancel=${this._endDrag}></div>
+                <div class="title_bar_close_button_container" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag} @pointermove=${this._drag} @pointerup=${this._endDrag} @pointercancel=${this._endDrag}>
                     <img class="title_bar_close_button_image" id="close_button" @click=${this._removePanel} src=""/>
                 </div>                                
             </div>
@@ -362,6 +366,7 @@ export class MagxPanel extends LitElement {
             -webkit-user-select: none;
             cursor: pointer;
             border: none;
+            touch-action: none;
         }
 
         .title_bar_close_button_container {
@@ -373,6 +378,7 @@ export class MagxPanel extends LitElement {
             -webkit-user-select: none;
             cursor: pointer;
             border: none;
+            touch-action: none;
         }
 
         .title_bar_close_button_image {            
@@ -419,6 +425,7 @@ export class MagxPanel extends LitElement {
             font-weight: bold;
             border: none;
             color: var(--magx-panel-text-color);
+            touch-action: none;
         }
     `;
 }

@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
+import { MagxHaptics } from './Haptics';
 
 // Simple button element
 @customElement(MagxPanelConstants.PANEL_BUTTON)
@@ -13,8 +14,9 @@ export class MagxPanelButton extends MagxPanelBaseElement {
     }
 
     // Notifies button click as a value change
-    private _clicked(): void {        
-        this._notifyOnValueChange();        
+    private _clicked(): void {
+        MagxHaptics.trigger('medium');
+        this._notifyOnValueChange();
     }
 
     // Renders the component

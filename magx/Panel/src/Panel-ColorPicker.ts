@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
+import { MagxHaptics } from './Haptics';
 
 // Color picker element for the panel
 @customElement(MagxPanelConstants.PANEL_COLORPICKER)
@@ -31,7 +32,8 @@ export class MagxPanelColorPicker extends MagxPanelBaseElement {
     // Called when user changes the color *while* the color picker is shown
     private _valueChanged(): void {
         this._color = this._colorInput?.value ?? "Unknown";
-        this._notifyOnValueChange();        
+        MagxHaptics.trigger('light');
+        this._notifyOnValueChange();
     }
 
     // Renders the component
