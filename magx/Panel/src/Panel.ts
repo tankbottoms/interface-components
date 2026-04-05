@@ -232,7 +232,6 @@ export class MagxPanel extends LitElement {
             this._startX = event.clientX;
             this._startY = event.clientY;
             this._overlay = this._createElement("div", "overlay", "overlay", this._panel) as HTMLDivElement;
-            document.body.style.cursor = "none";
             MagxHaptics.trigger('light');
         }
         event.preventDefault();
@@ -267,7 +266,6 @@ export class MagxPanel extends LitElement {
         if (!this._panel || !this._overlay) { return; }
         this._panel.removeChild(this._overlay);
         this._overlay = null;
-        document.body.style.cursor = "auto";
     }
 
     private _removePanel(): void {
