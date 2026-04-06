@@ -228,10 +228,12 @@ export class MagxPanel extends LitElement {
             ++MagxPanel._topZ;
             this._panel.style.zIndex = MagxPanel._topZ.toString();
             this._activePointerId = event.pointerId;
-            (event.target as HTMLElement).setPointerCapture(event.pointerId);
             this._startX = event.clientX;
             this._startY = event.clientY;
             this._overlay = this._createElement("div", "overlay", "overlay", this._panel) as HTMLDivElement;
+            document.addEventListener("pointermove", this._drag);
+            document.addEventListener("pointerup", this._endDrag);
+            document.addEventListener("pointercancel", this._endDrag);
             MagxHaptics.trigger('light');
         }
         event.preventDefault();
@@ -259,8 +261,10 @@ export class MagxPanel extends LitElement {
     // Called when dragging ends
     private _endDrag(event: PointerEvent): void {
         if (event.pointerId !== this._activePointerId) { return; }
-        (event.target as HTMLElement).releasePointerCapture(event.pointerId);
         this._activePointerId = -1;
+        document.removeEventListener("pointermove", this._drag);
+        document.removeEventListener("pointerup", this._endDrag);
+        document.removeEventListener("pointercancel", this._endDrag);
         event.preventDefault();
 
         if (!this._panel || !this._overlay) { return; }
@@ -277,9 +281,9 @@ export class MagxPanel extends LitElement {
         return html`
         <div id="panel" class="main_panel" @click=${this._panelClicked}>
             <div class="title_bar_container">
-                <div class="title_bar" id="title_bar" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag} @pointermove=${this._drag} @pointerup=${this._endDrag} @pointercancel=${this._endDrag}>${this.title}</div>
-                <div class="title_bar_filler" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag} @pointermove=${this._drag} @pointerup=${this._endDrag} @pointercancel=${this._endDrag}></div>
-                <div class="title_bar_close_button_container" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag} @pointermove=${this._drag} @pointerup=${this._endDrag} @pointercancel=${this._endDrag}>
+                <div class="title_bar" id="title_bar" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag}>${this.title}</div>
+                <div class="title_bar_filler" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag}></div>
+                <div class="title_bar_close_button_container" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag}>
                     <img class="title_bar_close_button_image" id="close_button" @click=${this._removePanel} src=""/>
                 </div>                                
             </div>

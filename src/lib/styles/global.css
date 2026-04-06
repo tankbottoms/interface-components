@@ -116,4 +116,7 @@ pre {
 	.main-content {
 		padding: var(--spacing-md);
 	}
+	.site-header .site-title span {
+		display: none;
+	}
 }
