@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { ComponentDef } from '$lib/data/components';
 
+	declare const __BUILD_VERSION__: string;
+
 	interface Props {
 		components: ComponentDef[];
 	}
@@ -15,7 +17,7 @@
 		Based on the <a href="https://github.com/mlalma/magx/tree/main" target="_blank" rel="noopener"
 			>magx</a
 		> project by <a href="https://github.com/mlalma" target="_blank" rel="noopener">mlalma</a> —
-		I liked the components enough to build them into a library I could use for my own webapps.
+		I liked the components enough to build them into a library I could use for my own webapps. <span class="build-version">{__BUILD_VERSION__}</span>
 	</p>
 
 	<div class="hero-stats">
@@ -73,6 +75,13 @@
 	}
 	.hero-subtitle a {
 		color: var(--color-link);
+	}
+	.build-version {
+		font-size: 0.65rem;
+		color: var(--color-text-muted);
+		font-family: var(--font-mono);
+		letter-spacing: 0.02em;
+		opacity: 0.6;
 	}
 	.hero-stats {
 		display: flex;

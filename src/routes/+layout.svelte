@@ -9,8 +9,6 @@
 	import { accentColor, pastelSwatches } from '$lib/stores/highlight';
 	import { browser } from '$app/environment';
 
-	declare const __BUILD_VERSION__: string;
-
 	let { children } = $props();
 	let pickerOpen = $state(false);
 
@@ -46,7 +44,6 @@
 			<a href="/" class="site-title">
 				<span>Interface Components</span>
 			</a>
-			<span class="build-version">{__BUILD_VERSION__}</span>
 			{#if pickerOpen}
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -107,14 +104,6 @@
 	.icon-picker-trigger:hover {
 		opacity: 0.8;
 	}
-	.build-version {
-		font-size: 0.55rem;
-		color: var(--color-text-muted);
-		font-family: var(--font-mono);
-		letter-spacing: 0.02em;
-		opacity: 0.7;
-		white-space: nowrap;
-	}
 	.color-picker-popup {
 		position: absolute;
 		top: 100%;
@@ -152,10 +141,5 @@
 	.picker-swatch.active {
 		border-color: var(--color-text);
 		box-shadow: 0 0 0 1px var(--color-bg), 0 0 0 3px var(--color-text);
-	}
-	@media (max-width: 768px) {
-		.build-version {
-			display: none;
-		}
 	}
 </style>
