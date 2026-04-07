@@ -2,7 +2,6 @@ import { LitElement, css, html, PropertyValueMap } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 import { MagxPanelBaseElement } from "./Panel-BaseElement";
 import { MagxPanelConstants } from "./Panel-Constants";
-import { MagxHaptics } from "./Haptics";
 
 // Panel gathers all elements into a single whole that can be move around / collapsed
 @customElement(MagxPanelConstants.PANEL)
@@ -234,7 +233,6 @@ export class MagxPanel extends LitElement {
             document.addEventListener("pointermove", this._drag);
             document.addEventListener("pointerup", this._endDrag);
             document.addEventListener("pointercancel", this._endDrag);
-            MagxHaptics.trigger('light');
         }
         event.preventDefault();
     }

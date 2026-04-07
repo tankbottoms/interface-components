@@ -45,6 +45,12 @@
 							<magx-panel-button title="Click Me"></magx-panel-button>
 						</magx-panel>
 					</div>
+					<div class="haptic-note">
+						<strong>Haptic Feedback</strong> — Panel components provide native haptic feedback on mobile devices.
+						<strong>iOS</strong> (Safari 18+): uses transparent <code>&lt;input switch&gt;</code> overlays — tapping buttons, checkboxes, inputs, color pickers, date/time pickers, and dropdowns triggers the Taptic Engine via real touch on a switch checkbox wrapped in a label.
+						<strong>Android</strong>: uses <code>navigator.vibrate()</code> with PWM intensity modulation.
+						<em>Known limitation: range slider drag haptics are not yet supported on iOS — the switch checkbox approach requires discrete taps and cannot fire during continuous drag gestures.</em>
+					</div>
 				{/snippet}
 			</DemoContainer>
 		{:else if comp.id === 'button'}
@@ -621,6 +627,30 @@
 		color: var(--color-text-muted);
 		margin-bottom: 4px;
 		letter-spacing: 0.03em;
+	}
+	.haptic-note {
+		margin-top: 12px;
+		padding: 10px 14px;
+		font-size: 0.75rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: 4px;
+	}
+	.haptic-note strong {
+		color: var(--color-text);
+	}
+	.haptic-note code {
+		font-size: 0.7rem;
+		padding: 1px 4px;
+		background: var(--color-bg);
+		border-radius: 2px;
+	}
+	.haptic-note em {
+		display: block;
+		margin-top: 6px;
+		color: var(--color-text-muted);
 	}
 	@media (max-width: 768px) {
 		:global(.sparkline-grid) {

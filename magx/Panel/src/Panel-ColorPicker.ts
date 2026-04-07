@@ -32,17 +32,40 @@ export class MagxPanelColorPicker extends MagxPanelBaseElement {
     // Called when user changes the color *while* the color picker is shown
     private _valueChanged(): void {
         this._color = this._colorInput?.value ?? "Unknown";
-        MagxHaptics.trigger('light');
+        if (!MagxHaptics.isIOS && MagxHaptics.isMobile) {
+            MagxHaptics.trigger('light');
+        }
         this._notifyOnValueChange();
+    }
+
+    // Label+switch overlay fires iOS haptic on tap, then hides to let color picker open
+    private _hapticTap(e: Event): void {
+        const sw = e.target as HTMLInputElement;
+        requestAnimationFrame(() => { sw.checked = false; });
+        const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
+        if (overlay) overlay.style.display = 'none';
+        // Click the color input to open the picker
+        const colorInput = this.shadowRoot?.getElementById(`${this.id}_input`) as HTMLInputElement;
+        if (colorInput) colorInput.click();
+    }
+
+    // Reset haptic overlay when color picker interaction ends
+    private _handleBlur(): void {
+        this._removeFocus();
+        const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
+        if (overlay) overlay.style.display = '';
     }
 
     // Renders the component
     render() {
         return html`
-            <div tabIndex="0" class="container_base" id="container" @blur=${this._removeFocus} >
+            <div tabIndex="0" class="container_base" id="container" @blur=${this._handleBlur} >
                 <div class="label"><b>${this.title}:</b> ${this.color}</div>
-                <label class="color_label" for="${this.id}_input" style="background-color: ${this.color};"></label>
-                <input id="${this.id}_input" class="color" type="color" .value=${this.color} @input=${this._valueChanged}/>
+                <div class="color-wrapper">
+                    <label class="color_label" for="${this.id}_input" style="background-color: ${this.color};"></label>
+                    <input id="${this.id}_input" class="color" type="color" .value=${this.color} @input=${this._valueChanged}/>
+                    <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticTap} /></label>
+                </div>
             </div>
         `;
     }
@@ -78,6 +101,34 @@ export class MagxPanelColorPicker extends MagxPanelBaseElement {
             box-sizing: border-box;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        .color-wrapper {
+            position: relative;
+        }
+
+        .haptic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            touch-action: manipulation;
+            z-index: 2;
+            display: block;
+        }
+
+        .haptic-switch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.01;
+            appearance: auto;
+            cursor: pointer;
+            touch-action: manipulation;
         }
     `];
 

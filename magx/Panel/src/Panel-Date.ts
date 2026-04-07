@@ -65,12 +65,31 @@ export class MagxPanelDate extends MagxPanelBaseElement {
         this._maxDate = this._createDateString(date);
     }
     
+    // Label+switch overlay fires iOS haptic on tap, hides to let date picker open
+    private _hapticTap(e: Event): void {
+        const sw = e.target as HTMLInputElement;
+        requestAnimationFrame(() => { sw.checked = false; });
+        const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
+        if (overlay) overlay.style.display = 'none';
+        const input = this.shadowRoot?.getElementById(this.id) as HTMLInputElement;
+        if (input) { input.focus(); input.showPicker?.(); }
+    }
+
+    private _handleBlur(): void {
+        this._removeFocus();
+        const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
+        if (overlay) overlay.style.display = '';
+    }
+
     // Renders the component
     render() {
         return html`
         <div class="container_base" id="container">
             <div class="label"><b>${this.title}</b></div>
-            <input id=${this.id} class="text_input" type="date" .value=${this.dateValue} @input=${this._valueChanged} .min=${this._minDate} .max=${this._maxDate} @blur=${this._removeFocus} @focus=${this._addFocus}/>
+            <div class="input-wrapper">
+                <input id=${this.id} class="text_input" type="date" .value=${this.dateValue} @input=${this._valueChanged} .min=${this._minDate} .max=${this._maxDate} @blur=${this._handleBlur} @focus=${this._addFocus}/>
+                <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticTap} /></label>
+            </div>
         </div>
         `;
     }
@@ -85,6 +104,34 @@ export class MagxPanelDate extends MagxPanelBaseElement {
     static styles = [MagxPanelBaseElement._baseStyle, css`
         input::-webkit-calendar-picker-indicator {
             cursor: pointer;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .haptic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            touch-action: manipulation;
+            z-index: 1;
+            display: block;
+        }
+
+        .haptic-switch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.01;
+            appearance: auto;
+            cursor: pointer;
+            touch-action: manipulation;
         }
     `];
 

@@ -41,16 +41,31 @@ export class MagxPanelCheckbox extends MagxPanelBaseElement {
     private _mouseup(): void { this.doNotRemoveSelected = false; }
 
     // Renders the component
+    // A label wrapping a transparent switch overlay covers the container.
+    // iOS Safari fires native haptic when a <label> toggles a switch checkbox.
+    // The overlay intercepts the tap → haptic fires → handler forwards toggle to real checkbox.
     render() {
         return html`
             <div class="container_base" id="container" @mousedown=${this._mousedown} @mouseup=${this._mouseup}>
-                <label class="checkbox_label" for="${this.id}">${this.title}</label>
-                <label class="checkbox" for="${this.id}">
+                <label class="checkbox_label">${this.title}</label>
+                <label class="checkbox">
                     <input id="${this.id}" type="checkbox" .checked=${this.checked} @change=${this._valueChanged} @blur=${this._removeFocus} @focus=${this._addFocus} />
                     <span></span>
                 </label>
+                <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticTap} /></label>
             </div>
         `;
+    }
+
+    // Haptic overlay label toggled the switch → reset it and forward to real checkbox
+    private _hapticTap(e: Event): void {
+        const sw = e.target as HTMLInputElement;
+        requestAnimationFrame(() => { sw.checked = false; });
+        const real = this.shadowRoot?.getElementById(this.id) as HTMLInputElement;
+        if (real) {
+            real.checked = !real.checked;
+            real.dispatchEvent(new Event('change'));
+        }
     }
 
     // Called before the component is rendered for the first time
@@ -67,7 +82,7 @@ export class MagxPanelCheckbox extends MagxPanelBaseElement {
             display: inline;
         }
 
-        .checkbox input {                
+        .checkbox input[type="checkbox"]:not([switch]) {
             position: absolute;
             left: -99999px;
         }
@@ -82,6 +97,30 @@ export class MagxPanelCheckbox extends MagxPanelBaseElement {
 
         .checkbox input:checked + span {
             background: var(--magx-panel-checkbox-checked);
+        }
+
+        .haptic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            touch-action: manipulation;
+            z-index: 1;
+            display: block;
+        }
+
+        .haptic-switch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.01;
+            appearance: auto;
+            cursor: pointer;
+            touch-action: manipulation;
         }
 
         .checkbox_label {                

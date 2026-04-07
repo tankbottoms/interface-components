@@ -47,14 +47,26 @@ export class MagxPanelRange extends MagxPanelBaseElement {
 
     private _lastHapticValue: number = -1;
 
-    // Whenever user moves the slider, event is sent
+    // TODO: Slider drag haptics not working on iOS Safari.
+    // iOS only fires native haptic from real user touch on <label><input switch></label>.
+    // Programmatic .click() and MagxHaptics rAF toggle loop do NOT produce haptic
+    // during continuous drag gestures. navigator.vibrate() unsupported on iOS.
+    // Approaches tried: (1) overlay label+switch — blocks drag interaction,
+    // (2) off-screen label+switch with programmatic .click() — no haptic,
+    // (3) MagxHaptics.trigger() rAF loop — no haptic during drag.
+    // Possible solutions: custom slider built from div+label elements, or
+    // Web Audio API workaround. Android vibrate works via MagxHaptics.trigger().
+    private _hapticInterval: number = 5;
+
     private _valueChanged(): void {
         if (!this._inputField) { return; }
         const oldVal = this._value;
         this._value = parseInt(this._inputField.value);
-        if (this._value !== this._lastHapticValue) {
+        const lastSnap = Math.floor(this._lastHapticValue / this._hapticInterval);
+        const curSnap = Math.floor(this._value / this._hapticInterval);
+        if (curSnap !== lastSnap) {
             this._lastHapticValue = this._value;
-            MagxHaptics.trigger('light');
+            MagxHaptics.trigger('selection');
         }
         this.requestUpdate("value", oldVal);
         this._notifyOnValueChange();
@@ -64,7 +76,7 @@ export class MagxPanelRange extends MagxPanelBaseElement {
     render() {
         return html`
             <div class="container_base" id="container">
-                <div class="label"><b>${this.title}:</b> ${this.value}</div>                                
+                <div class="label"><b>${this.title}:</b> ${this.value}</div>
                 <input id="${this.id}" type="range" class="range" .value="${this.value}" @input=${this._valueChanged} @blur=${this._removeFocus} @focus=${this._addFocus} min="${this.min}" max="${this.max}" step="${this.step}" />
             </div>`;
     }
@@ -187,6 +199,7 @@ export class MagxPanelRange extends MagxPanelBaseElement {
         .number {
             height: var(--magx-panel-common-height);
         }
+
     `];
 
     // Returns current slider value

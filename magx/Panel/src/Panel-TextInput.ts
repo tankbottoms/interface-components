@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
+import { MagxHaptics } from './Haptics';
 
 // Single-line text input component. Text input style can be numbers, password or arbitrary text
 @customElement(MagxPanelConstants.PANEL_TEXTINPUT)
@@ -95,12 +96,37 @@ export class MagxPanelTextInput extends MagxPanelBaseElement {
         this._notifyOnValueChange();
     }
 
+    // Label+switch overlay fires iOS haptic on first tap, then hides to let input get focus
+    private _hapticFocus(e: Event): void {
+        const sw = e.target as HTMLInputElement;
+        requestAnimationFrame(() => { sw.checked = false; });
+        // Hide the label overlay so the input gets subsequent touches
+        const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
+        if (overlay) overlay.style.display = 'none';
+        // Focus the real input
+        const input = this.shadowRoot?.getElementById(this.id) as HTMLInputElement;
+        if (input) input.focus();
+        if (!MagxHaptics.isIOS && MagxHaptics.isMobile) {
+            MagxHaptics.trigger('light');
+        }
+    }
+
+    // Reset haptic overlay when focus leaves so next tap fires again
+    private _handleBlur(): void {
+        this._removeFocus();
+        const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
+        if (overlay) overlay.style.display = '';
+    }
+
     // Renders the element
     render() {
         return html`
             <div class="container_base" id="container">
-                <div class="label"><b>${this.title}</b></div>                
-                <input id=${this.id} class="text_input" type="${this._type}" @input=${this._valueChanged} .value=${this.text} @blur=${this._removeFocus} @focus=${this._addFocus} .placeholder=${this.placeholder} maxlength="${this.maxLength}" />
+                <div class="label"><b>${this.title}</b></div>
+                <div class="input-wrapper">
+                    <input id=${this.id} class="text_input" type="${this._type}" @input=${this._valueChanged} .value=${this.text} @blur=${this._handleBlur} @focus=${this._addFocus} .placeholder=${this.placeholder} maxlength="${this.maxLength}" />
+                    <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticFocus} /></label>
+                </div>
             </div>
         `;
     }
@@ -112,7 +138,34 @@ export class MagxPanelTextInput extends MagxPanelBaseElement {
     }
 
     // Stylesheet
-    static styles = [MagxPanelBaseElement._baseStyle, css`         
+    static styles = [MagxPanelBaseElement._baseStyle, css`
+        .input-wrapper {
+            position: relative;
+        }
+
+        .haptic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: text;
+            touch-action: manipulation;
+            z-index: 1;
+            display: block;
+        }
+
+        .haptic-switch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.01;
+            appearance: auto;
+            cursor: text;
+            touch-action: manipulation;
+        }
     `];
 
     // Returns input field value

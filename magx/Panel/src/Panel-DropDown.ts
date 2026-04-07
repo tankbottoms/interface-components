@@ -13,8 +13,6 @@ export interface MagxSelectValueCallback {
 // Dropdown element for the panel
 @customElement(MagxPanelConstants.PANEL_DROPDOWN)
 export class MagxPanelDropdown extends MagxPanelBaseElement {
-    @property({type: Boolean}) public _checked: boolean = false;
-
     private _dropdown: HTMLSelectElement | null = null;
     private _index: number = 0;
 
@@ -67,14 +65,33 @@ export class MagxPanelDropdown extends MagxPanelBaseElement {
         this.requestUpdate();
     }
 
+    // Label+switch overlay fires iOS haptic on tap, hides to let select open
+    private _hapticTap(e: Event): void {
+        const sw = e.target as HTMLInputElement;
+        requestAnimationFrame(() => { sw.checked = false; });
+        const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
+        if (overlay) overlay.style.display = 'none';
+        const select = this.shadowRoot?.getElementById(this.id) as HTMLSelectElement;
+        if (select) { select.focus(); select.showPicker?.(); }
+    }
+
+    private _handleBlur(): void {
+        this._removeFocus();
+        const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
+        if (overlay) overlay.style.display = '';
+    }
+
     // Renders the component
     render() {
         return html`
             <div class="container_base" id="container">
                 <label class="label"><b>${this.title}</b></label>
-                <select class="select" id=${this.id} @change=${this._valueChanged} .selectedIndex=${this.index} @blur=${this._removeFocus} @focus=${this._addFocus}>                    
-                </select>                                                
-                <slot id="to_be_removed"></slot>                
+                <div class="select-wrapper">
+                    <select class="select" id=${this.id} @change=${this._valueChanged} .selectedIndex=${this.index} @blur=${this._handleBlur} @focus=${this._addFocus}>
+                    </select>
+                    <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticTap} /></label>
+                </div>
+                <slot id="to_be_removed"></slot>
             </div>
         `;
     }
@@ -132,6 +149,34 @@ export class MagxPanelDropdown extends MagxPanelBaseElement {
 
         .select:hover {
             cursor: pointer;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .haptic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            touch-action: manipulation;
+            z-index: 1;
+            display: block;
+        }
+
+        .haptic-switch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.01;
+            appearance: auto;
+            cursor: pointer;
+            touch-action: manipulation;
         }
     `];
 

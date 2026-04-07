@@ -34,7 +34,7 @@ export const componentDefs: ComponentDef[] = [
 		category: 'container',
 		group: 'panel',
 		description:
-			'The main container component. A draggable, collapsible floating panel that groups child elements into a unified HUD-style interface. Supports positioning, z-index management, and serialization of all child values to/from JSON.',
+			'The main container component. A draggable, collapsible floating panel that groups child elements into a unified HUD-style interface. Supports positioning, z-index management, serialization of all child values to/from JSON, and native haptic feedback on mobile (iOS Safari 18+ via switch checkbox, Android via navigator.vibrate).',
 		properties: [
 			{
 				name: 'id',

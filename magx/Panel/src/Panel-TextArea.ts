@@ -2,6 +2,7 @@ import { css, html } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
+import { MagxHaptics } from './Haptics';
 
 // Text area element. Difference between text area and text input is that 
 // text area is multi-line compnent whereas TextInput is single-line
@@ -44,12 +45,35 @@ export class MagxPanelTextArea extends MagxPanelBaseElement {
         this._notifyOnValueChange();
     }
 
+    // Label+switch overlay fires iOS haptic on first tap, then hides to let textarea get focus
+    private _hapticFocus(e: Event): void {
+        const sw = e.target as HTMLInputElement;
+        requestAnimationFrame(() => { sw.checked = false; });
+        const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
+        if (overlay) overlay.style.display = 'none';
+        const ta = this.shadowRoot?.getElementById(this.id) as HTMLTextAreaElement;
+        if (ta) ta.focus();
+        if (!MagxHaptics.isIOS && MagxHaptics.isMobile) {
+            MagxHaptics.trigger('light');
+        }
+    }
+
+    // Reset haptic overlay when focus leaves
+    private _handleBlur(): void {
+        this._removeFocus();
+        const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
+        if (overlay) overlay.style.display = '';
+    }
+
     // Renders the element
     render() {
         return html`
             <div class="container_base" id="container">
-                <div class="label"><b>${this.title}</b></div>                
-                <textarea id=${this.id} class="textarea" @input=${this._valueChanged} .value=${this.text} @blur=${this._removeFocus} @focus=${this._addFocus} .placeholder=${this.placeholder} maxlength="${this.maxLength}" />
+                <div class="label"><b>${this.title}</b></div>
+                <div class="textarea-wrapper">
+                    <textarea id=${this.id} class="textarea" @input=${this._valueChanged} .value=${this.text} @blur=${this._handleBlur} @focus=${this._addFocus} .placeholder=${this.placeholder} maxlength="${this.maxLength}" />
+                    <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticFocus} /></label>
+                </div>
             </div>
         `;
     }
@@ -105,7 +129,35 @@ export class MagxPanelTextArea extends MagxPanelBaseElement {
 
         .textarea::-webkit-scrollbar-thumb:hover {
             background: var(--magx-panel-scrollbar-active);
-        }    
+        }
+
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        .haptic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: text;
+            touch-action: manipulation;
+            z-index: 1;
+            display: block;
+        }
+
+        .haptic-switch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.01;
+            appearance: auto;
+            cursor: text;
+            touch-action: manipulation;
+        }
     `];
 
     // Returns the current text
