@@ -11,34 +11,42 @@
 
 	let { children } = $props();
 	let pickerOpen = $state(false);
+	let justOpened = $state(false);
 
 	function selectColor(color: string) {
 		$accentColor = color;
 		pickerOpen = false;
 	}
 
-	function togglePicker(e: MouseEvent) {
+	function togglePicker(e: Event) {
 		e.preventDefault();
 		e.stopPropagation();
-		pickerOpen = !pickerOpen;
-	}
-
-	function closePicker() {
-		pickerOpen = false;
+		if (pickerOpen) {
+			pickerOpen = false;
+		} else {
+			pickerOpen = true;
+			justOpened = true;
+			setTimeout(() => (justOpened = false), 300);
+		}
 	}
 
 	$effect(() => {
 		if (!browser || !pickerOpen) return;
-		const handler = () => (pickerOpen = false);
-		document.addEventListener('click', handler);
-		return () => document.removeEventListener('click', handler);
+		const handler = (e: Event) => {
+			if (justOpened) return;
+			const popup = document.querySelector('.color-picker-popup');
+			if (popup && popup.contains(e.target as Node)) return;
+			pickerOpen = false;
+		};
+		document.addEventListener('pointerdown', handler);
+		return () => document.removeEventListener('pointerdown', handler);
 	});
 </script>
 
 <div class="app-shell">
 	<header class="site-header">
 		<div class="site-title-group">
-			<button class="icon-picker-trigger" onclick={togglePicker} title="Change highlight color">
+			<button class="icon-picker-trigger" onpointerup={togglePicker} title="Change highlight color">
 				<i class="fas fa-cubes"></i>
 			</button>
 			<a href="/" class="site-title">
@@ -47,7 +55,7 @@
 			{#if pickerOpen}
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<div class="color-picker-popup" onclick={(e) => e.stopPropagation()}>
+				<div class="color-picker-popup" onpointerdown={(e) => e.stopPropagation()}>
 					<div class="picker-label">Highlight Color</div>
 					<div class="picker-swatches">
 						{#each pastelSwatches as swatch (swatch.color)}
@@ -56,7 +64,7 @@
 								class:active={$accentColor === swatch.color}
 								style="background: {swatch.color};"
 								title={swatch.name}
-								onclick={() => selectColor(swatch.color)}
+								onpointerup={() => selectColor(swatch.color)}
 							></button>
 						{/each}
 					</div>
@@ -97,9 +105,11 @@
 		cursor: pointer;
 		font-size: 1.1rem;
 		color: var(--color-accent);
-		padding: 4px;
+		padding: 8px;
 		display: flex;
 		align-items: center;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
 	}
 	.icon-picker-trigger:hover {
 		opacity: 0.8;
@@ -129,11 +139,13 @@
 		gap: 6px;
 	}
 	.picker-swatch {
-		width: 28px;
-		height: 28px;
+		width: 36px;
+		height: 36px;
 		border: 2px solid transparent;
 		cursor: pointer;
 		transition: border-color 0.15s;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
 	}
 	.picker-swatch:hover {
 		border-color: var(--color-text);
