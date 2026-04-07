@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { faProIcons } from '$lib/data/fa-icons';
+	import { browser } from '$app/environment';
 
 	type Family = 'thin' | 'light' | 'solid' | 'sharp-thin';
 
@@ -12,6 +13,8 @@
 
 	let activeFamily = $state<Family>('thin');
 	let search = $state('');
+	let selectedIcon = $state<string | null>(null);
+	let copied = $state(false);
 
 	const activeClasses = $derived(families.find((f) => f.id === activeFamily)!.classes);
 
@@ -20,7 +23,31 @@
 			? faProIcons.filter((name) => name.includes(search.toLowerCase()))
 			: faProIcons
 	);
+
+	function openDetail(name: string) {
+		selectedIcon = name;
+		copied = false;
+	}
+
+	function closeDetail() {
+		selectedIcon = null;
+	}
+
+	function copySnippet() {
+		if (!browser || !selectedIcon) return;
+		const snippet = `<i class="${activeClasses} fa-${selectedIcon}"></i>`;
+		navigator.clipboard.writeText(snippet).then(() => {
+			copied = true;
+			setTimeout(() => (copied = false), 1500);
+		});
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && selectedIcon) closeDetail();
+	}
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <section class="fa-card">
 	<div class="card-header">
@@ -64,15 +91,51 @@
 
 	<div class="fa-icon-grid">
 		{#each filtered as name (name)}
-			<div class="fa-icon-cell" title={name}>
+			<button class="fa-icon-cell" title={name} onclick={() => openDetail(name)}>
 				<i class="{activeClasses} fa-{name}"></i>
 				<span>{name}</span>
-			</div>
+			</button>
 		{/each}
 	</div>
 
 	{#if filtered.length === 0}
 		<div class="fa-empty">No icons match "{search}"</div>
+	{/if}
+
+	{#if selectedIcon}
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="detail-overlay" onkeydown={handleKeydown}>
+			<button class="detail-backdrop" onclick={closeDetail} aria-label="Close"></button>
+			<div class="detail-panel">
+				<div class="detail-header">
+					<div>
+						<div class="detail-icon-name">fa-{selectedIcon}</div>
+						<div class="detail-icon-label">Font Awesome Pro 6.5.1</div>
+					</div>
+					<button class="detail-close" onclick={closeDetail}>&#x2715;</button>
+				</div>
+				<div class="detail-preview">
+					<h4>Preview</h4>
+					<div class="style-strip">
+						{#each families as fam (fam.id)}
+							<div class="style-strip-item">
+								<i class="{fam.classes} fa-{selectedIcon}"></i>
+								<span class="style-strip-label">{fam.label}</span>
+							</div>
+						{/each}
+					</div>
+				</div>
+				<div class="detail-body">
+					<h4>Usage</h4>
+					<div class="detail-snippet">
+						<code>&lt;i class="{activeClasses} fa-{selectedIcon}"&gt;&lt;/i&gt;</code>
+						<button class="detail-copy" onclick={copySnippet}>
+							{copied ? 'Copied' : 'Copy'}
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	{/if}
 
 	<div class="fa-footer">
@@ -226,7 +289,9 @@
 		gap: 4px;
 		padding: 8px 2px;
 		background: var(--color-bg-alt);
-		cursor: default;
+		cursor: pointer;
+		border: none;
+		font-family: var(--font-mono);
 	}
 	.fa-icon-cell:hover {
 		background: var(--color-hover-bg, var(--color-bg-secondary));
@@ -289,5 +354,135 @@
 		background: var(--color-accent);
 		color: var(--color-bg);
 		text-decoration: none;
+	}
+	.detail-overlay {
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 200;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.detail-backdrop {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background: rgba(0, 0, 0, 0.3);
+		border: none;
+		cursor: default;
+	}
+	.detail-panel {
+		position: relative;
+		width: 520px;
+		max-width: 92vw;
+		max-height: 85vh;
+		background: var(--color-bg-secondary);
+		border: 2px solid var(--color-border-dark);
+		overflow-y: auto;
+		z-index: 1;
+	}
+	.detail-header {
+		padding: var(--spacing-lg);
+		border-bottom: 1px solid var(--color-border);
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+	}
+	.detail-icon-name {
+		font-size: 1.1rem;
+		font-weight: 700;
+	}
+	.detail-icon-label {
+		font-size: 0.8rem;
+		color: var(--color-text-muted);
+	}
+	.detail-close {
+		font-family: var(--font-mono);
+		font-size: 16px;
+		border: 1px solid var(--color-border);
+		border-radius: 0;
+		background: var(--color-bg-secondary);
+		cursor: pointer;
+		padding: 4px 8px;
+		color: var(--color-text);
+	}
+	.detail-close:hover {
+		background: var(--color-hover-bg);
+	}
+	.detail-preview {
+		padding: var(--spacing-lg);
+		border-bottom: 1px solid var(--color-border);
+	}
+	.detail-preview h4,
+	.detail-body h4 {
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--color-text-muted);
+		margin-bottom: var(--spacing-sm);
+	}
+	.style-strip {
+		display: flex;
+		align-items: flex-end;
+		flex-wrap: wrap;
+		gap: var(--spacing-sm);
+		justify-content: space-between;
+	}
+	.style-strip-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--spacing-sm);
+		flex: 1 1 0;
+		min-width: 0;
+	}
+	.style-strip-item i {
+		font-size: 2.5rem;
+		color: var(--color-accent);
+	}
+	.style-strip-label {
+		font-size: 0.6rem;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+		letter-spacing: 0.02em;
+		font-weight: 600;
+	}
+	.detail-body {
+		padding: var(--spacing-lg);
+	}
+	.detail-snippet {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-sm);
+		background: var(--color-bg-alt);
+		border: 1px solid var(--color-border);
+		padding: var(--spacing-xs) var(--spacing-sm);
+	}
+	.detail-snippet code {
+		flex: 1;
+		font-size: 0.8rem;
+		word-break: break-all;
+	}
+	.detail-copy {
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		padding: 4px 10px;
+		border: 1px solid var(--color-accent);
+		background: none;
+		color: var(--color-accent);
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	.detail-copy:hover {
+		background: var(--color-accent);
+		color: var(--color-bg);
 	}
 </style>

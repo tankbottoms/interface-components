@@ -33,7 +33,7 @@ export class MagxPanel extends LitElement {
     private _overlay: HTMLDivElement | null = null;
     private _titleBar: HTMLDivElement | null = null;
     private _contentArea: HTMLDivElement | null = null;
-    private _closeButton: HTMLImageElement | null = null;
+    private _closeButton: HTMLElement | null = null;
 
     // Constructor
     constructor() {
@@ -283,8 +283,11 @@ export class MagxPanel extends LitElement {
             <div class="title_bar_container">
                 <div class="title_bar" id="title_bar" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag}>${this.title}</div>
                 <div class="title_bar_filler" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag}></div>
-                <div class="title_bar_close_button_container" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag}>
-                    <img class="title_bar_close_button_image" id="close_button" @click=${this._removePanel} src=""/>
+                <div class="title_bar_close_button_container" id="close_button" @click=${this._removePanel}>
+                    <svg class="title_bar_close_button_svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="25" y1="25" x2="75" y2="75" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+                        <line x1="75" y1="25" x2="25" y2="75" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+                    </svg>
                 </div>                                
             </div>
             <div class="content_area" id="content_area">
@@ -326,19 +329,9 @@ export class MagxPanel extends LitElement {
     }
 
     public setCloseButtonState(show: boolean): void {
-        if (!this._closeButton || !this._titleBar) { return; }
+        if (!this._closeButton) { return; }
         this._showCloseButton = show;
-        if (this._showCloseButton) {
-            const titleBarTextHeightStr = window.getComputedStyle(this._titleBar).getPropertyValue("height");
-            const titleBarTextHeight = parseFloat(titleBarTextHeightStr.substring(0, titleBarTextHeightStr.length - 2));
-            const closeButtonProps = window.getComputedStyle(this._closeButton);
-            const imgData = closeButtonProps.getPropertyValue("--magx-panel-closebutton");
-            this._closeButton.src = imgData.substring(2, imgData.length - 1);
-            this._closeButton.style.display = "block";
-            this._closeButton.style.height = (titleBarTextHeight * 0.66).toString() + "px";
-        } else {
-            this._closeButton.style.display = "none";
-        }
+        this._closeButton.style.display = this._showCloseButton ? "flex" : "none";
     }
 
     // Called before the component is rendered for the first time
@@ -349,7 +342,7 @@ export class MagxPanel extends LitElement {
 
         this._titleBar = this.shadowRoot?.getElementById("title_bar") as HTMLDivElement;
         this._contentArea = this.shadowRoot?.getElementById("content_area") as HTMLDivElement;
-        this._closeButton = this.shadowRoot?.getElementById("close_button") as HTMLImageElement;
+        this._closeButton = this.shadowRoot?.getElementById("close_button") as HTMLElement;
         this.setPosition(this._startX, this._startY);
         this.setCloseButtonState(this._showCloseButton);
     }
@@ -380,15 +373,17 @@ export class MagxPanel extends LitElement {
             -webkit-user-select: none;
             cursor: pointer;
             border: none;
-            touch-action: none;
+            padding: 0 4px;
+            color: var(--magx-panel-text-color);
         }
 
-        .title_bar_close_button_image {            
-            height: 0px;
-            margin-right: 5px;
-            cursor: default;
-            user-select: none;
-            -webkit-user-select: none;
+        .title_bar_close_button_container:hover {
+            opacity: 0.7;
+        }
+
+        .title_bar_close_button_svg {
+            width: 12px;
+            height: 12px;
         }
 
         .main_panel {

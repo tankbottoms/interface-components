@@ -2,7 +2,8 @@ node_modules
 .svelte-kit
 build
 .DS_Store
-.claude
+.claude/
+!CLAUDE.md
 .github-commit-messages
 bun.lock
 cf-deployment.md

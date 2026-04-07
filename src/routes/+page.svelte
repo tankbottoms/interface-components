@@ -51,7 +51,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Button Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="Button Demo" x="10" y="10">
 							<magx-panel-button title="Primary Action"></magx-panel-button>
 							<magx-panel-button title="Secondary"></magx-panel-button>
 						</magx-panel>
@@ -62,7 +62,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Checkbox Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="Checkbox Demo" x="10" y="10">
 							<magx-panel-checkbox title="Option A" checked></magx-panel-checkbox>
 							<magx-panel-checkbox title="Option B"></magx-panel-checkbox>
 						</magx-panel>
@@ -73,7 +73,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Color Picker Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="Color Picker Demo" x="10" y="10">
 							<magx-panel-colorpicker title="Foreground" value="#2563eb"></magx-panel-colorpicker>
 							<magx-panel-colorpicker title="Background" value="#1a1b26"></magx-panel-colorpicker>
 						</magx-panel>
@@ -84,7 +84,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Date Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="Date Demo" x="10" y="10">
 							<magx-panel-date title="Start Date"></magx-panel-date>
 							<magx-panel-date title="End Date"></magx-panel-date>
 						</magx-panel>
@@ -95,7 +95,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Dropdown Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="Dropdown Demo" x="10" y="10">
 							<magx-panel-dropdown title="Difficulty" index="1">
 								<option label="Easy">Easy</option>
 								<option label="Normal">Normal</option>
@@ -109,7 +109,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="File Chooser Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="File Chooser Demo" x="10" y="10">
 							<magx-panel-filechooser title="Upload" placeholderLabel="Choose a file..."
 							></magx-panel-filechooser>
 						</magx-panel>
@@ -120,7 +120,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="HTML Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="HTML Demo" x="10" y="10">
 							<magx-panel-html title="Custom Content">
 								<p style="color: #7c3aed; margin: 4px;">
 									<b>Bold</b>, <i>italic</i>, and <u>underlined</u> text
@@ -134,7 +134,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Image Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="Image Demo" x="10" y="10">
 							<magx-panel-image title="Screenshot" src="/screenshots/sparkline-examples.png"
 							></magx-panel-image>
 						</magx-panel>
@@ -145,7 +145,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Progress Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="Progress Demo" x="10" y="10">
 							<magx-panel-progressbar title="Upload" id="demo-pb" currentValue="65" maxValue="100"
 							></magx-panel-progressbar>
 						</magx-panel>
@@ -156,7 +156,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Range Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="Range Demo" x="10" y="10">
 							<magx-panel-range title="Brightness" min="0" max="100" step="1" value="75"
 							></magx-panel-range>
 							<magx-panel-range title="Contrast" min="-50" max="50" step="5" value="0"
@@ -169,7 +169,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Panel Sparkline Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="Panel Sparkline Demo" x="10" y="10">
 							<magx-panel-sparkline title="CPU Usage" id="demo-panel-sparkline"></magx-panel-sparkline>
 						</magx-panel>
 					</div>
@@ -179,7 +179,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="TextArea Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="TextArea Demo" x="10" y="10">
 							<magx-panel-textarea title="Notes" placeholder="Type your notes here..."
 							></magx-panel-textarea>
 						</magx-panel>
@@ -190,7 +190,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="TextInput Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="TextInput Demo" x="10" y="10">
 							<magx-panel-textinput title="Username" placeholder="Enter name..." type="text"
 							></magx-panel-textinput>
 							<magx-panel-textinput title="Age" type="number" min="0" max="150"
@@ -205,7 +205,7 @@
 			<DemoContainer>
 				{#snippet children()}
 					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Time Demo" x="10" y="10" closebutton="false">
+						<magx-panel title="Time Demo" x="10" y="10">
 							<magx-panel-time title="Alarm Time"></magx-panel-time>
 						</magx-panel>
 					</div>
@@ -214,9 +214,7 @@
 		{:else if comp.id === 'sparkline'}
 			<DemoContainer>
 				{#snippet children()}
-					<div
-						style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;"
-					>
+					<div class="sparkline-grid">
 						<!-- 1. Line — gradient fill, average ref line -->
 						<div>
 							<div class="spark-label">Line / Gradient Fill</div>
@@ -231,7 +229,7 @@
 								refLineType="average"
 								refLineCol="rgba(200,200,200,0.5)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 2. Bar — solid fill, bordered -->
@@ -244,7 +242,7 @@
 								filltype="solid"
 								fillCol="rgba(37,99,235,0.6)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 3. Line — above/below dual color -->
@@ -263,7 +261,7 @@
 								refLineType="middle"
 								refLineCol="rgba(200,200,200,0.4)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 4. Line — endpoint marker -->
@@ -279,7 +277,7 @@
 								endpointCol="rgba(234,179,8,1)"
 								endpointRadius="4"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 5. Bar — no border, solid fill -->
@@ -292,7 +290,7 @@
 								filltype="solid"
 								fillCol="rgba(16,185,129,0.7)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 6. Line — thin, no fill, median ref -->
@@ -308,7 +306,7 @@
 								refLineType="median"
 								refLineCol="rgba(239,68,68,0.3)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 7. Bar — gradient fill -->
@@ -322,7 +320,7 @@
 								fillAboveCol="rgba(168,85,247,0.6)"
 								fillBelowCol="rgba(168,85,247,0.1)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 8. Line — thick, solid fill, no ref -->
@@ -336,7 +334,7 @@
 								fillCol="rgba(6,182,212,0.25)"
 								lineWidth="3"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 9. Line — first data point ref -->
@@ -353,7 +351,7 @@
 								refLineType="firstdatapoint"
 								refLineCol="rgba(244,63,94,0.4)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 10. Bar — above/below dual color -->
@@ -371,7 +369,7 @@
 								refLineType="middle"
 								refLineCol="rgba(150,150,150,0.3)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 11. Line — minimal, hairline -->
@@ -385,7 +383,7 @@
 								fillCol="rgba(0,0,0,0)"
 								lineWidth="0.5"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 12. Bar — tall narrow, bordered, no fill -->
@@ -398,7 +396,7 @@
 								filltype="solid"
 								fillCol="rgba(0,0,0,0)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 13. Line — gradient, capped values -->
@@ -417,7 +415,7 @@
 								upperBound="25"
 								lowerBound="3"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 14. Line — above/below with endpoint -->
@@ -437,7 +435,7 @@
 								refLineType="middle"
 								refLineCol="rgba(150,150,150,0.3)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 15. Bar — solid fill, average ref -->
@@ -453,7 +451,7 @@
 								refLineCol="rgba(14,165,233,0.6)"
 								refLineWidth="2"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 16. Line — dense data, gradient -->
@@ -468,7 +466,7 @@
 								fillBelowCol="rgba(139,92,246,0.02)"
 								lineWidth="1.5"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 17. Bar — wide, no border, gradient -->
@@ -482,7 +480,7 @@
 								fillAboveCol="rgba(245,158,11,0.7)"
 								fillBelowCol="rgba(245,158,11,0.15)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 18. Line — custom ref line position -->
@@ -500,7 +498,7 @@
 								refLineCol="rgba(220,38,38,0.5)"
 								refLineWidth="1"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 19. Bar — dual color, median ref -->
@@ -518,7 +516,7 @@
 								refLineType="median"
 								refLineCol="rgba(150,150,150,0.4)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 20. Line — monotone uptrend, solid fill -->
@@ -534,7 +532,7 @@
 								endpointCol="rgba(34,197,94,1)"
 								endpointRadius="3"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 21. Line — downtrend, red gradient -->
@@ -551,7 +549,7 @@
 								endpointCol="rgba(239,68,68,1)"
 								endpointRadius="3"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 22. Bar — sparse, heavy border -->
@@ -565,7 +563,7 @@
 								filltype="solid"
 								fillCol="rgba(148,163,184,0.4)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 23. Line — volatile, first-last diff -->
@@ -583,7 +581,7 @@
 								refLineType="average"
 								refLineCol="rgba(150,150,150,0.3)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 						<!-- 24. Bar — no border, dark teal -->
@@ -598,7 +596,7 @@
 								refLineType="average"
 								refLineCol="rgba(20,184,166,0.5)"
 								bckgCol="rgba(0,0,0,0)"
-								style="width: 200px; height: 60px; display: block;"
+								style="width: 100%; height: 60px; display: block;"
 							></magx-sparkline>
 						</div>
 					</div>
@@ -611,6 +609,11 @@
 <FontAwesomeSection />
 
 <style>
+	:global(.sparkline-grid) {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 16px;
+	}
 	:global(.spark-label) {
 		font-size: 0.7rem;
 		font-weight: 600;
@@ -618,5 +621,25 @@
 		color: var(--color-text-muted);
 		margin-bottom: 4px;
 		letter-spacing: 0.03em;
+	}
+	@media (max-width: 768px) {
+		:global(.sparkline-grid) {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 0;
+		}
+		:global(.sparkline-grid > div) {
+			padding: 8px;
+			border-bottom: 1px solid var(--color-border);
+		}
+		:global(.sparkline-grid > div:nth-child(odd)) {
+			border-right: 1px solid var(--color-border);
+		}
+		:global(.sparkline-grid > div:nth-last-child(1)),
+		:global(.sparkline-grid > div:nth-last-child(2):nth-child(odd)) {
+			border-bottom: none;
+		}
+		:global(.sparkline-grid > div:nth-last-child(1):nth-child(even)) {
+			border-bottom: none;
+		}
 	}
 </style>
