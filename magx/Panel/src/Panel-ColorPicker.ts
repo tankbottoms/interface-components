@@ -36,17 +36,13 @@ export class MagxPanelColorPicker extends MagxPanelBaseElement {
         this._notifyOnValueChange();
     }
 
-    private _openPicker(): void {
-        this._colorInput?.click();
-    }
-
     // Renders the component
     render() {
         return html`
             <div tabIndex="0" class="container_base" id="container" @blur=${this._removeFocus} >
                 <div class="label"><b>${this.title}:</b> ${this.color}</div>
-                <input id="${this.id}" class="color" type="color" .value=${this.color} @input=${this._valueChanged} @click=${this._addFocus}/>
-                <div class="color_label" @pointerup=${this._openPicker} style="background-color: ${this.color};"></div>
+                <label class="color_label" for="${this.id}_input" style="background-color: ${this.color};"></label>
+                <input id="${this.id}_input" class="color" type="color" .value=${this.color} @input=${this._valueChanged}/>
             </div>
         `;
     }
@@ -54,7 +50,7 @@ export class MagxPanelColorPicker extends MagxPanelBaseElement {
     // Called before the component is rendered for the first time
     firstUpdated(): void {
         super.firstUpdated();
-        this._colorInput = this.shadowRoot?.getElementById(`${this.id}`) as HTMLInputElement;
+        this._colorInput = this.shadowRoot?.getElementById(`${this.id}_input`) as HTMLInputElement;
     }
 
     // Stylesheet
@@ -62,14 +58,15 @@ export class MagxPanelColorPicker extends MagxPanelBaseElement {
         .color {
             position: absolute;
             left: 0;
-            top: 0;
-            width: 1px;
-            height: 1px;
+            bottom: 0;
+            width: 100%;
+            height: 20px;
             opacity: 0;
-            pointer-events: none;
+            cursor: pointer;
         }
 
         .color_label {
+            position: relative;
             width: 100%;
             height: 20px;
             display: block;
