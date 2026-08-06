@@ -41,7 +41,7 @@
 							<magx-panel-textinput title="Name" placeholder="Type here..."></magx-panel-textinput>
 							<magx-panel-range title="Volume" min="0" max="100" step="5" value="50"
 							></magx-panel-range>
-							<magx-panel-colorpicker title="Color" value="#7c3aed"></magx-panel-colorpicker>
+							<magx-panel-colorpicker title="Color" value="#3792a4"></magx-panel-colorpicker>
 							<magx-panel-button title="Click Me"></magx-panel-button>
 						</magx-panel>
 					</div>
@@ -128,7 +128,7 @@
 					<div style="position: relative; min-height: 250px;">
 						<magx-panel title="HTML Demo" x="10" y="10">
 							<magx-panel-html title="Custom Content">
-								<p style="color: #7c3aed; margin: 4px;">
+								<p style="color: #3792a4; margin: 4px;">
 									<b>Bold</b>, <i>italic</i>, and <u>underlined</u> text
 								</p>
 							</magx-panel-html>

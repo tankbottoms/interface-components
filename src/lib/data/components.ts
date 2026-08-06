@@ -159,7 +159,7 @@ panel.setPosition(50, 50);`
 				description: 'Fired on color change'
 			}
 		],
-		codeExample: `<magx-panel-colorpicker title="Background" id="cp1" value="#7c3aed"></magx-panel-colorpicker>`
+		codeExample: `<magx-panel-colorpicker title="Background" id="cp1" value="#3792a4"></magx-panel-colorpicker>`
 	},
 	{
 		id: 'date',
