@@ -8,12 +8,92 @@
 	--color-border-light: #e7e5e4;
 	--color-border-dark: #a8a29e;
 	--color-hover-bg: #f5f5f4;
-	--color-link: #2563eb;
-	--color-accent: #7c3aed;
-	--color-success: #16a34a;
+	--color-link: #2f7f8f;
+	--color-accent: #3792a4;
+	--color-success: #5e9463;
 	--color-shadow: #d6d3d1;
 
+	/* --- Interface section: house-style paper surface ------------------ */
+	--paper: #f4f3ee;
+	--paper-card: #fbfaf6;
+	--paper-pane: #ffffff;
+	--ink: #1a1a1a;
+	--ink-muted: #6b6b6b;
+	--ink-soft: #8f8f89;
+	--ink-note: #5a5a55;
+	--rule: #1a1a1a;
+	--rule-soft: #d4d3cc;
+	--rule-hair: #e2e1da;
+	--brutal-shadow: 3px 3px 0 var(--rule);
+
+	/* --- 8 Elegant Pastels (fills) ------------------------------------ */
+	--pastel-orchid: #f4e1fc;
+	--pastel-violet: #f0befa;
+	--pastel-peach: #fcdcc7;
+	--pastel-vanilla: #fcf7dc;
+	--pastel-blush: #ffe6e6;
+	--pastel-rose: #ffc2d0;
+	--pastel-aqua: #afeffd;
+	--pastel-mint: #e0fff1;
+
+	/* --- House / postcrime / gpumon pastels (fills) -------------------- */
+	--pastel-indigo: #bdbedc;
+	--pastel-cyan: #80deea;
+	--pastel-green: #a5d6a7;
+	--pastel-amber: #ffd54f;
+	--pastel-coral: #ef9a9a;
+	--pastel-lilac: #d1c4e9;
+	--pastel-teal: #b2dfdb;
+	--pastel-lime: #d4f1a8;
+
+	/* --- Darkened companions (strokes, legend keys, text on pastel) ---- */
+	--stroke-orchid: #9a6bb0;
+	--stroke-violet: #a855c4;
+	--stroke-peach: #c97e45;
+	--stroke-vanilla: #b39b3c;
+	--stroke-blush: #c77070;
+	--stroke-rose: #c75f81;
+	--stroke-aqua: #2e8fa6;
+	--stroke-mint: #3e9b72;
+	--stroke-indigo: #6e6fa8;
+	--stroke-cyan: #3792a4;
+	--stroke-green: #5e9463;
+	--stroke-amber: #b08a2a;
+	--stroke-coral: #c06060;
+	--stroke-lilac: #7e63b0;
+	--stroke-teal: #3e8f86;
+	--stroke-lime: #6f9435;
+
+	/* --- Categorical chart series ------------------------------------- */
+	--chart-1: #80deea;
+	--chart-2: #ffc2d0;
+	--chart-3: #ffd54f;
+	--chart-4: #bdbedc;
+	--chart-5: #a5d6a7;
+	--chart-6: #f0befa;
+	--chart-7: #fcdcc7;
+	--chart-8: #b2dfdb;
+	--chart-1-stroke: #3792a4;
+	--chart-2-stroke: #c75f81;
+	--chart-3-stroke: #b08a2a;
+	--chart-4-stroke: #6e6fa8;
+	--chart-5-stroke: #5e9463;
+	--chart-6-stroke: #a855c4;
+	--chart-7-stroke: #c97e45;
+	--chart-8-stroke: #3e8f86;
+
+	/* --- Status ------------------------------------------------------- */
+	--status-ok: #a5d6a7;
+	--status-ok-stroke: #5e9463;
+	--status-warn: #ffd54f;
+	--status-warn-stroke: #b08a2a;
+	--status-crit: #ef9a9a;
+	--status-crit-stroke: #c06060;
+	--status-idle: #bdbedc;
+	--status-idle-stroke: #6e6fa8;
+
 	--font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+	--font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
 	--spacing-xs: 0.25rem;
 	--spacing-sm: 0.5rem;
 	--spacing-md: 1rem;
@@ -31,13 +111,87 @@
 	--color-text: #dce0f8;
 	--color-text-muted: #7982a9;
 	--color-border: #414868;
-	--color-border-light: #414868;
-	--color-border-dark: #7dcfff;
+	--color-border-light: #2c3049;
+	--color-border-dark: #414868;
 	--color-hover-bg: #292e42;
 	--color-link: #7dcfff;
-	--color-accent: #bb9af7;
+	--color-accent: #80deea;
 	--color-success: #9ece6a;
 	--color-shadow: #414868;
+
+	--paper: #1a1b26;
+	--paper-card: #1f2335;
+	--paper-pane: #24283b;
+	--ink: #dce0f8;
+	--ink-muted: #7982a9;
+	--ink-soft: #5c6485;
+	--ink-note: #8a92b8;
+	--rule: #545c7e;
+	--rule-soft: #3b4261;
+	--rule-hair: #2c3049;
+	--brutal-shadow: 3px 3px 0 #2c3049;
+
+	/* Pastels are dimmed for dark paper: same hue, lower luminance, so a
+	   category keeps its identity across the theme flip without glowing. */
+	--pastel-orchid: #4a3b52;
+	--pastel-violet: #5c3f66;
+	--pastel-peach: #5c4534;
+	--pastel-vanilla: #55503a;
+	--pastel-blush: #55393c;
+	--pastel-rose: #5e3746;
+	--pastel-aqua: #29505c;
+	--pastel-mint: #2d5245;
+	--pastel-indigo: #3f4066;
+	--pastel-cyan: #2a5a63;
+	--pastel-green: #38553a;
+	--pastel-amber: #5c4a1e;
+	--pastel-coral: #5c3a3a;
+	--pastel-lilac: #453a5e;
+	--pastel-teal: #315450;
+	--pastel-lime: #47581f;
+
+	--stroke-orchid: #c9a3da;
+	--stroke-violet: #dc9cf0;
+	--stroke-peach: #eba874;
+	--stroke-vanilla: #d9c46b;
+	--stroke-blush: #eda0a0;
+	--stroke-rose: #f090ac;
+	--stroke-aqua: #6fd3e8;
+	--stroke-mint: #74d6a9;
+	--stroke-indigo: #a2a3d8;
+	--stroke-cyan: #6fd3e8;
+	--stroke-green: #93c996;
+	--stroke-amber: #e6c060;
+	--stroke-coral: #ec9494;
+	--stroke-lilac: #b39ae0;
+	--stroke-teal: #7ec8c0;
+	--stroke-lime: #b0d472;
+
+	--chart-1: #2a5a63;
+	--chart-2: #5e3746;
+	--chart-3: #5c4a1e;
+	--chart-4: #3f4066;
+	--chart-5: #38553a;
+	--chart-6: #5c3f66;
+	--chart-7: #5c4534;
+	--chart-8: #315450;
+	--chart-1-stroke: #6fd3e8;
+	--chart-2-stroke: #f090ac;
+	--chart-3-stroke: #e6c060;
+	--chart-4-stroke: #a2a3d8;
+	--chart-5-stroke: #93c996;
+	--chart-6-stroke: #dc9cf0;
+	--chart-7-stroke: #eba874;
+	--chart-8-stroke: #7ec8c0;
+
+	--status-ok: #38553a;
+	--status-ok-stroke: #93c996;
+	--status-warn: #5c4a1e;
+	--status-warn-stroke: #e6c060;
+	--status-crit: #5c3a3a;
+	--status-crit-stroke: #ec9494;
+	--status-idle: #3f4066;
+	--status-idle-stroke: #a2a3d8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -48,12 +202,84 @@
 		--color-text: #dce0f8;
 		--color-text-muted: #7982a9;
 		--color-border: #414868;
-		--color-border-light: #414868;
-		--color-border-dark: #7dcfff;
+		--color-border-light: #2c3049;
+		--color-border-dark: #414868;
 		--color-hover-bg: #292e42;
 		--color-link: #7dcfff;
-		--color-accent: #bb9af7;
+		--color-accent: #80deea;
 		--color-success: #9ece6a;
 		--color-shadow: #414868;
+
+		--paper: #1a1b26;
+		--paper-card: #1f2335;
+		--paper-pane: #24283b;
+		--ink: #dce0f8;
+		--ink-muted: #7982a9;
+		--ink-soft: #5c6485;
+		--ink-note: #8a92b8;
+		--rule: #545c7e;
+		--rule-soft: #3b4261;
+		--rule-hair: #2c3049;
+		--brutal-shadow: 3px 3px 0 #2c3049;
+
+		--pastel-orchid: #4a3b52;
+		--pastel-violet: #5c3f66;
+		--pastel-peach: #5c4534;
+		--pastel-vanilla: #55503a;
+		--pastel-blush: #55393c;
+		--pastel-rose: #5e3746;
+		--pastel-aqua: #29505c;
+		--pastel-mint: #2d5245;
+		--pastel-indigo: #3f4066;
+		--pastel-cyan: #2a5a63;
+		--pastel-green: #38553a;
+		--pastel-amber: #5c4a1e;
+		--pastel-coral: #5c3a3a;
+		--pastel-lilac: #453a5e;
+		--pastel-teal: #315450;
+		--pastel-lime: #47581f;
+
+		--stroke-orchid: #c9a3da;
+		--stroke-violet: #dc9cf0;
+		--stroke-peach: #eba874;
+		--stroke-vanilla: #d9c46b;
+		--stroke-blush: #eda0a0;
+		--stroke-rose: #f090ac;
+		--stroke-aqua: #6fd3e8;
+		--stroke-mint: #74d6a9;
+		--stroke-indigo: #a2a3d8;
+		--stroke-cyan: #6fd3e8;
+		--stroke-green: #93c996;
+		--stroke-amber: #e6c060;
+		--stroke-coral: #ec9494;
+		--stroke-lilac: #b39ae0;
+		--stroke-teal: #7ec8c0;
+		--stroke-lime: #b0d472;
+
+		--chart-1: #2a5a63;
+		--chart-2: #5e3746;
+		--chart-3: #5c4a1e;
+		--chart-4: #3f4066;
+		--chart-5: #38553a;
+		--chart-6: #5c3f66;
+		--chart-7: #5c4534;
+		--chart-8: #315450;
+		--chart-1-stroke: #6fd3e8;
+		--chart-2-stroke: #f090ac;
+		--chart-3-stroke: #e6c060;
+		--chart-4-stroke: #a2a3d8;
+		--chart-5-stroke: #93c996;
+		--chart-6-stroke: #dc9cf0;
+		--chart-7-stroke: #eba874;
+		--chart-8-stroke: #7ec8c0;
+
+		--status-ok: #38553a;
+		--status-ok-stroke: #93c996;
+		--status-warn: #5c4a1e;
+		--status-warn-stroke: #e6c060;
+		--status-crit: #5c3a3a;
+		--status-crit-stroke: #ec9494;
+		--status-idle: #3f4066;
+		--status-idle-stroke: #a2a3d8;
 	}
 }

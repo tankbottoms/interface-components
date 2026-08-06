@@ -1,13 +1,19 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
+import { accentSwatches, DEFAULT_ACCENT } from '$lib/data/palette';
 
 const STORAGE_KEY = 'interface-components-accent';
 
-const defaultAccent = '#7c3aed';
+/** Accents retired in the teal rebrand — migrate anyone still holding one. */
+const RETIRED = new Set(['#7c3aed', '#a78bfa', '#c4b5fd']);
+
+const defaultAccent = DEFAULT_ACCENT;
 
 function getInitial(): string {
 	if (browser) {
-		return localStorage.getItem(STORAGE_KEY) || defaultAccent;
+		const stored = localStorage.getItem(STORAGE_KEY);
+		if (!stored || RETIRED.has(stored.toLowerCase())) return defaultAccent;
+		return stored;
 	}
 	return defaultAccent;
 }
@@ -21,17 +27,4 @@ if (browser) {
 	});
 }
 
-export const pastelSwatches = [
-	{ name: 'Violet', color: '#7c3aed' },
-	{ name: 'Lavender', color: '#a78bfa' },
-	{ name: 'Rose', color: '#f472b6' },
-	{ name: 'Coral', color: '#fb7185' },
-	{ name: 'Peach', color: '#fdba74' },
-	{ name: 'Butter', color: '#fde047' },
-	{ name: 'Mint', color: '#6ee7b7' },
-	{ name: 'Sage', color: '#86efac' },
-	{ name: 'Sky', color: '#7dd3fc' },
-	{ name: 'Powder', color: '#93c5fd' },
-	{ name: 'Lilac', color: '#c4b5fd' },
-	{ name: 'Blush', color: '#fda4af' },
-];
+export const pastelSwatches = accentSwatches;

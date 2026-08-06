@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '$lib/styles/theme.css';
 	import '$lib/styles/global.css';
+	import '$lib/styles/interface.css';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import SearchBar from '$lib/components/SearchBar.svelte';
 	import SideNav from '$lib/components/SideNav.svelte';

@@ -1,0 +1,719 @@
+/**
+ * Interface section design system.
+ *
+ * A distillation of the shared house style running across house / gpumon /
+ * seaweed-stats / claude-proxy / postcrime: cream paper, ink rules, mono
+ * uppercase labels, pastel category fills, and hard (unblurred) shadows.
+ *
+ * Scoped under `.ifc` so it never leaks into the Components pages, which keep
+ * the original documentation styling.
+ */
+
+.ifc {
+	font-family: var(--font-mono);
+	color: var(--ink);
+}
+
+/* --- Page furniture ------------------------------------------------- */
+
+.ifc-page-head {
+	border-bottom: 2px solid var(--rule);
+	padding-bottom: var(--spacing-md);
+	margin-bottom: var(--spacing-xl);
+}
+.ifc-eyebrow {
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--color-accent);
+}
+.ifc-page-title {
+	font-size: 2rem;
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+	line-height: 1.1;
+	margin: 0.15rem 0 0.4rem;
+}
+.ifc-page-lede {
+	font-size: 0.82rem;
+	color: var(--ink-note);
+	max-width: 72ch;
+	line-height: 1.65;
+}
+
+/* Section header: numbered tag, bold title, right-aligned hint. */
+.ifc-sec {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+	margin: var(--spacing-xl) 0 var(--spacing-sm);
+	border-bottom: 1px solid var(--rule-soft);
+	padding-bottom: var(--spacing-xs);
+}
+.ifc-sec-tag {
+	border: 1px solid var(--rule);
+	padding: 1px 6px;
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	white-space: nowrap;
+}
+.ifc-sec-title {
+	font-size: 1rem;
+	font-weight: 800;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+}
+.ifc-sec-hint {
+	margin-left: auto;
+	font-size: 0.68rem;
+	color: var(--ink-soft);
+	letter-spacing: 0.04em;
+	text-align: right;
+}
+.ifc-sec-note {
+	font-size: 0.78rem;
+	color: var(--ink-note);
+	line-height: 1.65;
+	margin-bottom: var(--spacing-md);
+	max-width: 90ch;
+}
+
+/* --- Cards ---------------------------------------------------------- */
+
+.ifc-card {
+	border: 1px solid var(--rule);
+	background: var(--paper-card);
+	padding: var(--spacing-md);
+	min-width: 0;
+}
+.ifc-card-hdr {
+	display: flex;
+	align-items: baseline;
+	gap: var(--spacing-sm);
+	margin-bottom: 2px;
+}
+.ifc-card-title {
+	font-size: 0.74rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+.ifc-card-meta {
+	margin-left: auto;
+	font-size: 0.62rem;
+	letter-spacing: 0.08em;
+	color: var(--ink-soft);
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+.ifc-card-sub {
+	font-size: 0.66rem;
+	color: var(--ink-muted);
+	margin-bottom: var(--spacing-sm);
+}
+
+.ifc-grid {
+	display: grid;
+	gap: var(--spacing-md);
+}
+.ifc-grid-2 {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.ifc-grid-3 {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.ifc-grid-4 {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.ifc-grid-auto {
+	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+
+/* --- KPI tiles ------------------------------------------------------ */
+
+.ifc-tiles {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: var(--spacing-sm);
+}
+.ifc-tile {
+	border: 1px solid var(--rule);
+	background: var(--paper-card);
+	padding: 0.6rem 0.75rem;
+	text-align: center;
+}
+.ifc-tile-label {
+	font-size: 0.58rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--ink-muted);
+}
+.ifc-tile-value {
+	font-size: 1.45rem;
+	font-weight: 700;
+	line-height: 1.25;
+	font-variant-numeric: tabular-nums;
+}
+.ifc-tile-sub {
+	font-size: 0.6rem;
+	color: var(--ink-soft);
+}
+
+/* A tile row split by hairlines rather than gaps (the `house` sheet header). */
+.ifc-strip {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	border: 1px solid var(--rule);
+	border-top: 0;
+	background: var(--paper-card);
+}
+.ifc-strip > div {
+	padding: 0.5rem 0.8rem;
+	border-left: 1px solid var(--rule-soft);
+}
+.ifc-strip > div:first-child {
+	border-left: 0;
+}
+.ifc-strip-label {
+	font-size: 0.62rem;
+	color: var(--ink-muted);
+}
+.ifc-strip-value {
+	font-size: 1rem;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+/* --- Banners / notices ---------------------------------------------- */
+
+.ifc-banner {
+	display: flex;
+	gap: var(--spacing-sm);
+	align-items: flex-start;
+	background: var(--pastel-vanilla);
+	border-left: 5px solid var(--stroke-vanilla);
+	padding: 0.6rem 0.85rem;
+	font-size: 0.74rem;
+	line-height: 1.6;
+	color: var(--ink);
+}
+.ifc-banner strong {
+	font-weight: 700;
+}
+.ifc-banner.is-info {
+	background: var(--pastel-aqua);
+	border-left-color: var(--stroke-aqua);
+}
+.ifc-banner.is-ok {
+	background: var(--pastel-mint);
+	border-left-color: var(--stroke-mint);
+}
+.ifc-banner.is-crit {
+	background: var(--pastel-blush);
+	border-left-color: var(--stroke-coral);
+}
+
+/* Inline detection/annotation strip with a trailing action. */
+.ifc-notice {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+	border: 1px solid var(--rule-soft);
+	background: var(--paper-card);
+	padding: 0.5rem 0.75rem;
+	font-size: 0.72rem;
+}
+.ifc-notice-action {
+	margin-left: auto;
+	color: var(--color-accent);
+	white-space: nowrap;
+}
+
+/* --- Badges & pills -------------------------------------------------- */
+
+.ifc-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	border: 1px solid var(--rule);
+	padding: 1px 6px;
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+	background: var(--paper-pane);
+	color: var(--ink);
+}
+.ifc-badge.b-aqua { background: var(--pastel-aqua); border-color: var(--stroke-aqua); }
+.ifc-badge.b-mint { background: var(--pastel-mint); border-color: var(--stroke-mint); }
+.ifc-badge.b-rose { background: var(--pastel-rose); border-color: var(--stroke-rose); }
+.ifc-badge.b-blush { background: var(--pastel-blush); border-color: var(--stroke-blush); }
+.ifc-badge.b-peach { background: var(--pastel-peach); border-color: var(--stroke-peach); }
+.ifc-badge.b-vanilla { background: var(--pastel-vanilla); border-color: var(--stroke-vanilla); }
+.ifc-badge.b-violet { background: var(--pastel-violet); border-color: var(--stroke-violet); }
+.ifc-badge.b-orchid { background: var(--pastel-orchid); border-color: var(--stroke-orchid); }
+.ifc-badge.b-green { background: var(--pastel-green); border-color: var(--stroke-green); }
+.ifc-badge.b-amber { background: var(--pastel-amber); border-color: var(--stroke-amber); }
+.ifc-badge.b-cyan { background: var(--pastel-cyan); border-color: var(--stroke-cyan); }
+.ifc-badge.b-indigo { background: var(--pastel-indigo); border-color: var(--stroke-indigo); }
+.ifc-badge.b-coral { background: var(--pastel-coral); border-color: var(--stroke-coral); }
+.ifc-badge.b-lilac { background: var(--pastel-lilac); border-color: var(--stroke-lilac); }
+.ifc-badge.b-lime { background: var(--pastel-lime); border-color: var(--stroke-lime); }
+.ifc-badge.b-teal { background: var(--pastel-teal); border-color: var(--stroke-teal); }
+
+/* Emphasised badge — the hard-shadow "statistics" chip on the postcrime head. */
+.ifc-badge.is-raised {
+	box-shadow: var(--brutal-shadow);
+}
+
+/* Low-key pill used for statutes / keywords / tags. */
+.ifc-pill {
+	display: inline-block;
+	border: 1px solid var(--rule-soft);
+	background: var(--paper-pane);
+	padding: 2px 7px;
+	font-size: 0.66rem;
+	white-space: nowrap;
+	color: var(--ink);
+}
+.ifc-pill.is-link {
+	border-color: var(--color-accent);
+	color: var(--color-accent);
+}
+.ifc-pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 5px;
+}
+
+/* --- Legend --------------------------------------------------------- */
+
+.ifc-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--spacing-md);
+	margin-top: var(--spacing-sm);
+	font-size: 0.65rem;
+	color: var(--ink-muted);
+}
+.ifc-legend-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+}
+.ifc-legend-key {
+	width: 10px;
+	height: 10px;
+	border: 1px solid var(--rule);
+	flex-shrink: 0;
+}
+
+/* --- Tables --------------------------------------------------------- */
+
+.ifc-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.72rem;
+	font-variant-numeric: tabular-nums;
+}
+.ifc-table th {
+	text-align: left;
+	font-size: 0.6rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--ink-muted);
+	font-weight: 700;
+	padding: 0.4rem 0.6rem;
+	border-bottom: 1px solid var(--rule);
+}
+.ifc-table td {
+	padding: 0.35rem 0.6rem;
+	border-bottom: 1px solid var(--rule-hair);
+}
+.ifc-table td.num,
+.ifc-table th.num {
+	text-align: right;
+}
+.ifc-table tbody tr:hover {
+	background: var(--color-hover-bg);
+}
+.ifc-table .row-group td {
+	border-bottom: 1px solid var(--rule-soft);
+	font-weight: 700;
+}
+
+/* --- Expandable list rows (postcrime agency tree) -------------------- */
+
+.ifc-group {
+	border: 1px solid var(--rule);
+	background: var(--paper-card);
+	margin-bottom: var(--spacing-md);
+}
+.ifc-group-hdr {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-xs);
+	width: 100%;
+	background: var(--color-bg-secondary);
+	border: 0;
+	border-bottom: 1px solid var(--rule-soft);
+	padding: 0.45rem 0.7rem;
+	font-family: inherit;
+	font-size: 0.76rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--ink);
+	cursor: pointer;
+	text-align: left;
+}
+.ifc-row {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-xs);
+	width: 100%;
+	background: none;
+	border: 0;
+	border-left: 4px solid transparent;
+	border-bottom: 1px solid var(--rule-hair);
+	padding: 0.4rem 0.7rem;
+	font-family: inherit;
+	font-size: 0.72rem;
+	color: var(--ink);
+	cursor: pointer;
+	text-align: left;
+}
+.ifc-row:hover {
+	background: var(--color-hover-bg);
+}
+.ifc-row.is-open {
+	border-left-color: var(--color-accent);
+	background: var(--color-hover-bg);
+}
+.ifc-row-name {
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+}
+.ifc-row-badges {
+	margin-left: auto;
+	display: flex;
+	gap: 5px;
+	align-items: center;
+	flex-shrink: 0;
+}
+.ifc-row-detail {
+	border-left: 4px solid var(--color-accent);
+	border-bottom: 1px solid var(--rule-hair);
+	background: var(--paper-pane);
+	padding: 0.6rem 0.9rem;
+	font-size: 0.7rem;
+	color: var(--ink-note);
+}
+.ifc-caret {
+	width: 10px;
+	font-size: 0.6rem;
+	color: var(--ink-soft);
+	transition: transform 0.15s ease;
+	flex-shrink: 0;
+}
+.ifc-caret.is-open {
+	transform: rotate(90deg);
+}
+
+/* --- Meters (gpumon UTIL / MEM / PWR) -------------------------------- */
+
+.ifc-meter {
+	position: relative;
+	display: flex;
+	align-items: center;
+	border: 1px solid var(--rule);
+	height: 22px;
+	margin-bottom: 5px;
+	background: var(--paper-pane);
+	overflow: hidden;
+}
+.ifc-meter-fill {
+	position: absolute;
+	inset: 0 auto 0 0;
+}
+.ifc-meter-label {
+	position: relative;
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	padding: 0 6px;
+	border-right: 1px solid var(--rule);
+	background: var(--pastel-mint);
+	align-self: stretch;
+	display: flex;
+	align-items: center;
+}
+.ifc-meter-value {
+	position: relative;
+	margin-left: auto;
+	padding: 0 7px;
+	font-size: 0.66rem;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+/* --- Data-source chips (postcrime DB / FS latency) ------------------- */
+
+.ifc-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	border: 1px solid var(--rule-soft);
+	background: var(--paper-pane);
+	padding: 2px 7px;
+	font-size: 0.62rem;
+	letter-spacing: 0.05em;
+}
+.ifc-chip-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--status-ok-stroke);
+	flex-shrink: 0;
+}
+.ifc-chip-dot.is-warn { background: var(--status-warn-stroke); }
+.ifc-chip-dot.is-crit { background: var(--status-crit-stroke); }
+.ifc-chip-dot.is-idle { background: var(--status-idle-stroke); }
+.ifc-chip-label {
+	font-weight: 700;
+	text-transform: uppercase;
+}
+.ifc-chip-lat {
+	color: var(--ink-soft);
+	font-variant-numeric: tabular-nums;
+}
+
+/* --- Buttons -------------------------------------------------------- */
+
+.ifc-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	border: 1px solid var(--rule);
+	background: var(--paper-pane);
+	color: var(--ink);
+	font-family: inherit;
+	font-size: 0.66rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	padding: 4px 9px;
+	cursor: pointer;
+	text-decoration: none;
+}
+.ifc-btn:hover {
+	background: var(--color-hover-bg);
+	text-decoration: none;
+}
+.ifc-btn.is-active {
+	background: var(--color-accent);
+	border-color: var(--color-accent);
+	color: var(--paper-pane);
+}
+.ifc-btn-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+/* --- Key/value metadata block --------------------------------------- */
+
+.ifc-kv {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	gap: 3px var(--spacing-md);
+	font-size: 0.72rem;
+}
+.ifc-kv dt {
+	font-size: 0.6rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--ink-muted);
+	padding-top: 2px;
+}
+.ifc-kv dd {
+	margin: 0;
+}
+
+.ifc-block-hdr {
+	font-size: 0.68rem;
+	font-weight: 800;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--ink);
+	border-bottom: 1px solid var(--rule-soft);
+	padding-bottom: 3px;
+	margin: var(--spacing-lg) 0 var(--spacing-sm);
+}
+
+/* --- Chart chrome ---------------------------------------------------- */
+
+.ifc-chart {
+	position: relative;
+	width: 100%;
+}
+.ifc-chart svg {
+	display: block;
+	width: 100%;
+	height: auto;
+	overflow: visible;
+}
+.ifc-axis text {
+	font-size: 8px;
+	fill: var(--ink-soft);
+	font-family: var(--font-mono);
+}
+.ifc-axis line,
+.ifc-axis path {
+	stroke: var(--rule-hair);
+	shape-rendering: crispEdges;
+}
+
+/* Tooltip is positioned by the chart component in page-relative pixels. */
+.ifc-tip {
+	position: fixed;
+	z-index: 400;
+	pointer-events: none;
+	border: 1px solid var(--rule);
+	background: var(--paper-pane);
+	box-shadow: var(--brutal-shadow);
+	padding: 5px 8px;
+	font-size: 0.66rem;
+	line-height: 1.5;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+	color: var(--ink);
+}
+.ifc-tip-title {
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	font-size: 0.6rem;
+	color: var(--ink-muted);
+}
+.ifc-tip-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+.ifc-tip-key {
+	width: 8px;
+	height: 8px;
+	border: 1px solid var(--rule);
+	flex-shrink: 0;
+}
+.ifc-tip-val {
+	margin-left: auto;
+	font-weight: 700;
+	padding-left: var(--spacing-sm);
+}
+
+/* --- Split pane (document detail) ------------------------------------ */
+
+.ifc-split {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: var(--spacing-md);
+}
+.ifc-pane {
+	border: 1px solid var(--rule);
+	background: var(--paper-card);
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+.ifc-pane-hdr {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	border-bottom: 1px solid var(--rule-soft);
+	padding: 0.4rem 0.7rem;
+	font-size: 0.62rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--ink-muted);
+}
+.ifc-fulltext {
+	font-size: 0.68rem;
+	line-height: 1.7;
+	white-space: pre-wrap;
+	padding: 0.7rem;
+	margin: 0;
+	max-height: 460px;
+	overflow: auto;
+	color: var(--ink-note);
+}
+
+/* --- Breadcrumbs ----------------------------------------------------- */
+
+.ifc-crumbs {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 0.68rem;
+	color: var(--ink-soft);
+	border-bottom: 1px solid var(--rule-hair);
+	padding-bottom: 0.4rem;
+	margin-bottom: var(--spacing-sm);
+}
+.ifc-crumbs .sep {
+	opacity: 0.5;
+}
+.ifc-crumbs .current {
+	color: var(--ink);
+	font-weight: 700;
+}
+.ifc-crumb-tools {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* --- Misc ----------------------------------------------------------- */
+
+.ifc-mono-note {
+	font-size: 0.66rem;
+	color: var(--ink-soft);
+	line-height: 1.6;
+}
+.ifc-hr {
+	border: 0;
+	border-top: 1px solid var(--rule-hair);
+	margin: var(--spacing-lg) 0;
+}
+.ifc-stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-md);
+}
+.ifc-inline {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+@media (max-width: 900px) {
+	.ifc-grid-2,
+	.ifc-grid-3,
+	.ifc-grid-4,
+	.ifc-split {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.ifc-page-title {
+		font-size: 1.4rem;
+	}
+}
