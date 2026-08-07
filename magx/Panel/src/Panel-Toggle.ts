@@ -6,10 +6,12 @@ import { MagxHaptics } from './Haptics';
 
 // Square left-to-right sliding toggle switch.
 //
-// Deliberately shares the checkbox palette (--magx-panel-checkbox /
-// --magx-panel-checkbox-checked) so the two read as one family: the checkbox
-// answers "is this set?", the toggle answers "is this running?". The knob is
-// square, not round, to stay inside the panel's hard-edged geometry.
+// A toggle is drawn as an *outlined rectangle with a white square knob* — it
+// shares none of the checkbox's artwork. That separation is deliberate: the
+// checkbox glyph (a boxed X) answers "is this set?", the sliding rectangle
+// answers "is this running?", and a control that showed both at once would be
+// unreadable. The knob is square, not round, to stay inside the panel's
+// hard-edged geometry.
 @customElement(MagxPanelConstants.PANEL_TOGGLE)
 export class MagxPanelToggle extends MagxPanelBaseElement {
     @property({type: Boolean}) public _checked: boolean = false;
@@ -92,31 +94,37 @@ export class MagxPanelToggle extends MagxPanelBaseElement {
             left: -99999px;
         }
 
+        /* Outlined rectangle. No background image — see the class comment. */
         .track {
             display: block;
             position: relative;
             width: 34px;
             height: 16px;
-            background: var(--magx-panel-checkbox);
             box-sizing: border-box;
+            border: 1px solid var(--magx-panel-toggle-border, #6b6b6b);
+            background: var(--magx-panel-toggle-track, transparent);
+            transition: background 140ms linear;
         }
 
+        /* The knob is plain white so the travel is obvious against the outline. */
         .knob {
             position: absolute;
-            top: 2px;
-            left: 2px;
+            top: 1px;
+            left: 1px;
             width: 12px;
             height: 12px;
-            background: var(--magx-panel-bg, #222);
+            box-sizing: border-box;
+            background: var(--magx-panel-toggle-knob, #ffffff);
+            border: 1px solid var(--magx-panel-toggle-border, #6b6b6b);
             transition: left 140ms cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .toggle input:checked + .track {
-            background: var(--magx-panel-checkbox-checked);
+            background: var(--magx-panel-toggle-track-on, rgba(0, 0, 0, 0.16));
         }
 
         .toggle input:checked + .track .knob {
-            left: 20px;
+            left: 19px;
         }
 
         @media (prefers-reduced-motion: reduce) {

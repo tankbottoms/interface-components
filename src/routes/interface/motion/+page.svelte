@@ -91,7 +91,7 @@
 	<div class="ifc-sec">
 		<span class="ifc-sec-tag">01</span>
 		<span class="ifc-sec-title">Cursor-repel heading</span>
-		<span class="ifc-sec-hint">move the pointer through it</span>
+		<span class="ifc-sec-hint">sweep the pointer across the letters — they move out of its way</span>
 	</div>
 	<p class="ifc-sec-note">
 		Each glyph is a span carrying its own spring. The pointer pushes characters away with a linear
@@ -102,17 +102,34 @@
 		starts and the text stays ordinary.
 	</p>
 	<div class="ifc-card repel-stage">
+		<div class="ifc-card-title">Default — move your pointer through this line</div>
+		<div class="ifc-card-sub">
+			radius 80 · strength 18 · stiffness 0.08 · damping 0.78 — the reference setting the two
+			variations below are compared against
+		</div>
 		<RepelText text="INTERFACE" />
 	</div>
+	<p class="ifc-sec-note" style="margin-top:var(--spacing-sm)">
+		The two cards below run the same effect with one group of numbers changed, so the difference is
+		something you feel rather than read. Sweep the pointer across each at the same speed:
+		<strong>radius</strong> and <strong>strength</strong> control how far the pointer's influence
+		reaches and how hard it shoves; <strong>stiffness</strong> and <strong>damping</strong> control
+		how the glyphs travel home once it leaves.
+	</p>
 	<div class="ifc-grid ifc-grid-2" style="margin-top:var(--spacing-md)">
 		<div class="ifc-card">
-			<div class="ifc-card-title">Tighter radius</div>
-			<div class="ifc-card-sub">radius 46 · strength 26</div>
+			<div class="ifc-card-title">Short reach, hard shove</div>
+			<div class="ifc-card-sub">
+				radius 46 · strength 26 — only letters right under the pointer react, and they jump further
+			</div>
 			<RepelText text="COMPONENTS" radius={46} strength={26} size="clamp(1.4rem,5vw,2.6rem)" />
 		</div>
 		<div class="ifc-card">
-			<div class="ifc-card-title">Looser spring</div>
-			<div class="ifc-card-sub">stiffness 0.04 · damping 0.88</div>
+			<div class="ifc-card-title">Slow return, more overshoot</div>
+			<div class="ifc-card-sub">
+				stiffness 0.04 · damping 0.88 — letters drift back lazily and wobble past centre before
+				settling
+			</div>
 			<RepelText
 				text="PATTERNS"
 				stiffness={0.04}

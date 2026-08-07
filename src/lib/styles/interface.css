@@ -36,10 +36,13 @@
 	line-height: 1.1;
 	margin: 0.15rem 0 0.4rem;
 }
+/* Page intro runs the full content width. A measure cap reads as a stray
+   column against the full-bleed charts directly beneath it, so it is set in
+   `%` rather than `ch` deliberately. */
 .ifc-page-lede {
 	font-size: 0.82rem;
 	color: var(--ink-note);
-	max-width: min(72ch, 100%);
+	max-width: 100%;
 	line-height: 1.65;
 }
 
@@ -73,12 +76,13 @@
 	letter-spacing: 0.04em;
 	text-align: right;
 }
+/* Sub-title body text: full width, matching the lede above it. */
 .ifc-sec-note {
 	font-size: 0.78rem;
 	color: var(--ink-note);
 	line-height: 1.65;
 	margin-bottom: var(--spacing-md);
-	max-width: min(90ch, 100%);
+	max-width: 100%;
 }
 
 /* --- Cards ---------------------------------------------------------- */

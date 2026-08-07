@@ -38,12 +38,15 @@ export class MagxPanel extends LitElement {
     constructor() {
         super();
 
-        try { this._startX = parseInt(this.getAttribute("x") ?? "0"); } catch { this._startX = 0; }
-        try { this._startY = parseInt(this.getAttribute("y") ?? "0"); } catch { this._startY = 0; }
+        // NOTE: x/y are deliberately *not* read here. A custom element's
+        // constructor runs at createElement time, which under any client-side
+        // framework is before attributes are set — reading them here yields 0,0
+        // and every panel ends up stacked in the corner. They are read in
+        // firstUpdated() instead, where the markup is guaranteed complete.
+        this._startX = 0;
+        this._startY = 0;
         this.title = this.getAttribute("title") ?? "";
         this.id = this.getAttribute("id")?.trim() ?? "panel_" + Math.round(Math.random() * (1 << 24)).toString(16);
-        if (this.getAttribute("outofbounds")) { this._outOfBoundsCheck = this.getAttribute("outofbounds") === "true"; }
-        if (this.getAttribute("closebutton")) { this._showCloseButton = this.getAttribute("closebutton") === "true"; }
         this._bindHandlers();
     }
 
@@ -341,6 +344,17 @@ export class MagxPanel extends LitElement {
         this._titleBar = this.shadowRoot?.getElementById("title_bar") as HTMLDivElement;
         this._contentArea = this.shadowRoot?.getElementById("content_area") as HTMLDivElement;
         this._closeButton = this.shadowRoot?.getElementById("close_button") as HTMLElement;
+
+        // Positioning attributes are read here rather than in the constructor:
+        // see the note there. Values are parsed defensively because `x="12px"`
+        // and `x=""` are both things people write.
+        const px = parseInt(this.getAttribute("x") ?? "0", 10);
+        const py = parseInt(this.getAttribute("y") ?? "0", 10);
+        this._startX = Number.isFinite(px) ? px : 0;
+        this._startY = Number.isFinite(py) ? py : 0;
+        if (this.getAttribute("outofbounds")) { this._outOfBoundsCheck = this.getAttribute("outofbounds") === "true"; }
+        if (this.getAttribute("closebutton")) { this._showCloseButton = this.getAttribute("closebutton") === "true"; }
+
         this.setPosition(this._startX, this._startY);
         this.setCloseButtonState(this._showCloseButton);
     }

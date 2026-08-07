@@ -171,7 +171,7 @@
 		</div>
 
 		<div class="hero-spark">
-			<SparkGrid {fps} {seed} height={72} minWidth={160} />
+			<SparkGrid {fps} {seed} height={72} minWidth={160} limit={8} />
 			<p class="hero-spark-note">
 				Eight rendering variants of the same standalone <code>&lt;magx-sparkline&gt;</code> element —
 				line and bar, gradient and solid fills, above/below split colouring, endpoint dots, and

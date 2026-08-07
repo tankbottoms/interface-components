@@ -466,7 +466,11 @@ export class MagxSparkline extends LitElement {
         if (this._fillType === Filltype.Solid) {
             this._ctx.fillStyle = this._fillColor;
         } else if (this._fillType === Filltype.AboveOneColBelowOneCol) {
-            const yPos = Math.max(0.0001, Math.min(0.9999, referenceLineYpos / this._canvas.height));
+            // Clamped away from 0 and 1 by more than the +/-0.001 offsets used
+            // for the stops below: at 0.9999 the `yPos + 0.001` stop lands on
+            // 1.0009 and addColorStop throws IndexSizeError, which killed the
+            // whole fill whenever the reference line sat near the canvas edge.
+            const yPos = Math.max(0.002, Math.min(0.998, referenceLineYpos / this._canvas.height));
             const grd = this._ctx.createLinearGradient(0, 0, 0, this._canvas.height);
             grd.addColorStop(0, this._aboveBelowCols.above);
             grd.addColorStop(yPos - 0.001, this._aboveBelowCols.above);
@@ -475,7 +479,11 @@ export class MagxSparkline extends LitElement {
             grd.addColorStop(1, this._aboveBelowCols.below);
             this._ctx.fillStyle = grd;
         } else if (this._fillType === Filltype.Gradient) {
-            const yPos = Math.max(0.0001, Math.min(0.9999, referenceLineYpos / this._canvas.height));
+            // Clamped away from 0 and 1 by more than the +/-0.001 offsets used
+            // for the stops below: at 0.9999 the `yPos + 0.001` stop lands on
+            // 1.0009 and addColorStop throws IndexSizeError, which killed the
+            // whole fill whenever the reference line sat near the canvas edge.
+            const yPos = Math.max(0.002, Math.min(0.998, referenceLineYpos / this._canvas.height));
             const grd = this._ctx.createLinearGradient(0, 0, 0, this._canvas.height);            
             grd.addColorStop(0, this._aboveBelowCols.above);
             let c = this._aboveBelowVals.above;
@@ -520,7 +528,11 @@ export class MagxSparkline extends LitElement {
         if (this._fillType === Filltype.Solid) {
             this._ctx.fillStyle = this._fillColor;
         } else if (this._fillType === Filltype.AboveOneColBelowOneCol) {
-            const yPos = Math.max(0.0001, Math.min(0.9999, referenceLineYpos / this._canvas.height));
+            // Clamped away from 0 and 1 by more than the +/-0.001 offsets used
+            // for the stops below: at 0.9999 the `yPos + 0.001` stop lands on
+            // 1.0009 and addColorStop throws IndexSizeError, which killed the
+            // whole fill whenever the reference line sat near the canvas edge.
+            const yPos = Math.max(0.002, Math.min(0.998, referenceLineYpos / this._canvas.height));
             const grd = this._ctx.createLinearGradient(0, 0, 0, this._canvas.height);
             grd.addColorStop(0, this._aboveBelowCols.above);
             grd.addColorStop(yPos - 0.001, this._aboveBelowCols.above);
@@ -529,7 +541,11 @@ export class MagxSparkline extends LitElement {
             grd.addColorStop(1, this._aboveBelowCols.below);
             this._ctx.fillStyle = grd;
         } else if (this._fillType === Filltype.Gradient) {
-            const yPos = Math.max(0.0001, Math.min(0.9999, referenceLineYpos / this._canvas.height));
+            // Clamped away from 0 and 1 by more than the +/-0.001 offsets used
+            // for the stops below: at 0.9999 the `yPos + 0.001` stop lands on
+            // 1.0009 and addColorStop throws IndexSizeError, which killed the
+            // whole fill whenever the reference line sat near the canvas edge.
+            const yPos = Math.max(0.002, Math.min(0.998, referenceLineYpos / this._canvas.height));
             const grd = this._ctx.createLinearGradient(0, 0, 0, this._canvas.height);            
             grd.addColorStop(0, this._aboveBelowCols.above);
             let c = this._aboveBelowVals.above;

@@ -9,6 +9,11 @@
     --magx-panel-checkbox-checked: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAvElEQVQ4T63Tyw2EIBAA0OFKBxBL40wDRovAUACcKc1IB1zZDAkG18GYZTmSmafzgTnnMgwchoDWGlJKheGcP3JtnPceCqCUAmttSZznuYtgchsXQrgC+77DNE0kUpPbmBOoJaBOIVQylnqWgAAeKhDve/AN+EaklJBzhhgjWRoJVGTbNjiOowAIret6a+4jYIwpX8aDwLIs74C2D0IIYIyVP6Gm898m9kbVm85ljHUTf16k4VUefkwDrxk+zoUEwCt0GbUAAAAASUVORK5CYII=') no-repeat;
     --magx-panel-checkbox-label-left: 30px;
     --magx-panel-checkbox-label-top: 7px;
+    /* Toggle switch has its own tokens — it must never borrow the checkbox art. */
+    --magx-panel-toggle-border: #6b6b6b;
+    --magx-panel-toggle-track: transparent;
+    --magx-panel-toggle-track-on: rgba(0, 0, 0, 0.18);
+    --magx-panel-toggle-knob: #ffffff;
     --magx-panel-common-border: none;
     --magx-panel-common-height: 24px;
     --magx-panel-container-bg: #eeeeee;

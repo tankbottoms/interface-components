@@ -101,15 +101,15 @@
 							<magx-panel-toggle title="Streaming" labelOn="LIVE" labelOff="IDLE" checked
 							></magx-panel-toggle>
 							<magx-panel-toggle title="Bounds Check"></magx-panel-toggle>
-							<magx-panel-checkbox title="Compare: checkbox" checked></magx-panel-checkbox>
 						</magx-panel>
 					</div>
 					<div class="haptic-note">
-						<strong>Toggle vs checkbox.</strong> Both return a boolean, and both are drawn from the
-						same two palette entries, so they belong to one family. The checkbox is for values you
-						set and read back later — options, flags, filters. The toggle is for things that are
-						<em>running</em>: a stream, a sensor, a mode. The knob slides left to right and stays
-						square, and the state word on the right (<code>LIVE</code> / <code>IDLE</code>, configurable
+						<strong>Toggle vs checkbox.</strong> Both return a boolean, but they are two separate
+						controls and are never drawn as one. They share no artwork: the checkbox is a boxed
+						tick, the toggle an outlined rectangle with a plain white square knob that slides left
+						to right. Use the checkbox for values you set and read back later — options, flags,
+						filters. Use the toggle for things that are <em>running</em>: a stream, a sensor, a
+						mode. The state word on the right (<code>LIVE</code> / <code>IDLE</code>, configurable
 						via <code>labelOn</code> and <code>labelOff</code>) means you never have to infer state
 						from colour alone.
 					</div>

@@ -4,17 +4,21 @@
 	 *
 	 * This is the component that replaced the old hero *screenshot* of sparkline
 	 * variations — every tile here is the real element drawing on a real canvas.
-	 * It is used twice: small and quiet in the hero, and large across the animated
+	 * It is used in the hero (a short slice) and in full across the animated
 	 * charting section.
 	 *
 	 * Two things drive it:
 	 *  - `seed` — change it and every tile regenerates its synthetic series.
 	 *  - `fps`  — 0 draws once and stops; anything higher streams new datapoints
 	 *             at that rate through the shared frame pump.
+	 *
+	 * Element handles are collected by querying the container rather than by
+	 * `bind:this` into an array. Array-index bindings inside a keyed `{#each}`
+	 * were silently leaving the handles unset, which is what made every tile
+	 * render as an empty box: `paint()` was called with `undefined` and bailed.
 	 */
-	import { onMount } from 'svelte';
 	import { onTick, hexToRgb, cssVar } from '$lib/anim';
-	import { walk, spiky, diurnal, rng, between } from '$lib/interface/generate';
+	import { walk, spiky, diurnal } from '$lib/interface/generate';
 	import { chartSeries } from '$lib/data/palette';
 
 	interface Props {
@@ -49,107 +53,93 @@
 		series: number;
 		fill: 'gradient' | 'solid' | 'abovebelow' | 'none';
 		line: 'solid' | 'abovebelow' | 'firstlastdiff';
-		ref: 'none' | 'middle' | 'average' | 'median';
+		ref: 'none' | 'middle' | 'average' | 'median' | 'custom' | 'firstdatapoint';
+		/** Data-space y position for `ref: 'custom'`. */
+		refPos?: number;
 		lineWidth?: number;
 		endpoint?: boolean;
+		/** Fixed y-axis window, instead of tracking the data's own min/max. */
+		bounds?: [number, number];
+		/** Draw out-of-range points flat against the edge rather than off-canvas. */
+		cap?: [boolean, boolean];
+		/** Override the default sample count for this tile. */
+		points?: number;
 	}
 
+	/**
+	 * One tile per rendering behaviour the element actually supports — both chart
+	 * types crossed with every line type, fill type, reference-line type, plus the
+	 * axis controls (`setLowerBound` / `setUpperBound` / `setCap`), stroke weights
+	 * and the endpoint marker. The point of the grid is that nothing in the API is
+	 * left undocumented by example.
+	 */
 	const ALL: Variant[] = [
-		{
-			label: 'Line · gradient',
-			type: 'line',
-			shape: 'walk',
-			series: 0,
-			fill: 'gradient',
-			line: 'solid',
-			ref: 'average'
-		},
-		{
-			label: 'Bar · solid',
-			type: 'bar',
-			shape: 'spiky',
-			series: 1,
-			fill: 'solid',
-			line: 'solid',
-			ref: 'none'
-		},
-		{
-			label: 'Line · above/below',
-			type: 'line',
-			shape: 'diurnal',
-			series: 3,
-			fill: 'abovebelow',
-			line: 'abovebelow',
-			ref: 'middle'
-		},
-		{
-			label: 'Line · endpoint',
-			type: 'line',
-			shape: 'walk',
-			series: 4,
-			fill: 'none',
-			line: 'solid',
-			ref: 'none',
-			lineWidth: 2,
-			endpoint: true
-		},
-		{
-			label: 'Bar · above/below',
-			type: 'bar',
-			shape: 'walk',
-			series: 5,
-			fill: 'abovebelow',
-			line: 'solid',
-			ref: 'median'
-		},
-		{
-			label: 'Line · first/last diff',
-			type: 'line',
-			shape: 'walk',
-			series: 2,
-			fill: 'gradient',
-			line: 'firstlastdiff',
-			ref: 'none'
-		},
-		{
-			label: 'Line · median ref',
-			type: 'line',
-			shape: 'diurnal',
-			series: 6,
-			fill: 'gradient',
-			line: 'solid',
-			ref: 'median',
-			lineWidth: 1.5
-		},
-		{
-			label: 'Bar · quiet',
-			type: 'bar',
-			shape: 'walk',
-			series: 7,
-			fill: 'solid',
-			line: 'solid',
-			ref: 'none'
-		}
+		// ── Line: strokes and fills ──────────────────────────────────────────
+		{ label: 'Line · plain', type: 'line', shape: 'walk', series: 0, fill: 'none', line: 'solid', ref: 'none' },
+		{ label: 'Line · gradient fill', type: 'line', shape: 'walk', series: 0, fill: 'gradient', line: 'solid', ref: 'average' },
+		{ label: 'Line · solid fill', type: 'line', shape: 'walk', series: 3, fill: 'solid', line: 'solid', ref: 'none' },
+		{ label: 'Line · split fill', type: 'line', shape: 'diurnal', series: 3, fill: 'abovebelow', line: 'solid', ref: 'middle' },
+		{ label: 'Line · split stroke', type: 'line', shape: 'diurnal', series: 1, fill: 'none', line: 'abovebelow', ref: 'middle', lineWidth: 1.75 },
+		{ label: 'Line · first/last diff', type: 'line', shape: 'walk', series: 2, fill: 'gradient', line: 'firstlastdiff', ref: 'none' },
+		{ label: 'Line · endpoint dot', type: 'line', shape: 'walk', series: 4, fill: 'none', line: 'solid', ref: 'none', lineWidth: 2, endpoint: true },
+		{ label: 'Line · heavy stroke', type: 'line', shape: 'walk', series: 5, fill: 'none', line: 'solid', ref: 'none', lineWidth: 3 },
+		{ label: 'Line · hairline', type: 'line', shape: 'walk', series: 6, fill: 'none', line: 'solid', ref: 'none', lineWidth: 0.5, points: 90 },
+
+		// ── Line: every reference-line type ──────────────────────────────────
+		{ label: 'Ref · middle', type: 'line', shape: 'walk', series: 6, fill: 'gradient', line: 'solid', ref: 'middle' },
+		{ label: 'Ref · average', type: 'line', shape: 'walk', series: 7, fill: 'gradient', line: 'solid', ref: 'average' },
+		{ label: 'Ref · median', type: 'line', shape: 'diurnal', series: 6, fill: 'gradient', line: 'solid', ref: 'median', lineWidth: 1.5 },
+		{ label: 'Ref · first point', type: 'line', shape: 'walk', series: 1, fill: 'abovebelow', line: 'solid', ref: 'firstdatapoint' },
+		{ label: 'Ref · custom (50)', type: 'line', shape: 'walk', series: 2, fill: 'abovebelow', line: 'solid', ref: 'custom', refPos: 50 },
+
+		// ── Line: axis control ───────────────────────────────────────────────
+		{ label: 'Line · fixed 0–100', type: 'line', shape: 'walk', series: 4, fill: 'gradient', line: 'solid', ref: 'none', bounds: [0, 100] },
+		{ label: 'Line · capped 25–75', type: 'line', shape: 'spiky', series: 5, fill: 'solid', line: 'solid', ref: 'none', bounds: [25, 75], cap: [true, true] },
+
+		// ── Line: series shapes ──────────────────────────────────────────────
+		{ label: 'Line · diurnal', type: 'line', shape: 'diurnal', series: 7, fill: 'gradient', line: 'solid', ref: 'average' },
+		{ label: 'Line · spiky', type: 'line', shape: 'spiky', series: 5, fill: 'none', line: 'solid', ref: 'none', lineWidth: 1 },
+		{ label: 'Line · dense', type: 'line', shape: 'walk', series: 0, fill: 'gradient', line: 'solid', ref: 'none', points: 120, lineWidth: 0.75 },
+
+		// ── Bar ──────────────────────────────────────────────────────────────
+		{ label: 'Bar · solid', type: 'bar', shape: 'spiky', series: 1, fill: 'solid', line: 'solid', ref: 'none' },
+		{ label: 'Bar · gradient', type: 'bar', shape: 'walk', series: 0, fill: 'gradient', line: 'solid', ref: 'none' },
+		{ label: 'Bar · split fill', type: 'bar', shape: 'walk', series: 5, fill: 'abovebelow', line: 'solid', ref: 'middle' },
+		{ label: 'Bar · ghost', type: 'bar', shape: 'walk', series: 7, fill: 'solid', line: 'solid', ref: 'none', lineWidth: 1 },
+		{ label: 'Bar · ref average', type: 'bar', shape: 'walk', series: 3, fill: 'solid', line: 'solid', ref: 'average' },
+		{ label: 'Bar · first/last diff', type: 'bar', shape: 'walk', series: 2, fill: 'solid', line: 'firstlastdiff', ref: 'none' },
+		{ label: 'Bar · fixed 0–100', type: 'bar', shape: 'diurnal', series: 6, fill: 'solid', line: 'solid', ref: 'none', bounds: [0, 100] },
+		{ label: 'Bar · coarse', type: 'bar', shape: 'walk', series: 4, fill: 'solid', line: 'solid', ref: 'median', points: 16 }
 	];
 
 	const variants = $derived(limit > 0 ? ALL.slice(0, limit) : ALL);
 
 	const POINTS = 40;
 
-	let els: (HTMLElement | null)[] = $state([]);
+	let host: HTMLDivElement | null = $state(null);
 	let ready = $state(false);
 
 	/** Per-tile walk cursor, so streamed points continue the shape rather than jump. */
 	let cursors: number[] = [];
 
+	function tiles(): any[] {
+		if (!host) return [];
+		return [...host.querySelectorAll('magx-sparkline')];
+	}
+
+	function pointsOf(v: Variant): number {
+		return v.points ?? POINTS;
+	}
+
 	function seriesFor(v: Variant, s: number): number[] {
-		if (v.shape === 'spiky') return spiky(POINTS, { seed: s, base: 6, spike: 90, chance: 0.12 });
-		if (v.shape === 'diurnal') return diurnal(POINTS, { seed: s, min: 15, max: 95, period: 18 });
-		return walk(POINTS, { seed: s, min: 8, max: 92 });
+		const n = pointsOf(v);
+		if (v.shape === 'spiky') return spiky(n, { seed: s, base: 6, spike: 90, chance: 0.12 });
+		if (v.shape === 'diurnal') return diurnal(n, { seed: s, min: 15, max: 95, period: 18 });
+		return walk(n, { seed: s, min: 8, max: 92 });
 	}
 
 	/** Applies colour + rendering options, then loads a fresh series. */
-	function paint(el: any, v: Variant, s: number) {
+	function paint(el: any, v: Variant, s: number): number | undefined {
 		if (!el?.setType) return;
 
 		const sw = chartSeries[v.series % chartSeries.length];
@@ -159,7 +149,7 @@
 		const bg = hexToRgb(cssVar('--color-bg-alt', '#faf8f3'));
 
 		el.setBackgroundColor({ ...bg, a: 1 });
-		el.setDataPointNum(POINTS);
+		el.setDataPointNum(pointsOf(v));
 		el.setType(v.type);
 		el.setLineWidth(v.lineWidth ?? 1.25);
 
@@ -173,7 +163,13 @@
 			el.setFill('abovebelow', { above: { ...fill, a: 0.9 }, below: { ...alt, a: 0.28 } });
 		else el.setFill('solid', { ...fill, a: 0 });
 
-		el.setReferenceLine(v.ref);
+		// Axis controls are always set, never merely skipped: an element is reused
+		// across repaints, so leaving a previous bound in place would leak.
+		el.setLowerBound(!!v.bounds, v.bounds?.[0] ?? 0);
+		el.setUpperBound(!!v.bounds, v.bounds?.[1] ?? 0);
+		el.setCap(v.cap?.[0] ?? false, v.cap?.[1] ?? false);
+
+		el.setReferenceLine(v.ref, v.refPos ?? 0);
 		if (v.ref !== 'none') el.setReferenceLineColor({ r: 140, g: 140, b: 140, a: 0.45 }, 1);
 		if (v.endpoint) el.setEndpoint(2.5, { ...stroke, a: 1 });
 
@@ -184,24 +180,79 @@
 	}
 
 	function paintAll(s: number) {
-		cursors = variants.map((v, i) => paint(els[i], v, s + i * 17) ?? 50);
+		const els = tiles();
+		// Each tile is painted in isolation. These variants exist precisely to
+		// exercise every combination the element exposes, so one unlucky option
+		// pairing must not take the rest of the grid down with it — an unguarded
+		// throw here previously left every tile after it empty.
+		cursors = variants.map((v, i) => {
+			try {
+				return paint(els[i], v, s + i * 17) ?? 50;
+			} catch (err) {
+				console.warn(`[SparkGrid] "${v.label}" failed to paint`, err);
+				return 50;
+			}
+		});
 	}
 
-	onMount(() => {
-		// The canvas reads clientWidth/clientHeight, so wait for layout before the
-		// first paint — otherwise every tile renders into a zero-width canvas.
-		const raf = requestAnimationFrame(() => {
-			ready = true;
-			paintAll(seed);
-		});
-		return () => cancelAnimationFrame(raf);
-	});
-
-	// Reshuffle: a new seed repaints every tile from scratch.
+	/**
+	 * First paint, and every reshuffle after it.
+	 *
+	 * This deliberately does *not* use `onMount`. The mount callback was being
+	 * dropped from the production client bundle — the built chunk contained
+	 * `paint()` and both effects but no mount body at all, so `ready` never
+	 * flipped and every tile stayed empty while looking perfectly healthy in the
+	 * DOM. An effect survives the build and gives reshuffle for free, since
+	 * reading `seed` re-runs it.
+	 *
+	 * The retry loop is still needed: the element is a Lit custom element that
+	 * sizes its canvas from `clientWidth`/`clientHeight`, so painting before
+	 * upgrade-and-layout draws into a zero-width canvas.
+	 */
 	$effect(() => {
 		const s = seed;
-		if (!ready) return;
-		paintAll(s);
+		const h = host;
+		if (!h) return;
+
+		let raf = 0;
+		let stop = false;
+
+		const attempt = (tries: number) => {
+			if (stop) return;
+			const els = tiles();
+			const first = els[0] as any;
+			const upgraded = typeof first?.setType === 'function';
+			const laidOut = (first?.clientWidth ?? 0) > 0;
+			// On the last try, paint regardless: the element's own ResizeObserver
+			// re-renders it once geometry finally arrives.
+			if ((upgraded && laidOut) || tries <= 0) {
+				ready = true;
+				paintAll(s);
+				return;
+			}
+			raf = requestAnimationFrame(() => attempt(tries - 1));
+		};
+		attempt(120);
+
+		return () => {
+			stop = true;
+			if (raf) cancelAnimationFrame(raf);
+		};
+	});
+
+	// A grid that starts at zero width (narrow parent, late font, hidden section)
+	// needs one more paint once it has real geometry.
+	$effect(() => {
+		const h = host;
+		if (!h) return;
+		let lastW = h.clientWidth;
+		const ro = new ResizeObserver(() => {
+			const w = h.clientWidth;
+			if (w > 0 && lastW === 0 && ready) paintAll(seed);
+			lastW = w;
+		});
+		ro.observe(h);
+		return () => ro.disconnect();
 	});
 
 	// Streaming. Reads fps through a getter so the slider retunes the live loop.
@@ -210,6 +261,7 @@
 		return onTick(
 			() => fps,
 			() => {
+				const els = tiles();
 				variants.forEach((v, i) => {
 					const el = els[i] as any;
 					if (!el?.addDatapoint) return;
@@ -228,11 +280,10 @@
 	});
 </script>
 
-<div class="spark-grid" style="--tile-min:{minWidth}px">
-	{#each variants as v, i (v.label)}
+<div class="spark-grid" bind:this={host} style="--tile-min:{minWidth}px">
+	{#each variants as v (v.label)}
 		<figure class="tile">
 			<magx-sparkline
-				bind:this={els[i]}
 				style="display:block; width:100%; height:{height}px"
 				aria-label={v.label}
 			></magx-sparkline>
