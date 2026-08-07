@@ -22,6 +22,8 @@
 		{ href: '/interface/charting', name: 'Charting', icon: 'fa-chart-column' },
 		{ href: '/interface/layout', name: 'Layout & Data', icon: 'fa-table-cells-large' },
 		{ href: '/interface/documents', name: 'Documents', icon: 'fa-file-lines' },
+		{ href: '/interface/motion', name: 'Motion', icon: 'fa-wand-magic-sparkles' },
+		{ href: '/interface/consoles', name: 'Panel Consoles', icon: 'fa-sliders' },
 		{ href: '/interface/palette', name: 'Palette', icon: 'fa-palette' }
 	];
 
@@ -42,8 +44,10 @@
 			{ rootMargin: '-20% 0px -60% 0px', root: document.querySelector('.main-content') }
 		);
 
-		for (const comp of components) {
-			const el = document.getElementById(comp.id);
+		// Component anchors plus the standalone sections that are not components.
+		const ids = [...components.map((c) => c.id), 'sparkline-animated', 'panel-hooks'];
+		for (const id of ids) {
+			const el = document.getElementById(id);
 			if (el) observer.observe(el);
 		}
 
@@ -58,13 +62,34 @@
 		}
 		document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
+
+	/**
+	 * Back to the top of the landing page — the view the site loads with. From an
+	 * Interface route this is a real navigation; from the landing page itself it
+	 * is a scroll, and the hash is cleared so a reload lands in the same place.
+	 */
+	function goHome(e: MouseEvent) {
+		if (!onHome) return; // let the anchor navigate
+		e.preventDefault();
+		document.querySelector('.main-content')?.scrollTo({ top: 0, behavior: 'smooth' });
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+		if (location.hash) history.replaceState(null, '', location.pathname);
+	}
 </script>
 
 <nav class="sidenav" aria-label="Sections">
+	<a class="nav-home" href="/" onclick={goHome}>
+		<i class="fas fa-house"></i>
+		<span>Overview</span>
+		<i class="fas fa-arrow-turn-up nav-home-hint" aria-hidden="true"></i>
+	</a>
+
 	<div class="nav-section">Components</div>
 
 	<div class="nav-group">
-		<div class="nav-group-title"><i class="fas fa-layer-group"></i> Panel System</div>
+		<a class="nav-group-title nav-group-link" href="/" onclick={goHome} title="Back to the top">
+			<i class="fas fa-layer-group"></i> Panel System
+		</a>
 		{#each panelComponents as comp}
 			<button
 				class="nav-item"
@@ -91,6 +116,15 @@
 				{comp.name}
 			</button>
 		{/each}
+		<button
+			class="nav-item"
+			class:active={onHome && activeId === 'sparkline-animated'}
+			onclick={() => jump('sparkline-animated')}
+			aria-current={onHome && activeId === 'sparkline-animated' ? 'true' : undefined}
+		>
+			<i class="fas fa-film"></i>
+			Sparkline (Animated)
+		</button>
 	</div>
 
 	<div class="nav-section">Interface</div>
@@ -141,6 +175,43 @@
 	}
 	.nav-group-title i {
 		font-size: 0.65rem;
+	}
+	.nav-group-link {
+		text-decoration: none;
+		cursor: pointer;
+	}
+	.nav-group-link:hover {
+		color: var(--color-accent);
+		text-decoration: none;
+	}
+	.nav-home {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-xs);
+		padding: var(--spacing-xs) var(--spacing-sm);
+		margin-bottom: var(--spacing-sm);
+		border: 1px solid var(--color-border);
+		background: var(--color-bg-alt);
+		box-shadow: 2px 2px 0 var(--color-shadow);
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-text);
+		text-decoration: none;
+	}
+	.nav-home:hover {
+		background: var(--color-accent);
+		border-color: var(--color-accent);
+		color: #fff;
+		text-decoration: none;
+	}
+	.nav-home i {
+		font-size: 0.7rem;
+	}
+	.nav-home-hint {
+		margin-left: auto;
+		opacity: 0.5;
 	}
 	.nav-item {
 		display: flex;

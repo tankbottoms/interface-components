@@ -56,19 +56,21 @@ export const housePastels: Swatch[] = [
 export const allSwatches: Swatch[] = [...elegantPastels, ...housePastels];
 
 /**
- * Ordered categorical series for charts. Hues alternate so neighbouring series
- * never share a hue family — the single biggest legibility win in a stacked or
- * multi-line chart.
+ * Ordered categorical series for charts — the eight elegant pastels, reordered
+ * so neighbouring series never share a hue family. That reordering is the single
+ * biggest legibility win in a stacked or multi-line chart, and it is why the
+ * series order is not simply the palette order: aqua, rose, vanilla and mint
+ * lead because they are the four most separable hues in the set.
  */
 export const chartSeries: Swatch[] = [
-	housePastels[1], // cyan
+	elegantPastels[6], // aqua
 	elegantPastels[5], // rose
-	housePastels[3], // amber
-	housePastels[0], // indigo
-	housePastels[2], // green
-	elegantPastels[1], // violet
+	elegantPastels[3], // vanilla
+	elegantPastels[7], // mint
 	elegantPastels[2], // peach
-	housePastels[6] // teal
+	elegantPastels[1], // violet
+	elegantPastels[4], // blush
+	elegantPastels[0] // orchid
 ];
 
 /** Semantic status colours (ok / warn / crit / idle), house-style. */
@@ -100,3 +102,20 @@ export const accentSwatches = [
 ];
 
 export const DEFAULT_ACCENT = '#3792A4';
+
+/**
+ * The three accents the site picks between on load — rose, aqua and mint from
+ * the eight elegant pastels, in their stroke form so they can hold a link or a
+ * 1px rule. Rotating on load keeps the palette feeling alive without letting the
+ * page land on something illegible; a saved preference always wins over this.
+ */
+export const loadAccents = [
+	{ name: 'Rose', color: '#C75F81', token: 'rose' },
+	{ name: 'Aqua', color: '#2E8FA6', token: 'aqua' },
+	{ name: 'Mint', color: '#3E9B72', token: 'mint' }
+] as const;
+
+/** Picks one of the three load accents at random. */
+export function randomLoadAccent(): string {
+	return loadAccents[Math.floor(Math.random() * loadAccents.length)].color;
+}

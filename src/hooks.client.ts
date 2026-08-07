@@ -19,6 +19,7 @@ import { MagxPanelSparkline } from 'magx-panel/Panel-Sparkline';
 import { MagxPanelTextArea } from 'magx-panel/Panel-TextArea';
 import { MagxPanelTextInput } from 'magx-panel/Panel-TextInput';
 import { MagxPanelTime } from 'magx-panel/Panel-Time';
+import { MagxPanelToggle } from 'magx-panel/Panel-Toggle';
 import { MagxSparkline } from 'magx-sparkline/Sparkline';
 
 // Inject Panel CSS (default to light)
@@ -69,6 +70,7 @@ const defs: [string, CustomElementConstructor][] = [
 	['magx-panel-textarea', MagxPanelTextArea],
 	['magx-panel-textinput', MagxPanelTextInput],
 	['magx-panel-time', MagxPanelTime],
+	['magx-panel-toggle', MagxPanelToggle],
 	['magx-sparkline', MagxSparkline],
 ];
 
@@ -91,10 +93,23 @@ function initPanelSparkline() {
 
 			sparkline.setDataPointNum(30);
 			sparkline.setType('line' as any);
-			sparkline.setLineColor?.('solid' as any, { r: 124, g: 58, b: 237, a: 1 });
+			// Follow the live site accent rather than a baked-in colour.
+			const accent = getComputedStyle(document.documentElement)
+				.getPropertyValue('--color-accent')
+				.trim();
+			const hex = accent.replace('#', '');
+			const c =
+				hex.length >= 6
+					? {
+							r: parseInt(hex.substring(0, 2), 16),
+							g: parseInt(hex.substring(2, 4), 16),
+							b: parseInt(hex.substring(4, 6), 16)
+						}
+					: { r: 55, g: 146, b: 164 };
+			sparkline.setLineColor?.('solid' as any, { ...c, a: 1 });
 			sparkline.setFill?.('gradient' as any, {
-				above: { r: 124, g: 58, b: 237, a: 0.4 },
-				below: { r: 124, g: 58, b: 237, a: 0.05 }
+				above: { ...c, a: 0.4 },
+				below: { ...c, a: 0.05 }
 			});
 			sparkline.setReferenceLine?.('average' as any);
 			sparkline.setReferenceLineColor?.({ r: 200, g: 200, b: 200, a: 0.4 }, 1);

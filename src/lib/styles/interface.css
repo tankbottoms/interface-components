@@ -39,7 +39,7 @@
 .ifc-page-lede {
 	font-size: 0.82rem;
 	color: var(--ink-note);
-	max-width: 72ch;
+	max-width: min(72ch, 100%);
 	line-height: 1.65;
 }
 
@@ -78,7 +78,7 @@
 	color: var(--ink-note);
 	line-height: 1.65;
 	margin-bottom: var(--spacing-md);
-	max-width: 90ch;
+	max-width: min(90ch, 100%);
 }
 
 /* --- Cards ---------------------------------------------------------- */
@@ -586,7 +586,7 @@
 	z-index: 400;
 	pointer-events: none;
 	border: 1px solid var(--rule);
-	background: var(--paper-pane);
+	background: var(--tip-paper, #ffffff);
 	box-shadow: var(--brutal-shadow);
 	padding: 5px 8px;
 	font-size: 0.66rem;
@@ -649,6 +649,7 @@
 	font-size: 0.68rem;
 	line-height: 1.7;
 	white-space: pre-wrap;
+	overflow-wrap: anywhere;
 	padding: 0.7rem;
 	margin: 0;
 	max-height: 460px;
@@ -716,4 +717,10 @@
 	.ifc-page-title {
 		font-size: 1.4rem;
 	}
+}
+
+/* Rows that open a hover popover get a cursor + tint so the affordance is visible. */
+.ifc-table tr.is-hoverable:hover {
+	background: var(--color-hover-bg);
+	cursor: help;
 }

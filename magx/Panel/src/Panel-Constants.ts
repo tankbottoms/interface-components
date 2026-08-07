@@ -4,6 +4,7 @@ export class MagxPanelConstants {
     public static readonly PANEL = "magx-panel";
     public static readonly PANEL_BUTTON = "magx-panel-button";
     public static readonly PANEL_CHECKBOX = "magx-panel-checkbox";
+    public static readonly PANEL_TOGGLE = "magx-panel-toggle";
     public static readonly PANEL_COLORPICKER = "magx-panel-colorpicker";
     public static readonly PANEL_DATE = "magx-panel-date";
     public static readonly PANEL_DROPDOWN = "magx-panel-dropdown";

@@ -5,6 +5,8 @@
 	import ComponentCard from '$lib/components/ComponentCard.svelte';
 	import DemoContainer from '$lib/components/DemoContainer.svelte';
 	import FontAwesomeSection from '$lib/components/FontAwesomeSection.svelte';
+	import SparklineAnimatedSection from '$lib/components/SparklineAnimatedSection.svelte';
+	import PanelHooksSection from '$lib/components/PanelHooksSection.svelte';
 
 	const filtered = $derived(
 		componentDefs.filter((c) => {
@@ -56,11 +58,27 @@
 		{:else if comp.id === 'button'}
 			<DemoContainer>
 				{#snippet children()}
-					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Button Demo" x="10" y="10">
-							<magx-panel-button title="Primary Action"></magx-panel-button>
-							<magx-panel-button title="Secondary"></magx-panel-button>
+					<div style="position: relative; min-height: 400px;">
+						<magx-panel title="Button Modes" x="10" y="10">
+							<magx-panel-button title="Run Once" readout></magx-panel-button>
+							<magx-panel-button title="Record" mode="toggle"></magx-panel-button>
+							<magx-panel-button title="Purge" mode="countdown" seconds="5" secondary="Abort"
+							></magx-panel-button>
 						</magx-panel>
+					</div>
+					<div class="haptic-note">
+						<strong>Three presses, three contracts.</strong> A flat button that only darkens while
+						the finger is down tells you nothing afterwards, which is why it used to be impossible
+						to tell this component from a checkbox.
+						<strong>Run Once</strong> is momentary — it darkens, holds the darkening long enough to actually
+						register, then releases. Nothing persists.
+						<strong>Record</strong> is a toggle — it darkens and <em>stays</em> darkened, with an ON/OFF
+						marker on the right. That is the mode that overlaps a checkbox; the difference is that a
+						toggle button is an action you leave engaged, where a checkbox is a value you read back.
+						<strong>Purge</strong> is a countdown — it darkens and its label is replaced by a ticking
+						counter, then undarkens when it reaches zero. Press and hold it (or right-click, or alt-click)
+						to fire the secondary action instead. The strip under each button names the primary and
+						secondary action and underlines whichever fired last.
 					</div>
 				{/snippet}
 			</DemoContainer>
@@ -72,6 +90,28 @@
 							<magx-panel-checkbox title="Option A" checked></magx-panel-checkbox>
 							<magx-panel-checkbox title="Option B"></magx-panel-checkbox>
 						</magx-panel>
+					</div>
+				{/snippet}
+			</DemoContainer>
+		{:else if comp.id === 'toggle'}
+			<DemoContainer>
+				{#snippet children()}
+					<div style="position: relative; min-height: 300px;">
+						<magx-panel title="Toggle Demo" x="10" y="10">
+							<magx-panel-toggle title="Streaming" labelOn="LIVE" labelOff="IDLE" checked
+							></magx-panel-toggle>
+							<magx-panel-toggle title="Bounds Check"></magx-panel-toggle>
+							<magx-panel-checkbox title="Compare: checkbox" checked></magx-panel-checkbox>
+						</magx-panel>
+					</div>
+					<div class="haptic-note">
+						<strong>Toggle vs checkbox.</strong> Both return a boolean, and both are drawn from the
+						same two palette entries, so they belong to one family. The checkbox is for values you
+						set and read back later — options, flags, filters. The toggle is for things that are
+						<em>running</em>: a stream, a sensor, a mode. The knob slides left to right and stays
+						square, and the state word on the right (<code>LIVE</code> / <code>IDLE</code>, configurable
+						via <code>labelOn</code> and <code>labelOff</code>) means you never have to infer state
+						from colour alone.
 					</div>
 				{/snippet}
 			</DemoContainer>
@@ -139,9 +179,9 @@
 		{:else if comp.id === 'image'}
 			<DemoContainer>
 				{#snippet children()}
-					<div style="position: relative; min-height: 250px;">
-						<magx-panel title="Image Demo" x="10" y="10">
-							<magx-panel-image title="Screenshot" src="/screenshots/sparkline-examples.png"
+					<div style="position: relative; min-height: 380px;">
+						<magx-panel title="Image Demo" x="10" y="10" style="--magx-panel-panel-width:300px">
+							<magx-panel-image title="Trainer" src="/screenshots/trainer-hero.jpg"
 							></magx-panel-image>
 						</magx-panel>
 					</div>
@@ -611,6 +651,10 @@
 		{/if}
 	</ComponentCard>
 {/each}
+
+<SparklineAnimatedSection />
+
+<PanelHooksSection />
 
 <FontAwesomeSection />
 

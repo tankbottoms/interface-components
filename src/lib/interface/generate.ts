@@ -100,6 +100,36 @@ export function rollingMean(values: number[], window: number): number[] {
 	});
 }
 
+/**
+ * How many extra samples a series carries so it can be animated. Generators are
+ * called once with `n + RESERVOIR` points; each frame takes a window one sample
+ * further along, so the chart scrolls continuously instead of being regenerated
+ * (which would flicker, because a new seed produces an unrelated shape).
+ */
+export const RESERVOIR = 900;
+
+/** Moving window over a reservoir series. Wraps once the reservoir runs out. */
+export function windowOf(values: number[], len: number, frame: number): number[] {
+	if (values.length <= len) return values;
+	const span = values.length - len;
+	const off = ((frame % span) + span) % span;
+	return values.slice(off, off + len);
+}
+
+/**
+ * Smooth perturbation for charts with no time axis — donuts, treemaps, ranked
+ * lists, meters. Each index gets its own phase so the set breathes rather than
+ * pulsing in unison, and the ordering stays recognisable between frames.
+ */
+export function drift(values: number[], frame: number, amt = 0.14): number[] {
+	return values.map((v, i) => v * (1 + amt * Math.sin(frame * 0.08 + i * 1.7)));
+}
+
+/** Single-value form of `drift`, for scalars held on an object. */
+export function driftOne(v: number, frame: number, i = 0, amt = 0.14): number {
+	return v * (1 + amt * Math.sin(frame * 0.08 + i * 1.7));
+}
+
 /** hour × weekday matrix for the load-shape heatmap. */
 export function heatmapMatrix(
 	opts: { seed?: number; rows?: number; cols?: number } = {}

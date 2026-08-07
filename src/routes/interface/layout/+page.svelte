@@ -8,20 +8,91 @@
 		walk,
 		fmtBytes,
 		fmtNum,
-		pick
+		pick,
+		RESERVOIR,
+		windowOf,
+		driftOne
 	} from '$lib/interface/generate';
+	import { onTick } from '$lib/anim';
+	import AnimBar from '$lib/interface/AnimBar.svelte';
+	import HoverCard from '$lib/interface/HoverCard.svelte';
+	import Tooltip from '$lib/interface/charts/Tooltip.svelte';
 
 	let seed = $state(11);
+	let fps = $state(0);
+	let frame = $state(0);
 	const reshuffle = () => (seed = (seed * 37 + 5) % 99991);
+
+	/**
+	 * Layout surfaces animate the same way the charts do: 0 fps is the static
+	 * page, above zero the live figures drift and the node sparklines scroll a
+	 * window along a reservoir. The structure never moves — only the numbers —
+	 * because a layout demo that reflows on every frame is unreadable.
+	 */
+	$effect(() => onTick(() => fps, () => (frame += 1)));
 
 	const kpis = $derived.by(() => {
 		const r = rng(seed);
+		const d = (v: number, i: number, amt = 0.05) => driftOne(v, frame, i, amt);
+		const docs = d(between(r, 18_000, 42_000), 0);
+		const agencies = d(between(r, 40, 120), 1, 0.02);
+		const pages = d(between(r, 400_000, 950_000), 2);
+		const corpus = d(between(r, 40e9, 120e9), 3, 0.03);
+		const enriched = Math.min(99.9, d(between(r, 61, 97), 4, 0.02));
 		return [
-			{ label: 'Documents', value: fmtNum(between(r, 18_000, 42_000)), sub: 'indexed' },
-			{ label: 'Agencies', value: fmtNum(between(r, 40, 120)), sub: 'sources' },
-			{ label: 'Pages', value: fmtNum(between(r, 400_000, 950_000)), sub: 'extracted' },
-			{ label: 'Corpus', value: fmtBytes(between(r, 40e9, 120e9)), sub: 'on disk' },
-			{ label: 'Enriched', value: `${between(r, 61, 97).toFixed(1)}%`, sub: 'with metadata' }
+			{
+				label: 'Documents',
+				value: fmtNum(docs),
+				sub: 'indexed',
+				detail: [
+					{ k: 'ingested today', v: fmtNum(docs * 0.014), token: 'mint' },
+					{ k: 'awaiting OCR', v: fmtNum(docs * 0.006), token: 'peach' },
+					{ k: 'quarantined', v: fmtNum(docs * 0.0008), token: 'blush' }
+				],
+				note: 'Counts every revision, not every unique filing.'
+			},
+			{
+				label: 'Agencies',
+				value: fmtNum(agencies),
+				sub: 'sources',
+				detail: [
+					{ k: 'federal', v: fmtNum(agencies * 0.42), token: 'aqua' },
+					{ k: 'state', v: fmtNum(agencies * 0.38), token: 'violet' },
+					{ k: 'municipal', v: fmtNum(agencies * 0.2), token: 'vanilla' }
+				],
+				note: 'An agency is a distinct issuing body, not a docket.'
+			},
+			{
+				label: 'Pages',
+				value: fmtNum(pages),
+				sub: 'extracted',
+				detail: [
+					{ k: 'text layer', v: fmtNum(pages * 0.71), token: 'mint' },
+					{ k: 'OCR', v: fmtNum(pages * 0.27), token: 'peach' },
+					{ k: 'image only', v: fmtNum(pages * 0.02), token: 'blush' }
+				]
+			},
+			{
+				label: 'Corpus',
+				value: fmtBytes(corpus),
+				sub: 'on disk',
+				detail: [
+					{ k: 'originals', v: fmtBytes(corpus * 0.83), token: 'aqua' },
+					{ k: 'derivatives', v: fmtBytes(corpus * 0.12), token: 'orchid' },
+					{ k: 'index', v: fmtBytes(corpus * 0.05), token: 'teal' }
+				],
+				note: 'Before replication; the mirror doubles it.'
+			},
+			{
+				label: 'Enriched',
+				value: `${enriched.toFixed(1)}%`,
+				sub: 'with metadata',
+				detail: [
+					{ k: 'entities', v: `${(enriched * 0.98).toFixed(1)}%`, token: 'mint' },
+					{ k: 'citations', v: `${(enriched * 0.74).toFixed(1)}%`, token: 'aqua' },
+					{ k: 'summaries', v: `${(enriched * 0.51).toFixed(1)}%`, token: 'vanilla' }
+				]
+			}
 		];
 	});
 
@@ -30,15 +101,23 @@
 		return names.map((name, i) => {
 			const r = rng(seed + i * 13);
 			const up = r() > 0.16;
+			const clamp = (v: number) => Math.max(1, Math.min(99, v));
 			return {
 				name,
 				up,
 				role: ['GPU', 'GPU', 'ENRICH', 'STORE', 'EDGE'][i],
 				link: pick(r, ['10 Gb/s', '2.5 Gb/s', '1 Gb/s', '1 Gb/s']),
-				load: between(r, 3, 96),
-				disk: between(r, 18, 93),
-				rtt: between(r, 0.3, 42),
-				trend: walk(32, { seed: seed + 100 + i, min: 2, max: 100, step: 16 })
+				load: clamp(driftOne(between(r, 3, 96), frame, i, 0.14)),
+				disk: clamp(driftOne(between(r, 18, 93), frame, i + 1, 0.03)),
+				rtt: Math.max(0.2, driftOne(between(r, 0.3, 42), frame, i + 2, 0.2)),
+				cores: intBetween(r, 8, 128),
+				ramGB: intBetween(r, 16, 512),
+				uptimeD: intBetween(r, 1, 480),
+				trend: windowOf(
+					walk(32 + RESERVOIR, { seed: seed + 100 + i, min: 2, max: 100, step: 16 }),
+					32,
+					frame
+				)
 			};
 		});
 	});
@@ -103,13 +182,33 @@
 
 	const table = $derived.by(() => {
 		const r = rng(seed + 400);
-		return Array.from({ length: 8 }, () => ({
-			file: `${pick(r, ['DOJ', 'SEC', 'LASC', 'FTC'])}-${intBetween(r, 1000, 9999)}.pdf`,
-			size: between(r, 40_000, 90_000_000),
-			pages: intBetween(r, 1, 420),
-			ocr: between(r, 74, 99.8),
-			state: pick(r, ['indexed', 'queued', 'failed', 'indexed', 'indexed'])
-		}));
+		return Array.from({ length: 8 }, (_, i) => {
+			const size = between(r, 40_000, 90_000_000);
+			const pages = intBetween(r, 1, 420);
+			return {
+				file: `${pick(r, ['DOJ', 'SEC', 'LASC', 'FTC'])}-${intBetween(r, 1000, 9999)}.pdf`,
+				size,
+				pages,
+				ocr: Math.min(99.9, driftOne(between(r, 74, 99.8), frame, i, 0.01)),
+				state: pick(r, ['indexed', 'queued', 'failed', 'indexed', 'indexed']),
+				src: r() > 0.4 ? 'DB' : 'FS',
+				ingestMs: Math.round(between(r, 40, 5400)),
+				entities: intBetween(r, 4, 260),
+				bytesPerPage: size / Math.max(1, pages)
+			};
+		});
+	});
+
+	/**
+	 * Table rows cannot be wrapped in `HoverCard` — a `<div>` is not valid inside
+	 * `<tbody>` — so the table drives the shared `Tooltip` directly.
+	 */
+	type TableRow = (typeof table)[number];
+	let rowTip = $state<{ x: number; y: number; show: boolean; row: TableRow | null }>({
+		x: 0,
+		y: 0,
+		show: false,
+		row: null
 	});
 
 	const stateToken = (s: string) =>
@@ -129,10 +228,19 @@
 			banners, KPI strips, section heads, badges, data-source chips, expandable agency rows and
 			dense tables. Content is synthesised; the arrangement is the point.
 		</p>
-		<div class="ifc-btn-row" style="margin-top:var(--spacing-sm)">
-			<button class="ifc-btn" onclick={reshuffle}><i class="fas fa-rotate"></i> Reshuffle</button>
-			<span class="ifc-mono-note" style="align-self:center">seed {seed}</span>
-		</div>
+		<p class="ifc-page-lede" style="margin-top:var(--spacing-sm)">
+			KPI tiles, node cards and table rows carry a white-plate hover popover with the breakdown
+			behind the headline figure — the detail you would otherwise have to click through for. The
+			same FPS control as the charting page animates the live numbers: structure holds still, values
+			move, because a layout demo that reflows every frame cannot be read.
+		</p>
+		<AnimBar
+			bind:fps
+			{seed}
+			{frame}
+			onreshuffle={reshuffle}
+			note="Hover any tile, node card or table row for the popover"
+		/>
 	</header>
 
 	<!-- 01 banners --------------------------------------------------- -->
@@ -175,12 +283,14 @@
 		<span class="ifc-sec-hint">gap-separated vs hairline-separated</span>
 	</div>
 	<div class="ifc-tiles">
-		{#each kpis as k}
-			<div class="ifc-tile">
-				<div class="ifc-tile-label">{k.label}</div>
-				<div class="ifc-tile-value">{k.value}</div>
-				<div class="ifc-tile-sub">{k.sub}</div>
-			</div>
+		{#each kpis as k (k.label)}
+			<HoverCard title={k.label} rows={k.detail} note={k.note ?? ''}>
+				<div class="ifc-tile">
+					<div class="ifc-tile-label">{k.label}</div>
+					<div class="ifc-tile-value">{k.value}</div>
+					<div class="ifc-tile-sub">{k.sub}</div>
+				</div>
+			</HoverCard>
 		{/each}
 	</div>
 	<div class="ifc-strip" style="margin-top:var(--spacing-md);border-top:1px solid var(--rule)">
@@ -344,22 +454,36 @@
 		<span class="ifc-sec-hint">status dot · speed pill · load meter</span>
 	</div>
 	<div class="ifc-grid ifc-grid-auto">
-		{#each nodes as n}
-			<div class="ifc-card">
-				<div class="ifc-card-hdr">
-					<span class="ifc-chip-dot" class:is-crit={!n.up}></span>
-					<span class="ifc-card-title">{n.name}</span>
-					<span class="ifc-card-meta">{n.role}</span>
+		{#each nodes as n (n.name)}
+			<HoverCard
+				title={n.name}
+				rows={[
+					{ k: 'role', v: n.role, token: 'aqua' },
+					{ k: 'cores', v: `${n.cores}`, token: 'violet' },
+					{ k: 'memory', v: `${n.ramGB} GB`, token: 'orchid' },
+					{ k: 'load', v: `${n.load.toFixed(1)}%`, token: 'mint' },
+					{ k: 'disk', v: `${n.disk.toFixed(1)}%`, token: 'peach' },
+					{ k: 'round-trip', v: `${n.rtt.toFixed(2)} ms`, token: 'vanilla' },
+					{ k: 'uptime', v: `${n.uptimeD} d` }
+				]}
+				note={n.up ? 'Reporting on the last heartbeat.' : 'Last heartbeat missed — figures are stale.'}
+			>
+				<div class="ifc-card">
+					<div class="ifc-card-hdr">
+						<span class="ifc-chip-dot" class:is-crit={!n.up}></span>
+						<span class="ifc-card-title">{n.name}</span>
+						<span class="ifc-card-meta">{n.role}</span>
+					</div>
+					<div class="ifc-inline" style="margin-bottom:6px">
+						<span class="ifc-badge b-{n.up ? 'mint' : 'blush'}">{n.up ? 'online' : 'offline'}</span>
+						<span class="ifc-badge b-cyan">{n.link}</span>
+						<span class="ifc-badge b-vanilla">{n.rtt.toFixed(1)} ms</span>
+					</div>
+					<MeterBar label="LOAD" value={n.load} display={`${n.load.toFixed(0)}%`} />
+					<MeterBar label="DISK" value={n.disk} display={`${n.disk.toFixed(0)}%`} />
+					<MiniSpark values={n.trend} token="teal" unit="%" height={34} />
 				</div>
-				<div class="ifc-inline" style="margin-bottom:6px">
-					<span class="ifc-badge b-{n.up ? 'mint' : 'blush'}">{n.up ? 'online' : 'offline'}</span>
-					<span class="ifc-badge b-cyan">{n.link}</span>
-					<span class="ifc-badge b-vanilla">{n.rtt.toFixed(1)} ms</span>
-				</div>
-				<MeterBar label="LOAD" value={n.load} display={`${n.load.toFixed(0)}%`} />
-				<MeterBar label="DISK" value={n.disk} display={`${n.disk.toFixed(0)}%`} />
-				<MiniSpark values={n.trend} token="teal" unit="%" height={34} />
-			</div>
+			</HoverCard>
 		{/each}
 	</div>
 
@@ -381,8 +505,12 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each table as row}
-					<tr>
+				{#each table as row (row.file)}
+					<tr
+						class="is-hoverable"
+						onmousemove={(e) => (rowTip = { x: e.clientX, y: e.clientY, show: true, row })}
+						onmouseleave={() => (rowTip = { ...rowTip, show: false })}
+					>
 						<td>{row.file}</td>
 						<td class="num">{fmtBytes(row.size)}</td>
 						<td class="num">{row.pages}</td>
@@ -393,6 +521,28 @@
 			</tbody>
 		</table>
 	</div>
+
+	<Tooltip x={rowTip.x} y={rowTip.y} show={rowTip.show && !!rowTip.row}>
+		{#if rowTip.row}
+			<div class="ifc-tip-title">{rowTip.row.file}</div>
+			<div class="ifc-tip-row">
+				<span class="ifc-tip-key" style="background:var(--pastel-aqua)"></span>
+				<span>source</span><span class="ifc-tip-val">{rowTip.row.src}</span>
+			</div>
+			<div class="ifc-tip-row">
+				<span class="ifc-tip-key" style="background:var(--pastel-mint)"></span>
+				<span>per page</span><span class="ifc-tip-val">{fmtBytes(rowTip.row.bytesPerPage)}</span>
+			</div>
+			<div class="ifc-tip-row">
+				<span class="ifc-tip-key" style="background:var(--pastel-peach)"></span>
+				<span>ingest</span><span class="ifc-tip-val">{rowTip.row.ingestMs} ms</span>
+			</div>
+			<div class="ifc-tip-row">
+				<span class="ifc-tip-key" style="background:var(--pastel-violet)"></span>
+				<span>entities</span><span class="ifc-tip-val">{rowTip.row.entities}</span>
+			</div>
+		{/if}
+	</Tooltip>
 
 	<div class="ifc-hr"></div>
 	<div class="ifc-mono-note">

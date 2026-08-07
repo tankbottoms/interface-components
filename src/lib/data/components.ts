@@ -91,19 +91,76 @@ panel.setPosition(50, 50);`
 		category: 'control',
 		group: 'panel',
 		description:
-			'A simple clickable button element for panels. Fires a value change event when clicked.',
+			'A clickable button with an explicit press contract. Three modes make the result of a press visible: momentary darkens and releases, toggle darkens and stays engaged with an ON/OFF marker, countdown darkens and replaces the label with a ticking counter before releasing. Long-press, right-click or alt-click fires an optional secondary action, and the readout strip names both actions and which one fired last.',
 		properties: [
 			{ name: 'title', type: 'String', default: '""', description: 'Button label text' },
+			{
+				name: 'mode',
+				type: 'String',
+				default: '"momentary"',
+				description: '"momentary" | "toggle" | "countdown" — how the press state is held'
+			},
+			{
+				name: 'seconds',
+				type: 'Number',
+				default: '3',
+				description: 'Countdown length, countdown mode only'
+			},
+			{
+				name: 'secondary',
+				type: 'String',
+				default: '""',
+				description: 'Label for the long-press / alt-click action. Set it to enable the secondary action.'
+			},
+			{
+				name: 'readout',
+				type: 'Boolean',
+				default: 'false',
+				description: 'Force the action readout strip on even without a secondary action'
+			},
 			{ name: 'id', type: 'String', default: 'auto-generated', description: 'Unique identifier' }
 		],
 		events: [
 			{
 				name: 'magx-panelValueChanged',
 				detail: '{ panelId, panelElementId }',
-				description: 'Fired on click'
+				description:
+					'Fired on primary press, secondary press, and when a countdown elapses. Call getValue() to read which: toggle returns its boolean, countdown returns ticks remaining, momentary returns "primary" | "secondary".'
 			}
 		],
-		codeExample: `<magx-panel-button title="Submit" id="btn1"></magx-panel-button>`
+		codeExample: `<magx-panel-button title="Submit" id="btn1"></magx-panel-button>
+<magx-panel-button title="Record" mode="toggle"></magx-panel-button>
+<magx-panel-button title="Purge" mode="countdown" seconds="5" secondary="Abort"></magx-panel-button>`
+	},
+	{
+		id: 'toggle',
+		name: 'Toggle Switch',
+		tagName: 'magx-panel-toggle',
+		icon: 'fa-toggle-on',
+		category: 'control',
+		group: 'panel',
+		description:
+			'A square left-to-right sliding switch. Shares the checkbox palette so the two read as one family — the checkbox answers "is this set?", the toggle answers "is this running?". The knob is square, not round, to stay inside the panel geometry.',
+		properties: [
+			{ name: 'title', type: 'String', default: '""', description: 'Label text' },
+			{
+				name: 'checked',
+				type: 'Boolean',
+				default: 'false',
+				description: 'Initial state (attribute)'
+			},
+			{ name: 'labelOn', type: 'String', default: '"ON"', description: 'State text when engaged' },
+			{ name: 'labelOff', type: 'String', default: '"OFF"', description: 'State text when idle' },
+			{ name: 'id', type: 'String', default: 'auto-generated', description: 'Unique identifier' }
+		],
+		events: [
+			{
+				name: 'magx-panelValueChanged',
+				detail: '{ panelId, panelElementId }',
+				description: 'Fired on toggle'
+			}
+		],
+		codeExample: `<magx-panel-toggle title="Streaming" labelOn="LIVE" labelOff="IDLE" checked></magx-panel-toggle>`
 	},
 	{
 		id: 'checkbox',
@@ -113,7 +170,7 @@ panel.setPosition(50, 50);`
 		category: 'control',
 		group: 'panel',
 		description:
-			'A toggle checkbox element. Returns a boolean value indicating checked state.',
+			'A checkbox element. Returns a boolean indicating checked state. Use it for a value you set and read back later — an option, flag or filter. For something that is running rather than set, use the Toggle Switch.',
 		properties: [
 			{ name: 'title', type: 'String', default: '""', description: 'Label text' },
 			{

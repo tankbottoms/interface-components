@@ -288,7 +288,7 @@
 		border-left: 3px solid var(--rule-soft);
 		padding-left: var(--spacing-sm);
 		margin-top: var(--spacing-sm);
-		max-width: 78ch;
+		max-width: min(78ch, 100%);
 	}
 	.insight p {
 		margin: 0;

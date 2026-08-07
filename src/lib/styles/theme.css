@@ -64,23 +64,26 @@
 	--stroke-teal: #3e8f86;
 	--stroke-lime: #6f9435;
 
-	/* --- Categorical chart series ------------------------------------- */
-	--chart-1: #80deea;
+	/* --- Categorical chart series -------------------------------------
+	   The eight elegant pastels, reordered so neighbouring series never share
+	   a hue family: aqua, rose, vanilla, mint, peach, violet, blush, orchid.
+	   Mirrors `chartSeries` in src/lib/data/palette.ts — keep the two in step. */
+	--chart-1: #afeffd;
 	--chart-2: #ffc2d0;
-	--chart-3: #ffd54f;
-	--chart-4: #bdbedc;
-	--chart-5: #a5d6a7;
+	--chart-3: #fcf7dc;
+	--chart-4: #e0fff1;
+	--chart-5: #fcdcc7;
 	--chart-6: #f0befa;
-	--chart-7: #fcdcc7;
-	--chart-8: #b2dfdb;
-	--chart-1-stroke: #3792a4;
+	--chart-7: #ffe6e6;
+	--chart-8: #f4e1fc;
+	--chart-1-stroke: #2e8fa6;
 	--chart-2-stroke: #c75f81;
-	--chart-3-stroke: #b08a2a;
-	--chart-4-stroke: #6e6fa8;
-	--chart-5-stroke: #5e9463;
+	--chart-3-stroke: #b39b3c;
+	--chart-4-stroke: #3e9b72;
+	--chart-5-stroke: #c97e45;
 	--chart-6-stroke: #a855c4;
-	--chart-7-stroke: #c97e45;
-	--chart-8-stroke: #3e8f86;
+	--chart-7-stroke: #c77070;
+	--chart-8-stroke: #9a6bb0;
 
 	/* --- Status ------------------------------------------------------- */
 	--status-ok: #a5d6a7;
@@ -122,6 +125,7 @@
 	--paper: #1a1b26;
 	--paper-card: #1f2335;
 	--paper-pane: #24283b;
+	--tip-paper: #24283b;
 	--ink: #dce0f8;
 	--ink-muted: #7982a9;
 	--ink-soft: #5c6485;
@@ -167,22 +171,23 @@
 	--stroke-teal: #7ec8c0;
 	--stroke-lime: #b0d472;
 
-	--chart-1: #2a5a63;
+	/* Same eight hues as light, sunk to paper-dark fills with brightened strokes. */
+	--chart-1: #1e4c57;
 	--chart-2: #5e3746;
-	--chart-3: #5c4a1e;
-	--chart-4: #3f4066;
-	--chart-5: #38553a;
-	--chart-6: #5c3f66;
-	--chart-7: #5c4534;
-	--chart-8: #315450;
-	--chart-1-stroke: #6fd3e8;
+	--chart-3: #55511f;
+	--chart-4: #23503c;
+	--chart-5: #5c4534;
+	--chart-6: #4e2e58;
+	--chart-7: #5a3535;
+	--chart-8: #463450;
+	--chart-1-stroke: #7fdcf0;
 	--chart-2-stroke: #f090ac;
-	--chart-3-stroke: #e6c060;
-	--chart-4-stroke: #a2a3d8;
-	--chart-5-stroke: #93c996;
+	--chart-3-stroke: #dfce72;
+	--chart-4-stroke: #79d3a8;
+	--chart-5-stroke: #eba874;
 	--chart-6-stroke: #dc9cf0;
-	--chart-7-stroke: #eba874;
-	--chart-8-stroke: #7ec8c0;
+	--chart-7-stroke: #efa0a0;
+	--chart-8-stroke: #c79ada;
 
 	--status-ok: #38553a;
 	--status-ok-stroke: #93c996;
@@ -213,6 +218,7 @@
 		--paper: #1a1b26;
 		--paper-card: #1f2335;
 		--paper-pane: #24283b;
+		--tip-paper: #24283b;
 		--ink: #dce0f8;
 		--ink-muted: #7982a9;
 		--ink-soft: #5c6485;
@@ -256,22 +262,22 @@
 		--stroke-teal: #7ec8c0;
 		--stroke-lime: #b0d472;
 
-		--chart-1: #2a5a63;
+		--chart-1: #1e4c57;
 		--chart-2: #5e3746;
-		--chart-3: #5c4a1e;
-		--chart-4: #3f4066;
-		--chart-5: #38553a;
-		--chart-6: #5c3f66;
-		--chart-7: #5c4534;
-		--chart-8: #315450;
-		--chart-1-stroke: #6fd3e8;
+		--chart-3: #55511f;
+		--chart-4: #23503c;
+		--chart-5: #5c4534;
+		--chart-6: #4e2e58;
+		--chart-7: #5a3535;
+		--chart-8: #463450;
+		--chart-1-stroke: #7fdcf0;
 		--chart-2-stroke: #f090ac;
-		--chart-3-stroke: #e6c060;
-		--chart-4-stroke: #a2a3d8;
-		--chart-5-stroke: #93c996;
+		--chart-3-stroke: #dfce72;
+		--chart-4-stroke: #79d3a8;
+		--chart-5-stroke: #eba874;
 		--chart-6-stroke: #dc9cf0;
-		--chart-7-stroke: #eba874;
-		--chart-8-stroke: #7ec8c0;
+		--chart-7-stroke: #efa0a0;
+		--chart-8-stroke: #c79ada;
 
 		--status-ok: #38553a;
 		--status-ok-stroke: #93c996;

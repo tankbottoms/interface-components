@@ -8,6 +8,7 @@
 	import Treemap from '$lib/interface/charts/Treemap.svelte';
 	import DonutChart from '$lib/interface/charts/DonutChart.svelte';
 	import MeterBar from '$lib/interface/charts/MeterBar.svelte';
+	import AnimBar from '$lib/interface/AnimBar.svelte';
 	import {
 		walk,
 		spiky,
@@ -24,42 +25,71 @@
 		between,
 		intBetween,
 		MONTHS,
-		WEEKDAYS
+		WEEKDAYS,
+		RESERVOIR,
+		windowOf,
+		drift,
+		driftOne
 	} from '$lib/interface/generate';
+	import { onTick } from '$lib/anim';
 
 	/**
 	 * Every dataset below is generated, never fetched. `seed` advances on each
 	 * "Reshuffle" so the shapes change but stay inside plausible ranges — the
 	 * point of these demos is the presentation, not the numbers.
+	 *
+	 * The same page serves as both the static and the animated reference. Static
+	 * is simply `fps = 0`: the frame counter parks and every chart holds the
+	 * window it was on. Above zero, time-series charts scroll a window along a
+	 * pre-generated reservoir (continuous motion, no reseeding flicker) and
+	 * categorical charts breathe on a per-index sine.
 	 */
 	let seed = $state(7);
+	let fps = $state(0);
+	let frame = $state(0);
 	const reshuffle = () => (seed = (seed * 31 + 17) % 99991);
 
+	$effect(() => onTick(() => fps, () => (frame += 1)));
+
 	const dayLabels = $derived(Array.from({ length: 30 }, (_, i) => `${i + 1}`));
-	const daily = $derived(walk(30, { seed, min: 6, max: 48, start: 22, step: 6 }));
+	const dailyRes = $derived(
+		walk(30 + RESERVOIR, { seed, min: 6, max: 48, start: 22, step: 6 })
+	);
+	const daily = $derived(windowOf(dailyRes, 30, frame));
 	const dailyMean = $derived(rollingMean(daily, 7));
 
 	const tiers = ['Off-peak', 'Mid-peak', 'On-peak'];
-	const monthly = $derived(stacked(MONTHS, 3, { seed: seed + 1, min: 320, max: 1180 }));
+	const monthlyBase = $derived(stacked(MONTHS, 3, { seed: seed + 1, min: 320, max: 1180 }));
+	const monthly = $derived(
+		monthlyBase.map((p, i) => ({ ...p, values: drift(p.values, frame + i * 3, 0.1) }))
+	);
 
-	const load = $derived(heatmapMatrix({ seed: seed + 2 }));
+	const loadBase = $derived(heatmapMatrix({ seed: seed + 2 }));
+	const load = $derived(loadBase.map((row, i) => drift(row, frame + i * 5, 0.18)));
 	const hours = Array.from({ length: 24 }, (_, h) => `${h}`.padStart(2, '0'));
 
-	const baseline = $derived(diurnal(48, { seed: seed + 3, min: 120, max: 940, period: 24 }));
+	const baselineRes = $derived(
+		diurnal(48 + RESERVOIR, { seed: seed + 3, min: 120, max: 940, period: 24 })
+	);
+	const baseline = $derived(windowOf(baselineRes, 48, frame));
 	const halfHours = Array.from({ length: 48 }, (_, i) =>
 		i % 4 === 0 ? `${String(Math.floor(i / 2)).padStart(2, '0')}:00` : ''
 	);
 
-	const latP50 = $derived(walk(60, { seed: seed + 4, min: 40, max: 260, start: 90, step: 22 }));
+	const latRes = $derived(
+		walk(60 + RESERVOIR, { seed: seed + 4, min: 40, max: 260, start: 90, step: 22 })
+	);
+	const latP50 = $derived(windowOf(latRes, 60, frame));
 	const latP95 = $derived(latP50.map((v, i) => v * between(rng(seed + 5 + i), 1.5, 2.8)));
 	const latTicks = Array.from({ length: 60 }, (_, i) => (i % 10 === 0 ? `−${60 - i}m` : ''));
 
 	const gpus = $derived(
 		['spark-1 / GB10', 'spark-2 / GB10', 'node-18 / RTX A4000'].map((name, i) => {
 			const r = rng(seed + 40 + i);
-			const util = between(r, 8, 97);
-			const mem = between(r, 22, 94);
-			const pwr = between(r, 30, 88);
+			const clamp = (v: number) => Math.max(1, Math.min(99, v));
+			const util = clamp(driftOne(between(r, 8, 97), frame, i));
+			const mem = clamp(driftOne(between(r, 22, 94), frame, i + 1, 0.06));
+			const pwr = clamp(driftOne(between(r, 30, 88), frame, i + 2, 0.1));
 			return {
 				name,
 				util,
@@ -68,18 +98,34 @@
 				memGB: (mem / 100) * (i === 2 ? 16 : 128),
 				capGB: i === 2 ? 16 : 128,
 				watts: (pwr / 100) * (i === 2 ? 140 : 240),
-				temp: between(r, 38, 79),
-				trend: walk(40, { seed: seed + 60 + i, min: 5, max: 100, start: util, step: 18 })
+				temp: clamp(driftOne(between(r, 38, 79), frame, i + 3, 0.05)),
+				trend: windowOf(
+					walk(40 + RESERVOIR, { seed: seed + 60 + i, min: 5, max: 100, start: util, step: 18 }),
+					40,
+					frame
+				)
 			};
 		})
 	);
 
-	const netIn = $derived(spiky(56, { seed: seed + 8, base: 6, spike: 190, chance: 0.1 }));
-	const netOut = $derived(spiky(56, { seed: seed + 9, base: 4, spike: 120, chance: 0.08 }));
-	const diskOps = $derived(spiky(56, { seed: seed + 10, base: 30, spike: 640, chance: 0.14 }));
-	const volumeUse = $derived(walk(56, { seed: seed + 11, min: 41, max: 78, start: 58, step: 3 }));
+	const netInRes = $derived(
+		spiky(56 + RESERVOIR, { seed: seed + 8, base: 6, spike: 190, chance: 0.1 })
+	);
+	const netOutRes = $derived(
+		spiky(56 + RESERVOIR, { seed: seed + 9, base: 4, spike: 120, chance: 0.08 })
+	);
+	const diskRes = $derived(
+		spiky(56 + RESERVOIR, { seed: seed + 10, base: 30, spike: 640, chance: 0.14 })
+	);
+	const volumeRes = $derived(
+		walk(56 + RESERVOIR, { seed: seed + 11, min: 41, max: 78, start: 58, step: 3 })
+	);
+	const netIn = $derived(windowOf(netInRes, 56, frame));
+	const netOut = $derived(windowOf(netOutRes, 56, frame));
+	const diskOps = $derived(windowOf(diskRes, 56, frame));
+	const volumeUse = $derived(windowOf(volumeRes, 56, frame));
 
-	const folders = $derived(
+	const foldersBase = $derived(
 		ranked(
 			[
 				'/archive/corpus',
@@ -94,8 +140,15 @@
 			{ seed: seed + 12, top: 62_000_000_000 }
 		)
 	);
+	const folders = $derived(
+		foldersBase.map((f, i) => ({
+			...f,
+			value: driftOne(f.value, frame, i, 0.08),
+			count: Math.round(driftOne(f.count, frame, i, 0.08))
+		}))
+	);
 
-	const namespaces = $derived(
+	const namespacesBase = $derived(
 		treeNodes(
 			[
 				'corpus',
@@ -112,6 +165,9 @@
 			{ seed: seed + 13 }
 		)
 	);
+	const namespaces = $derived(
+		namespacesBase.map((n, i) => ({ ...n, value: driftOne(n.value, frame, i, 0.1) }))
+	);
 
 	const mix = $derived(
 		[
@@ -121,14 +177,15 @@
 			{ label: 'errors', v: 6 }
 		].map((s, i) => ({
 			label: s.label,
-			value: Math.round(s.v * between(rng(seed + 70 + i), 0.7, 1.35) * 340)
+			value: Math.round(driftOne(s.v * between(rng(seed + 70 + i), 0.7, 1.35) * 340, frame, i, 0.12))
 		}))
 	);
 
 	const quotas = $derived(
 		['5-hour session', 'Weekly (all models)', 'Weekly (Opus)'].map((label, i) => {
 			const r = rng(seed + 90 + i);
-			return { label, pct: between(r, 12, 96), reset: `${intBetween(r, 1, 71)}h` };
+			const pct = Math.max(2, Math.min(99, driftOne(between(r, 12, 96), frame, i, 0.09)));
+			return { label, pct, reset: `${intBetween(r, 1, 71)}h` };
 		})
 	);
 
@@ -147,14 +204,23 @@
 			Static charts and hover behaviour distilled from the house energy sheet, the gpumon
 			federation console, the seaweed volume report and the claude-proxy dashboard — rebuilt on the
 			interface-components palette. Every chart is inline SVG with no charting dependency, and every
-			dataset is synthesised in the browser from seeded generators.
+			dataset is synthesised in the browser from seeded generators. Hovering any chart opens a
+			white-plate popover with the values behind the mark under the cursor.
 		</p>
-		<div class="ifc-btn-row" style="margin-top:var(--spacing-sm)">
-			<button class="ifc-btn" onclick={reshuffle}>
-				<i class="fas fa-rotate"></i> Reshuffle data
-			</button>
-			<span class="ifc-mono-note" style="align-self:center">seed {seed}</span>
-		</div>
+		<p class="ifc-page-lede" style="margin-top:var(--spacing-sm)">
+			The page is both the static and the animated reference. At <strong>0 fps</strong> every chart
+			holds its frame — that is the static version. Above zero, time-series charts scroll a window
+			along a pre-generated reservoir so motion is continuous rather than a reseed flicker, and
+			categorical charts (donut, treemap, ranked list, meters) breathe on a per-index sine so the
+			ordering stays readable while the values move.
+		</p>
+		<AnimBar
+			bind:fps
+			{seed}
+			{frame}
+			onreshuffle={reshuffle}
+			note="Reshuffle draws a new reservoir · FPS scrolls the window along it"
+		/>
 	</header>
 
 	<!-- 01 ------------------------------------------------------------ -->
