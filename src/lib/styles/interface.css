@@ -93,6 +93,16 @@
 	padding: var(--spacing-md);
 	min-width: 0;
 }
+/*
+ * A panel stage is absolutely positioned and wider than a phone, so the card
+ * holding one has to scroll rather than push the page out past its margins.
+ * The scroll is on the card, not the page, which keeps the section headings
+ * and prose aligned with everything else while the panels pan under them.
+ */
+.ifc-card.cp-card {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
 .ifc-card-hdr {
 	display: flex;
 	align-items: baseline;

@@ -72,7 +72,7 @@ export class MagxPanelToggle extends MagxPanelBaseElement {
                     <span class="track"><span class="knob"></span></span>
                 </label>
                 <span class="state">${state}</span>
-                <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticTap} /></label>
+                <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticTap} /></label>
             </div>
         `;
     }

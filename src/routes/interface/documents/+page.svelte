@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { rng, between, intBetween, pick, fmtBytes } from '$lib/interface/generate';
+	import { fitStage } from '$lib/interface/fitStage';
+	import { magxById } from '$lib/interface/magx';
 
 	/**
 	 * Document detail layout, modelled on the postcrime `/doc/:id` view:
@@ -89,6 +91,28 @@
 					.join('\n')
 			: pageText
 	);
+
+	/**
+	 * Closing section: the same record rebuilt out of panel elements. The Viewer
+	 * panel is wired to the page rather than to a copy of it — its dropdown and
+	 * toggle drive the split pane in section 04, and its button reseeds the
+	 * document. One document-level listener covers all of them.
+	 */
+	const CP_W = 336;
+	let panelStage: HTMLDivElement | null = $state(null);
+	$effect(() => (panelStage ? fitStage(panelStage, 12) : undefined));
+
+	$effect(() => {
+		const read = (id: string): any => (magxById(id) as any)?.getValue?.();
+		const onChange = (e: Event) => {
+			const id = (e as CustomEvent).detail?.panelElementId as string;
+			if (id === 'dp-view') view = read(id)?.index === 1 ? 'text' : 'pdf';
+			else if (id === 'dp-strip') stripWs = !!read(id);
+			else if (id === 'dp-next') reshuffle();
+		};
+		document.addEventListener('magx-panelValueChanged', onChange);
+		return () => document.removeEventListener('magx-panelValueChanged', onChange);
+	});
 </script>
 
 <svelte:head>
@@ -266,9 +290,139 @@
 			<pre class="ifc-fulltext">{rendered}</pre>
 		</div>
 	</div>
+
+	<!-- 05 ------------------------------------------------------------ -->
+	<div class="ifc-sec">
+		<span class="ifc-sec-tag">05</span>
+		<span class="ifc-sec-title">The same document, in panels</span>
+		<span class="ifc-sec-hint">drag · collapse · tab</span>
+	</div>
+	<p class="ifc-sec-note">
+		A document viewer assembled from panel elements rather than page markup. The controls are live:
+		the <em>Pane</em> dropdown and the <em>Normalise whitespace</em> toggle drive the split view in
+		section 04 above, and <em>Next document</em> reseeds the whole page. Click a title bar and press
+		<kbd>Tab</kbd> to walk the controls — <kbd>Space</kbd> toggles, arrows step the dropdown, and
+		arrows on the title bar move the panel.
+	</p>
+	<div class="ifc-card cp-card">
+		<div bind:this={panelStage} class="cp-stage">
+			<magx-panel title="Record" x="0" y="0" style="--magx-panel-panel-width:{CP_W}px">
+				<magx-panel-html title="doc #{doc.id}">
+					<div class="dp-kv">
+						<div class="dp-row"><span class="dp-k">agency</span><b>{doc.agency}</b></div>
+						<div class="dp-row"><span class="dp-k">unit</span><b>{doc.unit}</b></div>
+						<div class="dp-row"><span class="dp-k">filed</span><b>{doc.filed}</b></div>
+						<div class="dp-row"><span class="dp-k">pages</span><b>{doc.pages}</b></div>
+						<div class="dp-row"><span class="dp-k">size</span><b>{fmtBytes(doc.size)}</b></div>
+					</div>
+				</magx-panel-html>
+				<magx-panel-html title="citation">
+					<div class="dp-cite">{doc.citation}</div>
+				</magx-panel-html>
+			</magx-panel>
+
+			<magx-panel title="Quality" x="352" y="0" style="--magx-panel-panel-width:{CP_W}px">
+				<magx-panel-progressbar title="OCR confidence" currentValue={doc.ocr} maxValue="100"
+				></magx-panel-progressbar>
+				<magx-panel-html title="retrieval">
+					<div class="dp-kv">
+						<div class="dp-row">
+							<span class="dp-k">served from</span><b>{doc.source}</b>
+						</div>
+						<div class="dp-row">
+							<span class="dp-k">db</span><b>{doc.dbMs.toFixed(1)} ms</b>
+						</div>
+						<div class="dp-row">
+							<span class="dp-k">fs</span><b>{doc.fsMs.toFixed(1)} ms</b>
+						</div>
+						<div class="dp-row">
+							<span class="dp-k">entities</span><b>{doc.entities}</b>
+						</div>
+						<div class="dp-row">
+							<span class="dp-k">capture</span><b>{doc.scanned ? 'scanned' : 'born-digital'}</b>
+						</div>
+					</div>
+				</magx-panel-html>
+				<magx-panel-html title="statutes cited">
+					<div class="dp-tags">
+						{#each doc.statutes as s (s)}<span class="ifc-badge b-vanilla">{s}</span>{/each}
+					</div>
+				</magx-panel-html>
+			</magx-panel>
+
+			<magx-panel title="Viewer" x="704" y="0" style="--magx-panel-panel-width:{CP_W}px">
+				<magx-panel-dropdown id="dp-view" title="Pane" index="0">
+					<option>pdf</option>
+					<option>text</option>
+				</magx-panel-dropdown>
+				<magx-panel-toggle
+					id="dp-strip"
+					title="Normalise whitespace"
+					labelOn="ON"
+					labelOff="OFF"
+					checked
+				></magx-panel-toggle>
+				<magx-panel-button id="dp-next" title="Next document" mode="momentary"
+				></magx-panel-button>
+				<magx-panel-textarea
+					id="dp-note"
+					title="Reviewer note"
+					placeholder="Notes are typed here — Tab in, type, Tab out."
+				></magx-panel-textarea>
+				<magx-panel-html title="state">
+					<div class="dp-log">
+						pane {view} · text {stripWs ? 'normalised' : 'verbatim'} · seed {seed}
+					</div>
+				</magx-panel-html>
+			</magx-panel>
+		</div>
+	</div>
 </div>
 
 <style>
+	/* Panels are absolutely positioned, so the stage needs its own box.
+	   `fitStage` supplies the height; the min-height is only a pre-measure
+	   fallback so the section never flashes at zero. */
+	.cp-stage {
+		position: relative;
+		min-width: 1056px;
+		min-height: 320px;
+	}
+	.dp-kv {
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+	}
+	.dp-row {
+		display: flex;
+		align-items: baseline;
+		gap: 6px;
+		font-size: 0.68rem;
+	}
+	.dp-row b {
+		margin-left: auto;
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+	.dp-k {
+		opacity: 0.6;
+	}
+	.dp-cite {
+		font-family: Palatino, 'Palatino Linotype', Georgia, serif;
+		font-size: 0.72rem;
+		line-height: 1.45;
+	}
+	.dp-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+	}
+	.dp-log {
+		font-size: 0.64rem;
+		opacity: 0.7;
+		font-variant-numeric: tabular-nums;
+	}
+
 	.doc-title {
 		font-size: 1.25rem;
 		font-weight: 800;

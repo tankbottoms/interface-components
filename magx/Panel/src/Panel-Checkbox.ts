@@ -52,7 +52,7 @@ export class MagxPanelCheckbox extends MagxPanelBaseElement {
                     <input id="${this.id}" type="checkbox" .checked=${this.checked} @change=${this._valueChanged} @blur=${this._removeFocus} @focus=${this._addFocus} />
                     <span></span>
                 </label>
-                <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticTap} /></label>
+                <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticTap} /></label>
             </div>
         `;
     }

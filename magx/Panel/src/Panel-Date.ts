@@ -88,7 +88,7 @@ export class MagxPanelDate extends MagxPanelBaseElement {
             <div class="label"><b>${this.title}</b></div>
             <div class="input-wrapper">
                 <input id=${this.id} class="text_input" type="date" .value=${this.dateValue} @input=${this._valueChanged} .min=${this._minDate} .max=${this._maxDate} @blur=${this._handleBlur} @focus=${this._addFocus}/>
-                <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticTap} /></label>
+                <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticTap} /></label>
             </div>
         </div>
         `;

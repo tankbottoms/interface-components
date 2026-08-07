@@ -307,9 +307,17 @@
 	<p class="ifc-sec-note">
 		Application state publishes a single <code>--live-value-pct</code>. A bar, a dial, a gradient
 		stop and a text colour all read it. Nothing recalculates in script when the number moves — the
-		frame budget goes to the compositor instead. Raise the FPS control above to see it driven at
-		rate.
+		frame budget goes to the compositor instead. Use the controls below to drive it: pause holds the
+		last value so the four readouts can be compared against each other, and the FPS slider sets how
+		fast the number is republished.
 	</p>
+	<AnimBar
+		bind:fps
+		{seed}
+		{frame}
+		onreshuffle={reshuffle}
+		note="Paused holds --live-value-pct; the readouts stay in sync because they all read the same property."
+	/>
 	<div bind:this={meterEl} class="ifc-card value-stage">
 		<div class="value-row">
 			<span class="value-k">bar</span>

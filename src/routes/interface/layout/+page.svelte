@@ -17,6 +17,8 @@
 	import AnimBar from '$lib/interface/AnimBar.svelte';
 	import HoverCard from '$lib/interface/HoverCard.svelte';
 	import Tooltip from '$lib/interface/charts/Tooltip.svelte';
+	import { fitStage } from '$lib/interface/fitStage';
+	import { magxById } from '$lib/interface/magx';
 
 	let seed = $state(11);
 	let fps = $state(0);
@@ -213,6 +215,39 @@
 
 	const stateToken = (s: string) =>
 		s === 'indexed' ? 'b-mint' : s === 'queued' ? 'b-vanilla' : 'b-blush';
+
+	/**
+	 * The closing section rebuilds this page's own surfaces out of panels, and
+	 * the controls in them are not a parallel copy of the page state — they drive
+	 * it. Changing "Row density" in the panel re-renders the table in section 06;
+	 * the fps range is the same `fps` the animate bar at the top writes.
+	 *
+	 * Binding is two-way and safe in both directions because every panel setter
+	 * guards on inequality (`Panel-DropDown.index`, `Panel-Range.value`), so the
+	 * value coming back from Svelte after a user change is a no-op rather than a
+	 * second notification.
+	 */
+	const CP_W = 336;
+	let panelStage: HTMLDivElement | null = $state(null);
+	$effect(() => (panelStage ? fitStage(panelStage, 12) : undefined));
+
+	let panelNode = $state(0);
+	const focusNode = $derived(nodes[panelNode] ?? nodes[0]);
+
+	$effect(() => {
+		const read = (id: string): any => (magxById(id) as any)?.getValue?.();
+		const onChange = (e: Event) => {
+			const id = (e as CustomEvent).detail?.panelElementId as string;
+			if (id === 'lp-node') panelNode = read(id)?.index ?? 0;
+			else if (id === 'lp-density')
+				density = read(id)?.index === 1 ? 'compact' : 'comfortable';
+			else if (id === 'lp-strip') stripWs = !!read(id);
+			else if (id === 'lp-fps') fps = Number(read(id) ?? 0);
+			else if (id === 'lp-reshuffle') reshuffle();
+		};
+		document.addEventListener('magx-panelValueChanged', onChange);
+		return () => document.removeEventListener('magx-panelValueChanged', onChange);
+	});
 </script>
 
 <svelte:head>
@@ -544,6 +579,94 @@
 		{/if}
 	</Tooltip>
 
+	<!-- 08 ------------------------------------------------------------ -->
+	<div class="ifc-sec">
+		<span class="ifc-sec-tag">08</span>
+		<span class="ifc-sec-title">The same surfaces, in panels</span>
+		<span class="ifc-sec-hint">drag · collapse · tab</span>
+	</div>
+	<p class="ifc-sec-note">
+		Everything above rebuilt as a panel stack. The three panels are not a separate demo — the
+		<em>View</em> controls write the page state directly, so changing row density re-renders the
+		table in section 06 and the fps range is the same one the animate bar at the top drives. Click a
+		title bar and press <kbd>Tab</kbd> to walk the controls; <kbd>Space</kbd> toggles, arrows step a
+		dropdown or a slider, and arrows on the title bar nudge the panel itself.
+	</p>
+	<div class="ifc-card cp-card">
+		<div bind:this={panelStage} class="cp-stage">
+			<magx-panel title="Corpus" x="0" y="0" style="--magx-panel-panel-width:{CP_W}px">
+				<magx-panel-html title="indexed totals">
+					<div class="lp-kv">
+						{#each kpis as k (k.label)}
+							<div class="lp-row">
+								<span class="lp-k">{k.label}</span>
+								<b class="lp-v">{k.value}</b>
+								<span class="lp-s">{k.sub}</span>
+							</div>
+						{/each}
+					</div>
+				</magx-panel-html>
+				<magx-panel-html title="sources">
+					<div class="lp-kv">
+						{#each sources as s (s.label)}
+							<div class="lp-row">
+								<span class="lp-k">{s.label}</span>
+								<b class="lp-v">{s.latency.toFixed(1)} ms</b>
+								<span class="lp-s">{s.detail}</span>
+							</div>
+						{/each}
+					</div>
+				</magx-panel-html>
+			</magx-panel>
+
+			<magx-panel title="Fleet" x="352" y="0" style="--magx-panel-panel-width:{CP_W}px">
+				<magx-panel-dropdown id="lp-node" title="Node" index={panelNode}>
+					{#each nodes as n (n.name)}<option>{n.name}</option>{/each}
+				</magx-panel-dropdown>
+				<magx-panel-html title="{focusNode.role} · {focusNode.link}">
+					<MeterBar label="LOAD" value={focusNode.load} display="{focusNode.load.toFixed(0)}%" />
+					<MeterBar label="DISK" value={focusNode.disk} display="{focusNode.disk.toFixed(0)}%" />
+					<div class="lp-kv" style="margin-top:6px">
+						<div class="lp-row">
+							<span class="lp-k">rtt</span><b class="lp-v">{focusNode.rtt.toFixed(1)} ms</b>
+							<span class="lp-s">{focusNode.up ? 'up' : 'unreachable'}</span>
+						</div>
+						<div class="lp-row">
+							<span class="lp-k">cores</span><b class="lp-v">{focusNode.cores}</b>
+							<span class="lp-s">{focusNode.ramGB} GB</span>
+						</div>
+					</div>
+				</magx-panel-html>
+				<magx-panel-html title="load — last 32 samples">
+					<MiniSpark values={focusNode.trend} token="aqua" unit="%" height={64} />
+				</magx-panel-html>
+			</magx-panel>
+
+			<magx-panel title="View" x="704" y="0" style="--magx-panel-panel-width:{CP_W}px">
+				<magx-panel-dropdown id="lp-density" title="Row density" index="0">
+					<option>comfortable</option>
+					<option>compact</option>
+				</magx-panel-dropdown>
+				<magx-panel-toggle
+					id="lp-strip"
+					title="Strip whitespace"
+					labelOn="ON"
+					labelOff="OFF"
+					checked
+				></magx-panel-toggle>
+				<magx-panel-range id="lp-fps" title="Animate (fps)" min="0" max="30" step="1" value={fps}
+				></magx-panel-range>
+				<magx-panel-button id="lp-reshuffle" title="Reshuffle" mode="momentary"
+				></magx-panel-button>
+				<magx-panel-html title="live state">
+					<div class="lp-log">
+						seed {seed} · frame {frame} · {density} · ws {stripWs ? 'stripped' : 'kept'}
+					</div>
+				</magx-panel-html>
+			</magx-panel>
+		</div>
+	</div>
+
 	<div class="ifc-hr"></div>
 	<div class="ifc-mono-note">
 		Build footer pattern — version, commit, node, and generation time in one hairline row.
@@ -556,6 +679,44 @@
 </div>
 
 <style>
+	/* Panels are absolutely positioned, so the stage needs its own box. The
+	   min-width keeps all three side by side before any dragging; `fitStage`
+	   supplies the height, and the min-height below is only a pre-measure
+	   fallback so the section never flashes at zero. */
+	.cp-stage {
+		position: relative;
+		min-width: 1056px;
+		min-height: 320px;
+	}
+	.lp-kv {
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+	}
+	.lp-row {
+		display: flex;
+		align-items: baseline;
+		gap: 6px;
+		font-size: 0.68rem;
+	}
+	.lp-k {
+		min-width: 62px;
+		opacity: 0.6;
+	}
+	.lp-v {
+		font-variant-numeric: tabular-nums;
+	}
+	.lp-s {
+		margin-left: auto;
+		opacity: 0.5;
+		font-size: 0.62rem;
+	}
+	.lp-log {
+		font-size: 0.64rem;
+		opacity: 0.7;
+		font-variant-numeric: tabular-nums;
+	}
+
 	.popbar {
 		display: flex;
 		align-items: center;

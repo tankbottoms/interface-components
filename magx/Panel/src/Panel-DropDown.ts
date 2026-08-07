@@ -81,15 +81,53 @@ export class MagxPanelDropdown extends MagxPanelBaseElement {
         if (overlay) overlay.style.display = '';
     }
 
+    // Enumerate the options from the keyboard.
+    //
+    // A focused <select> looks like it already does this, but on macOS the arrow
+    // keys open the native picker instead of stepping the value, so nothing
+    // changes until the picker is dismissed and no `change` fires in between.
+    // Stepping selectedIndex directly makes Up/Down behave the same on every
+    // platform, and keeps the panel's value event stream continuous.
+    //
+    // Enter and Space still open the picker, which is the right escape hatch for
+    // a long list where stepping one at a time is tedious.
+    private _keydown(e: KeyboardEvent): void {
+        if (!this._dropdown) { return; }
+        const last = this._dropdown.options.length - 1;
+        if (last < 0) { return; }
+
+        let next = this._dropdown.selectedIndex;
+        switch (e.key) {
+            case 'ArrowDown':
+            case 'ArrowRight': next = Math.min(last, next + 1); break;
+            case 'ArrowUp':
+            case 'ArrowLeft': next = Math.max(0, next - 1); break;
+            case 'Home': next = 0; break;
+            case 'End': next = last; break;
+            case 'Enter':
+            case ' ':
+                e.preventDefault();
+                this._dropdown.showPicker?.();
+                return;
+            default: return;
+        }
+
+        e.preventDefault();
+        if (next === this._dropdown.selectedIndex) { return; }
+        this._dropdown.selectedIndex = next;
+        this._valueChanged();
+        this.requestUpdate();
+    }
+
     // Renders the component
     render() {
         return html`
             <div class="container_base" id="container">
                 <label class="label"><b>${this.title}</b></label>
                 <div class="select-wrapper">
-                    <select class="select" id=${this.id} @change=${this._valueChanged} .selectedIndex=${this.index} @blur=${this._handleBlur} @focus=${this._addFocus}>
+                    <select class="select" id=${this.id} @change=${this._valueChanged} .selectedIndex=${this.index} @keydown=${this._keydown} @blur=${this._handleBlur} @focus=${this._addFocus}>
                     </select>
-                    <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticTap} /></label>
+                    <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticTap} /></label>
                 </div>
                 <slot id="to_be_removed"></slot>
             </div>

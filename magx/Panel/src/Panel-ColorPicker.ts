@@ -56,15 +56,60 @@ export class MagxPanelColorPicker extends MagxPanelBaseElement {
         if (overlay) overlay.style.display = '';
     }
 
+    // A keyboard cannot drive a native colour well: <input type="color"> opens an
+    // OS dialog that the page has no reach into, so a Tab stop here used to be a
+    // dead end — focusable, and then nothing.
+    //
+    // Arrows step a small fixed ramp instead, which is enough to pick a colour
+    // without a mouse and matches how the rest of the panel behaves under arrow
+    // keys. Enter and Space still open the real picker for anything precise.
+    // The ramp is a hue sweep at one lightness rather than a designer palette,
+    // so the control stays generic — a panel is not the place to hardcode a
+    // brand.
+    private static readonly _RAMP: string[] = [
+        '#000000', '#4d4d4d', '#8c8c8c', '#cccccc', '#ffffff',
+        '#c0392b', '#e07a3f', '#e3b23c', '#6fa84f', '#3d9a8b',
+        '#3792a4', '#3b6fa8', '#6f5aa8', '#a85a93'
+    ];
+
+    private _step(delta: number): void {
+        const ramp = MagxPanelColorPicker._RAMP;
+        const cur = this._color.toLowerCase();
+        const at = ramp.indexOf(cur);
+        // An off-ramp colour (set by attribute or by the OS picker) enters the
+        // ramp at the end nearest the direction of travel rather than jumping
+        // to index 0, so the first press moves by one step like every other.
+        const next = at < 0
+            ? (delta > 0 ? 0 : ramp.length - 1)
+            : Math.min(ramp.length - 1, Math.max(0, at + delta));
+
+        this.color = ramp[next];
+        if (this._colorInput) { this._colorInput.value = ramp[next]; }
+    }
+
+    private _keydown(e: KeyboardEvent): void {
+        switch (e.key) {
+            case 'ArrowDown':
+            case 'ArrowRight': e.preventDefault(); this._step(1); break;
+            case 'ArrowUp':
+            case 'ArrowLeft': e.preventDefault(); this._step(-1); break;
+            case 'Enter':
+            case ' ':
+                e.preventDefault();
+                this._colorInput?.click();
+                break;
+        }
+    }
+
     // Renders the component
     render() {
         return html`
-            <div tabIndex="0" class="container_base" id="container" @blur=${this._handleBlur} >
+            <div tabIndex="0" class="container_base" id="container" role="listbox" aria-label=${this.title || 'Colour'} @keydown=${this._keydown} @focus=${this._addFocus} @blur=${this._handleBlur} >
                 <div class="label"><b>${this.title}:</b> ${this.color}</div>
                 <div class="color-wrapper">
                     <label class="color_label" for="${this.id}_input" style="background-color: ${this.color};"></label>
                     <input id="${this.id}_input" class="color" type="color" .value=${this.color} @input=${this._valueChanged}/>
-                    <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticTap} /></label>
+                    <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticTap} /></label>
                 </div>
             </div>
         `;

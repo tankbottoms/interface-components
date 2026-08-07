@@ -125,7 +125,7 @@ export class MagxPanelTextInput extends MagxPanelBaseElement {
                 <div class="label"><b>${this.title}</b></div>
                 <div class="input-wrapper">
                     <input id=${this.id} class="text_input" type="${this._type}" @input=${this._valueChanged} .value=${this.text} @blur=${this._handleBlur} @focus=${this._addFocus} .placeholder=${this.placeholder} maxlength="${this.maxLength}" />
-                    <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticFocus} /></label>
+                    <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticFocus} /></label>
                 </div>
             </div>
         `;

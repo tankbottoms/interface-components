@@ -20,6 +20,7 @@ export class MagxPanel extends LitElement {
     private _maxY: number = 0;
     private _outOfBoundsCheck: boolean = true;
     private _activePointerId: number = -1;
+    private _selected: boolean = false;
 
     private _showCloseButton: boolean = true;
     private _draggable: boolean = true;
@@ -164,6 +165,82 @@ export class MagxPanel extends LitElement {
         this._drag = this._drag.bind(this);
         this._endDrag = this._endDrag.bind(this);
         this._doubleClickTitle = this._doubleClickTitle.bind(this);
+        this._focusIn = this._focusIn.bind(this);
+        this._focusOut = this._focusOut.bind(this);
+        this._titleKeydown = this._titleKeydown.bind(this);
+    }
+
+    // --- selection ---------------------------------------------------------
+    //
+    // A panel is "selected" when focus is anywhere inside it — its own title bar
+    // or any of its controls. Selection raises it above its neighbours and draws
+    // a border, which is the same thing a click on the title bar has always done
+    // for the mouse. Deriving it from focus rather than tracking a separate
+    // "current panel" means the keyboard and the pointer cannot disagree about
+    // which panel is active.
+    //
+    // `focusout` fires before the matching `focusin` when moving between two
+    // controls in the same panel, so deselecting has to wait a tick and check
+    // where focus actually landed. Doing it synchronously makes the border
+    // flicker on every Tab.
+    private _focusIn(): void {
+        if (this._selected) { return; }
+        this._selected = true;
+        this._panel?.classList.add('is-selected');
+        if (this._panel) {
+            ++MagxPanel._topZ;
+            this._panel.style.zIndex = MagxPanel._topZ.toString();
+        }
+    }
+
+    private _focusOut(): void {
+        setTimeout(() => {
+            if (this.contains(document.activeElement) || this.shadowRoot?.activeElement) { return; }
+            this._selected = false;
+            this._panel?.classList.remove('is-selected');
+        }, 0);
+    }
+
+    // Keys handled on the title bar, i.e. when the panel as a whole is the
+    // focused thing rather than one of its controls.
+    //
+    //   Enter / Space  collapse and expand, matching the double-click
+    //   Arrows         move the panel, 8px a press and 24 with Shift
+    //   Escape         hand focus back to the page
+    //
+    // Tab is left alone: from the title bar it falls through to the first
+    // control inside the panel, which is exactly the wanted behaviour and is
+    // already what sequential focus navigation does across an open shadow root.
+    private _titleKeydown(e: KeyboardEvent): void {
+        const nudge = e.shiftKey ? 24 : 8;
+
+        switch (e.key) {
+            case 'Enter':
+            case ' ':
+                if (!this._collapsible) { return; }
+                e.preventDefault();
+                this.toggleCollapsed();
+                return;
+            case 'Escape':
+                (this.shadowRoot?.activeElement as HTMLElement | null)?.blur();
+                return;
+            case 'ArrowLeft':
+            case 'ArrowRight':
+            case 'ArrowUp':
+            case 'ArrowDown':
+                break;
+            default:
+                return;
+        }
+
+        if (!this._draggable || !this._panel) { return; }
+        e.preventDefault();
+
+        const x = parseInt(this._panel.style.left || '0', 10) || 0;
+        const y = parseInt(this._panel.style.top || '0', 10) || 0;
+        const dx = e.key === 'ArrowLeft' ? -nudge : e.key === 'ArrowRight' ? nudge : 0;
+        const dy = e.key === 'ArrowUp' ? -nudge : e.key === 'ArrowDown' ? nudge : 0;
+        this.setPosition(x + dx, y + dy);
     }
 
     // Helper method to create an element
@@ -226,6 +303,13 @@ export class MagxPanel extends LitElement {
     private _startDrag(event: PointerEvent) {
         if (!this._panel) { return; }
 
+        // pointerdown is preventDefault()ed below to stop the browser starting a
+        // text selection mid-drag, which also suppresses the focus a click would
+        // normally give the title bar. Focus it explicitly so that clicking a
+        // panel and then pressing an arrow key moves it, rather than doing
+        // nothing until the user has also Tabbed to it.
+        this._titleBar?.focus({ preventScroll: true });
+
         if (this._draggable && this._titleBar) {
             ++MagxPanel._topZ;
             this._panel.style.zIndex = MagxPanel._topZ.toString();
@@ -280,11 +364,18 @@ export class MagxPanel extends LitElement {
     // Renders the element
     protected render() {
         return html`
-        <div id="panel" class="main_panel" @click=${this._panelClicked}>
+        <div id="panel" class="main_panel" @click=${this._panelClicked}
+             @focusin=${this._focusIn} @focusout=${this._focusOut}>
             <div class="title_bar_container">
-                <div class="title_bar" id="title_bar" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag}>${this.title}</div>
+                <div class="title_bar" id="title_bar" tabindex="0" role="button"
+                    aria-label="${this.title} panel"
+                    @keydown=${this._titleKeydown}
+                    @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag}>${this.title}</div>
                 <div class="title_bar_filler" @dblclick=${this._doubleClickTitle} @pointerdown=${this._startDrag}></div>
-                <div class="title_bar_close_button_container" id="close_button" @click=${this._removePanel}>
+                <div class="title_bar_close_button_container" id="close_button" tabindex="0" role="button"
+                    aria-label="Close panel"
+                    @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this._removePanel(); } }}
+                    @click=${this._removePanel}>
                     <svg class="title_bar_close_button_svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <line x1="25" y1="25" x2="75" y2="75" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
                         <line x1="75" y1="25" x2="25" y2="75" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
@@ -435,6 +526,22 @@ export class MagxPanel extends LitElement {
             border: none;
             color: var(--magx-panel-text-color);
             touch-action: none;
+        }
+
+        /*
+         * The panel as a whole is the keyboard target: Tab lands on the title
+         * bar first, and from there Enter collapses, arrows move it, and another
+         * Tab walks into the controls. So the title bar carries the ring and the
+         * panel carries the "this is the one you are driving" outline.
+         */
+        .title_bar:focus-visible,
+        .title_bar_close_button_container:focus-visible {
+            outline: var(--magx-panel-focus-ring, 2px solid #4c9be8);
+            outline-offset: -2px;
+        }
+
+        .main_panel.is-selected {
+            box-shadow: var(--magx-panel-panel-shadow-selected, 0 0 0 1px var(--magx-panel-selected-outline, #4c9be8), var(--magx-panel-panel-shadow));
         }
     `;
 }

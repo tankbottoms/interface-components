@@ -144,6 +144,40 @@ export class MagxPanelButton extends MagxPanelBaseElement {
         }
     }
 
+    // The tab stop is the label, not the hidden switch inside it.
+    //
+    // That switch exists only because iOS fires a native haptic when a real
+    // <label> toggles a real switch — it is a haptic transport, not a control,
+    // and it carries no focus ring, so leaving it as the tab stop meant the
+    // button could be focused with no way to see that it was. The label takes
+    // the focus and forwards the keys.
+    //
+    // Space and Enter both fire the primary action, as they do on a native
+    // <button>. Holding either fires the secondary action, mirroring the
+    // long-press: keydown repeats while a key is held, so the first repeat is
+    // the signal that this is a hold rather than a tap.
+    private _keydown(e: KeyboardEvent): void {
+        if (e.key !== ' ' && e.key !== 'Enter') { return; }
+        e.preventDefault();
+
+        if (e.repeat) {
+            if (!this.secondary || this._wasLong) { return; }
+            this._wasLong = true;
+            MagxHaptics.trigger('heavy');
+            this._fire('secondary');
+            return;
+        }
+        if (this._wasLong) { return; }
+        MagxHaptics.trigger('medium');
+        this._fire('primary');
+    }
+
+    // A hold that fired the secondary action must not also fire the primary one
+    // when the key comes back up.
+    private _keyup(): void {
+        this._wasLong = false;
+    }
+
     private _context(e: Event): void {
         if (!this.secondary) return;
         e.preventDefault();
@@ -169,11 +203,14 @@ export class MagxPanelButton extends MagxPanelBaseElement {
         return html`
             <div class="container_base" id="container">
                 <label id=${this.id} class="button ${dark ? 'is-dark' : ''} ${busy ? 'is-busy' : ''}"
+                    tabindex="0" role="button"
+                    aria-pressed=${this.mode === 'toggle' ? String(this._on) : 'undefined'}
+                    @keydown=${this._keydown} @keyup=${this._keyup}
                     @blur=${this._removeFocus} @focus=${this._addFocus}
                     @pointerdown=${this._pointerdown} @pointerup=${this._pointerup}
                     @pointercancel=${this._pointerup} @pointerleave=${this._pointerup}
                     @contextmenu=${this._context}>
-                    <input type="checkbox" switch class="haptic-switch" @change=${this._clicked} />
+                    <input type="checkbox" switch tabindex="-1" aria-hidden="true" class="haptic-switch" @change=${this._clicked} />
                     <span class="button-text">${label}</span>
                     ${this.mode === 'toggle'
                         ? html`<span class="mark">${this._on ? 'ON' : 'OFF'}</span>`

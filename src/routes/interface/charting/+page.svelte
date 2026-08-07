@@ -508,7 +508,7 @@
 		white-plate popovers, and the Reshuffle and FPS controls at the top of the page drive these three
 		exactly as they drive the rest.
 	</p>
-	<div class="ifc-card">
+	<div class="ifc-card cp-card">
 		<div bind:this={panelStage} class="cp-stage">
 			<magx-panel title="Baseline draw" x="0" y="0" style="--magx-panel-panel-width:{CP_W}px">
 				<magx-panel-html title="watts · 30-minute buckets">

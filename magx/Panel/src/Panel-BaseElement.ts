@@ -132,5 +132,27 @@ export abstract class MagxPanelBaseElement extends LitElement {
 	        background: var(--magx-panel-text-bg-focused);
 	        border: var(--magx-panel-text-border-focused);
         }
+
+        /*
+         * Keyboard focus has to be visible or Tab is useless — you can move
+         * through the panel but never see where you are.
+         *
+         * Several controls here set "outline: none" to kill the platform ring,
+         * which was fine while the panel was mouse-only. This puts a ring back
+         * on the *container*, not the control, so a checkbox and a text field
+         * highlight the same way and the ring never gets clipped by a 20px-tall
+         * swatch.
+         *
+         * :has(:focus-visible) rather than :focus-within on purpose —
+         * :focus-within is true for a mouse click as well, and a ring that
+         * appears on every click reads as a selection state rather than as a
+         * keyboard cue. The second selector covers containers that are
+         * themselves the tab stop (the colour picker).
+         */
+        .container_base:has(:focus-visible),
+        .container_base:focus-visible {
+            outline: var(--magx-panel-focus-ring, 2px solid #4c9be8);
+            outline-offset: -2px;
+        }
     `;
 }

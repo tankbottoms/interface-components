@@ -59,7 +59,7 @@ export class MagxPanelFileChooser extends MagxPanelBaseElement {
                 <div class="file-wrapper">
                     <input id=${this.id} type="file" class="file_chooser" @change=${this._valueChanged} @blur=${this._handleBlur} @focus=${this._addFocus} />
                     <label id="file_chooser_label" class="file_chooser_label" for=${this.id}>${this.placeholderLabel}</label>
-                    <label class="haptic-overlay"><input type="checkbox" switch class="haptic-switch" @change=${this._hapticTap} /></label>
+                    <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticTap} /></label>
                 </div>
             </div>
         `;

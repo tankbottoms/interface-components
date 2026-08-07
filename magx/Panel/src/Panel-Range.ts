@@ -103,6 +103,12 @@ export class MagxPanelRange extends MagxPanelBaseElement {
             box-sizing: border-box;
         }
 
+        /*
+         * The ring lives on the container (see Panel-BaseElement), not here: a
+         * range input is only a few pixels tall, so an outline on the input
+         * itself hugs the track and reads as part of the slider rather than as
+         * focus. The container ring surrounds the label and the track together.
+         */
         .range:focus {
             outline: none;
             border: none;
