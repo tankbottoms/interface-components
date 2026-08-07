@@ -129,7 +129,7 @@
 		leaves — the <em>return</em> half. Tuning those two halves separately is the entire craft of
 		spring motion.
 	</p>
-	<div class="ifc-grid ifc-grid-2" style="margin-top:var(--spacing-md)">
+	<div class="ifc-grid ifc-grid-2 repel-variants" style="margin-top:var(--spacing-md)">
 		<div class="ifc-card">
 			<div class="ifc-card-title">Outbound changed — short reach, hard shove</div>
 			<div class="ifc-card-sub">
@@ -308,10 +308,25 @@
 </div>
 
 <style>
-	.repel-stage {
+	/*
+	 * The three words are the subject of this section, so each one sits centred
+	 * in its card — horizontally, and vertically in the space left over once the
+	 * caption above it has taken what it needs. The two variant cards carry
+	 * different amounts of caption, so without this they sat at different heights
+	 * and the comparison they exist to make was harder to see.
+	 */
+	.repel-stage,
+	.repel-variants :global(.ifc-card) {
 		display: flex;
-		justify-content: center;
+		flex-direction: column;
 		overflow: hidden;
+	}
+	.repel-stage :global(.rt),
+	.repel-variants :global(.rt) {
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
 	}
 
 	.lp-note {

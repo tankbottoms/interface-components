@@ -16,6 +16,8 @@
 	 */
 	import { onTick, hexToRgb, cssVar } from '$lib/anim';
 	import { walk, RESERVOIR, windowOf, driftOne, fmtBytes, fmtCompact } from '$lib/interface/generate';
+	import DemoControls from '$lib/components/DemoControls.svelte';
+	import { fitStage } from '$lib/interface/fitStage';
 
 	const PANEL_W = 288;
 
@@ -216,6 +218,24 @@
 		};
 	});
 
+	/* Size each console to its panels once they have upgraded and laid out. */
+	$effect(() => {
+		if (!ready) return;
+		const stops = [...document.querySelectorAll<HTMLElement>('.pc-canvas')].map((s) => fitStage(s));
+		return () => stops.forEach((f) => f());
+	});
+
+	/**
+	 * Keep the in-panel Animate slider showing the page rate. Section 01 makes the
+	 * point that the panel element and the strip above are the same control, which
+	 * only reads as true if moving one moves the other.
+	 */
+	$effect(() => {
+		const rate = fps;
+		if (!ready) return;
+		(document.getElementById('pc-fps') as any)?.setValue?.(rate);
+	});
+
 	$effect(() => {
 		if (!ready) return;
 		paint(gpuSpark, util, '--stroke-aqua');
@@ -337,6 +357,28 @@
 			the GPU console.
 		</p>
 	</header>
+
+	<!--
+		One rate for the whole page. Every series on all three consoles is derived
+		from `frame`, so this single strip animates all six charts at once — the
+		in-panel Animate slider in the GPU console writes the same state, which is
+		the comparison that section is making.
+	-->
+	<div class="pc-anim">
+		<DemoControls
+			bind:fps
+			max={30}
+			onreshuffle={() => (seed = (seed * 31 + 17) % 99991)}
+			note="drives all six charts on this page"
+		/>
+		<p class="pc-anim-note">
+			Animation is off until you press play, because a console that moves while you are reading it is
+			harder to read. Every chart below shares this one clock: the sparklines slide, the readouts
+			drift, and the fleet table re-sorts, all from the same <code>frame</code> counter. Reshuffle
+			reseeds the generators instead of advancing them, so you get a different plausible situation
+			rather than the next second of this one.
+		</p>
+	</div>
 
 	<!-- 01 GPU control ------------------------------------------------- -->
 	<div class="ifc-sec">
@@ -570,9 +612,19 @@
 	.pc-canvas {
 		position: relative;
 		min-width: calc(var(--w) * 3 + 32px);
-		/* Tall enough for the fullest panel — every rate readout now carries its
-		   own chart, so the telemetry and pipeline panels grew. */
-		min-height: 700px;
+		/* Fallback only. `fitStage` overwrites this with the measured extent of
+		   the panels, so the section is never half-empty and never spills. */
+		min-height: 240px;
+	}
+
+	.pc-anim {
+		margin-bottom: var(--spacing-lg);
+	}
+	.pc-anim-note {
+		margin: var(--spacing-sm) 0 0;
+		font-size: 0.78rem;
+		line-height: 1.6;
+		color: var(--ink-soft);
 	}
 
 	.pc-kv {

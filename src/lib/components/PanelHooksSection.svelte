@@ -14,6 +14,8 @@
 	 * `detail.panelElementId`. That single listener is the whole integration
 	 * surface — there is no per-element subscription API to learn.
 	 */
+	import { fitStage } from '$lib/interface/fitStage';
+
 	const GLYPHS = [
 		'fa-gauge-high',
 		'fa-microchip',
@@ -61,6 +63,18 @@
 	 * sliders moved without touching the picture and the glyph button never
 	 * advanced, in the build but never in dev. An effect survives the build.
 	 */
+	/**
+	 * Each stage holds one absolutely-positioned panel and so has no height of
+	 * its own. The Display panel grew when the preview image moved inside it and
+	 * promptly overran its fixed stage, landing on top of the plate below.
+	 */
+	$effect(() => {
+		const stops = [...document.querySelectorAll<HTMLElement>('.hooks-grid .stage')].map((s) =>
+			fitStage(s, 12)
+		);
+		return () => stops.forEach((f) => f());
+	});
+
 	$effect(() => {
 		canVibrate = typeof navigator !== 'undefined' && 'vibrate' in navigator;
 
@@ -256,6 +270,7 @@
 	.stage {
 		position: relative;
 		width: 250px;
+		/* Fallback only — `fitStage` measures the panel and sets a real height. */
 		min-height: 170px;
 		margin-bottom: var(--spacing-sm);
 	}

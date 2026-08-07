@@ -13,6 +13,7 @@
 	import { onTick, hexToRgb, cssVar } from '$lib/anim';
 	import { walk, spiky, diurnal } from '$lib/interface/generate';
 	import { chartSeries } from '$lib/data/palette';
+	import { fitStage } from '$lib/interface/fitStage';
 
 	declare const __BUILD_VERSION__: string;
 
@@ -162,6 +163,15 @@
 			stop = true;
 			if (raf) cancelAnimationFrame(raf);
 		};
+	});
+
+	/* Size each column to its panel rather than to a guessed min-height. */
+	$effect(() => {
+		if (!ready) return;
+		const stops = [...document.querySelectorAll<HTMLElement>('.hero-dash .panel-stage')].map((s) =>
+			fitStage(s, 12)
+		);
+		return () => stops.forEach((f) => f());
 	});
 
 	/**
@@ -327,23 +337,6 @@
 					></magx-panel-toggle>
 				</magx-panel>
 			</div>
-			<figure class="plate">
-				<img
-					src="/screenshots/trainer-hero.jpg"
-					alt="Pencil drawing of a time-trial bike on an indoor trainer"
-					width="300"
-					height="300"
-					loading="lazy"
-				/>
-				<figcaption>
-					Same box as the panel — drawn for
-					<a
-						href="https://heart-rate-broadcaster.atsignhandle.workers.dev/about"
-						target="_blank"
-						rel="noopener">heart-rate-broadcaster</a
-					>
-				</figcaption>
-			</figure>
 		</div>
 
 		<!-- Column 3 — the toolkit no responsible person should ship. -->
@@ -483,41 +476,19 @@
 		position: relative;
 		width: var(--panel-w);
 	}
+	/* Fallbacks only — `fitStage` measures each panel and sets a real height, so
+	   a column never carries dead space below its panel. */
 	.panel-stage.tall {
-		min-height: 1180px;
+		min-height: 400px;
 	}
 	.panel-stage.mid {
-		min-height: 640px;
+		min-height: 300px;
 	}
 	.col-note {
 		font-size: 0.75rem;
 		line-height: 1.55;
 		color: var(--color-text-muted);
 	}
-	.plate {
-		border: 1px solid var(--color-border);
-		background: var(--color-bg-alt);
-		padding: 6px;
-	}
-	.plate img {
-		display: block;
-		width: 100%;
-		height: auto;
-		filter: grayscale(1);
-	}
-	.plate figcaption {
-		font-family: var(--font-mono);
-		font-size: 0.6rem;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--color-text-muted);
-		margin-top: 4px;
-		line-height: 1.4;
-	}
-	.plate figcaption a {
-		color: var(--color-link);
-	}
-
 	/* Light-DOM children of magx-panel-html — not scoped away by Svelte. */
 	:global(.hero-dash .pill) {
 		font-family: var(--font-mono);
