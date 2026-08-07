@@ -5,9 +5,15 @@
 
 	interface Props {
 		components: ComponentDef[];
+		/**
+		 * Fired after any entry is picked. The desktop sidebar ignores it; the
+		 * mobile drawer uses it to close itself, so tapping a section does not
+		 * leave the overlay covering the thing you just navigated to.
+		 */
+		onnavigate?: () => void;
 	}
 
-	let { components }: Props = $props();
+	let { components, onnavigate }: Props = $props();
 	let activeId = $state('');
 
 	const panelComponents = $derived(components.filter((c) => c.group === 'panel'));
@@ -56,6 +62,7 @@
 
 	/** On the landing page anchors scroll; elsewhere they navigate back to it. */
 	function jump(id: string) {
+		onnavigate?.();
 		if (!onHome) {
 			window.location.href = `/#${id}`;
 			return;
@@ -69,6 +76,7 @@
 	 * is a scroll, and the hash is cleared so a reload lands in the same place.
 	 */
 	function goHome(e: MouseEvent) {
+		onnavigate?.();
 		if (!onHome) return; // let the anchor navigate
 		e.preventDefault();
 		document.querySelector('.main-content')?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -136,6 +144,7 @@
 				class="nav-item"
 				class:active={path.startsWith(link.href)}
 				href={link.href}
+				onclick={() => onnavigate?.()}
 				aria-current={path.startsWith(link.href) ? 'page' : undefined}
 			>
 				<i class="fas {link.icon}"></i>

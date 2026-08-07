@@ -90,51 +90,75 @@
 	<!-- 01 repel title ------------------------------------------------- -->
 	<div class="ifc-sec">
 		<span class="ifc-sec-tag">01</span>
-		<span class="ifc-sec-title">Cursor-repel heading</span>
-		<span class="ifc-sec-hint">sweep the pointer across the letters — they move out of its way</span>
+		<span class="ifc-sec-title">A heading whose letters dodge your cursor</span>
+		<span class="ifc-sec-hint">put your pointer on the word below — the letters get out of the way</span>
 	</div>
 	<p class="ifc-sec-note">
-		Each glyph is a span carrying its own spring. The pointer pushes characters away with a linear
-		falloff inside an 80px radius; when it leaves, they settle back under damping rather than
-		snapping. One <code>requestAnimationFrame</code> loop walks a flat array of glyphs — there are no
+		<strong>What this is.</strong> A page title where every letter is a separate element on a spring.
+		Bring the pointer near one and it is pushed away; take the pointer off and it drifts back to
+		where it belongs. That is the whole effect — there is nothing to click, no state, and no
+		outcome. It exists to make a masthead feel like a physical surface rather than a printed one,
+		and it is here because the same three numbers behind it (how far the pointer reaches, how hard
+		it pushes, how the thing returns) are the numbers behind every other bit of motion on this page.
+	</p>
+	<p class="ifc-sec-note" style="margin-top:var(--spacing-sm)">
+		<strong>How it is built.</strong> Each glyph is a span carrying its own spring. The pointer
+		pushes characters away with a linear falloff inside an 80px radius — the dashed circle that
+		follows your cursor below is that radius, drawn; anything inside it is being pushed, anything
+		outside it is not. When the pointer leaves, the glyphs settle back under damping rather than
+		snapping. One <code>requestAnimationFrame</code> loop walks a flat array of glyphs — no
 		per-character listeners and no CSS transitions, because a transition would fight the spring for
 		control of <code>transform</code>. Under <code>prefers-reduced-motion</code> the loop never
-		starts and the text stays ordinary.
+		starts and the text stays ordinary, selectable type.
 	</p>
 	<div class="ifc-card repel-stage">
-		<div class="ifc-card-title">Default — move your pointer through this line</div>
+		<div class="ifc-card-title">The reference setting</div>
 		<div class="ifc-card-sub">
-			radius 80 · strength 18 · stiffness 0.08 · damping 0.78 — the reference setting the two
-			variations below are compared against
+			radius 80 · strength 18 · stiffness 0.08 · damping 0.78 — the two variants below change one
+			group of these and nothing else
 		</div>
-		<RepelText text="INTERFACE" />
+		<RepelText text="INTERFACE" ring hint="Move your pointer across the letters" />
 	</div>
 	<p class="ifc-sec-note" style="margin-top:var(--spacing-sm)">
-		The two cards below run the same effect with one group of numbers changed, so the difference is
-		something you feel rather than read. Sweep the pointer across each at the same speed:
-		<strong>radius</strong> and <strong>strength</strong> control how far the pointer's influence
-		reaches and how hard it shoves; <strong>stiffness</strong> and <strong>damping</strong> control
-		how the glyphs travel home once it leaves.
+		<strong>What the two cards below are for.</strong> They are the same effect with one group of
+		numbers changed, side by side, so the parameters mean something you can feel instead of read.
+		Sweep your pointer across all three at the same speed and compare:
+		<strong>radius</strong> and <strong>strength</strong> decide how far the pointer's influence
+		reaches and how hard it shoves — that is the <em>outbound</em> half;
+		<strong>stiffness</strong> and <strong>damping</strong> decide how the glyphs travel home once it
+		leaves — the <em>return</em> half. Tuning those two halves separately is the entire craft of
+		spring motion.
 	</p>
 	<div class="ifc-grid ifc-grid-2" style="margin-top:var(--spacing-md)">
 		<div class="ifc-card">
-			<div class="ifc-card-title">Short reach, hard shove</div>
+			<div class="ifc-card-title">Outbound changed — short reach, hard shove</div>
 			<div class="ifc-card-sub">
-				radius 46 · strength 26 — only letters right under the pointer react, and they jump further
+				radius 46 · strength 26. Compare with the reference: fewer letters react at once, because the
+				circle of influence is smaller — but the ones that do react jump nearly half again as far.
 			</div>
-			<RepelText text="COMPONENTS" radius={46} strength={26} size="clamp(1.4rem,5vw,2.6rem)" />
+			<RepelText
+				text="COMPONENTS"
+				radius={46}
+				strength={26}
+				size="clamp(1.4rem,5vw,2.6rem)"
+				ring
+				hint="Sweep across — notice how few letters move"
+			/>
 		</div>
 		<div class="ifc-card">
-			<div class="ifc-card-title">Slow return, more overshoot</div>
+			<div class="ifc-card-title">Return changed — slow, loose, overshoots</div>
 			<div class="ifc-card-sub">
-				stiffness 0.04 · damping 0.88 — letters drift back lazily and wobble past centre before
-				settling
+				stiffness 0.04 · damping 0.88. The push is identical to the reference; only the way home
+				differs. Move the pointer off and watch — the letters drift back lazily and wobble past
+				centre a couple of times before settling.
 			</div>
 			<RepelText
 				text="PATTERNS"
 				stiffness={0.04}
 				damping={0.88}
 				size="clamp(1.4rem,5vw,2.6rem)"
+				ring
+				hint="Sweep across, then move away and watch them settle"
 			/>
 		</div>
 	</div>

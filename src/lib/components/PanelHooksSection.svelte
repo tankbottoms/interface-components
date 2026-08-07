@@ -14,8 +14,6 @@
 	 * `detail.panelElementId`. That single listener is the whole integration
 	 * surface — there is no per-element subscription API to learn.
 	 */
-	import { onMount } from 'svelte';
-
 	const GLYPHS = [
 		'fa-gauge-high',
 		'fa-microchip',
@@ -55,7 +53,15 @@
 		lastHaptic = ok ? `${label} · navigator.vibrate` : `${label} · switch fallback`;
 	}
 
-	onMount(() => {
+	/**
+	 * The one listener that makes all three panels work.
+	 *
+	 * This used to live in `onMount`, and the whole body was being dropped from
+	 * the production client bundle — which is why the brightness and contrast
+	 * sliders moved without touching the picture and the glyph button never
+	 * advanced, in the build but never in dev. An effect survives the build.
+	 */
+	$effect(() => {
 		canVibrate = typeof navigator !== 'undefined' && 'vibrate' in navigator;
 
 		const onChange = (e: Event) => {
@@ -64,7 +70,12 @@
 			else if (id === 'hook-contrast') contrast = Number(valueOf(id) ?? 100);
 			else if (id === 'hook-haptics') hapticsOn = Boolean(valueOf(id));
 			else if (id === 'hook-glyph') {
-				glyphIndex += 1;
+				// The button reports both its primary and secondary press through
+				// the same id; `Reset` returns to the first glyph, anything else
+				// steps forward one.
+				const v = valueOf(id);
+				const secondary = v === 'secondary' || v?.secondary === true || v?.action === 'secondary';
+				glyphIndex = secondary ? 0 : glyphIndex + 1;
 				buzz(12, `glyph → ${GLYPHS[glyphIndex % GLYPHS.length]}`);
 			} else if (id === 'hook-buzz') buzz([18, 40, 18], 'double tap');
 		};
@@ -96,6 +107,18 @@
 					></magx-panel-range>
 					<magx-panel-range id="hook-contrast" title="Contrast" min="20" max="180" value="100"
 					></magx-panel-range>
+					<!--
+						The filter is set on the custom-element host, not on the <img>.
+						The image lives in the element's shadow root, so a host filter is
+						the only way to reach it from the page — and it is the correct
+						way: filters inherit into shadow trees.
+					-->
+					<magx-panel-image
+						id="hook-image"
+						title="Preview"
+						src="/screenshots/trainer-hero.jpg"
+						style="filter: grayscale(1) brightness({brightness}%) contrast({contrast}%)"
+					></magx-panel-image>
 				</magx-panel>
 			</div>
 			<figure class="preview">
@@ -112,7 +135,10 @@
 			<p class="hook-note">
 				Two <code>magx-panel-range</code> elements. The handler reads
 				<code>getValue()</code> off the element named in the event and writes it straight into an
-				inline <code>filter</code>. No per-frame work — the browser composites it.
+				inline <code>filter</code> — applied twice here, once to the
+				<code>magx-panel-image</code> inside the panel and once to the plate below it, so you can
+				see the same value driving a picture the panel owns and a picture it does not. No per-frame
+				work — the browser composites it.
 			</p>
 		</div>
 
@@ -164,12 +190,25 @@
 			<div class="glyph-plate">
 				<i class="fat {glyph}" aria-hidden="true"></i>
 				<code>{glyph}</code>
+				<span class="glyph-count">
+					{(glyphIndex % GLYPHS.length) + 1} of {GLYPHS.length}
+				</span>
 			</div>
+			<ol class="glyph-strip">
+				{#each GLYPHS as g, i}
+					<li class:on={i === glyphIndex % GLYPHS.length}>
+						<i class="fat {g}" aria-hidden="true"></i>
+					</li>
+				{/each}
+			</ol>
 			<p class="hook-note">
-				A button push advances an index into a Font Awesome set. Icons are the bundled Pro 6.5.1
-				Thin family (<code>fat</code> prefix) — local, never a CDN, and never emoji. The progress
-				bar below the button is driven from the same index, which is the cheapest way to show a
-				panel element reflecting state owned by the host application rather than by itself.
+				<strong>Next Glyph</strong> steps forward through the set and wraps at the end;
+				<strong>Reset</strong> (the secondary press) returns to the first. The strip above shows the
+				whole enumeration with the current entry filled, so the button's effect is visible without
+				cycling through to find out. Icons are the bundled Font Awesome Pro 6.5.1 Thin family
+				(<code>fat</code> prefix) — local, never a CDN, and never emoji. The progress bar under the
+				button is driven from the same index, which is the cheapest way to show a panel element
+				reflecting state owned by the host application rather than by itself.
 			</p>
 		</div>
 	</div>
@@ -274,6 +313,38 @@
 		font-size: 3rem;
 		color: var(--color-accent);
 		line-height: 1;
+	}
+	.glyph-count {
+		font-family: var(--font-mono);
+		font-size: 0.6rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-text-muted);
+	}
+	/* The whole enumeration, current entry filled. */
+	.glyph-strip {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+		list-style: none;
+		margin: 6px 0 0;
+		padding: 0;
+	}
+	.glyph-strip li {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 26px;
+		height: 26px;
+		border: 1px solid var(--color-border);
+		background: var(--color-bg-alt);
+		color: var(--color-text-muted);
+		font-size: 0.8rem;
+	}
+	.glyph-strip li.on {
+		background: var(--color-accent);
+		border-color: var(--color-accent);
+		color: #fff;
 	}
 	.hook-note {
 		font-size: 0.78rem;

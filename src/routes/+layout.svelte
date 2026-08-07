@@ -13,6 +13,12 @@
 	let { children } = $props();
 	let pickerOpen = $state(false);
 	let justOpened = $state(false);
+	/**
+	 * Below 768px the sidebar is hidden entirely, which left the Interface
+	 * routes unreachable — there is no link to them anywhere else. This drawer
+	 * is the mobile route to the same nav.
+	 */
+	let navOpen = $state(false);
 
 	function selectColor(color: string) {
 		$accentColor = color;
@@ -42,11 +48,34 @@
 		document.addEventListener('pointerdown', handler);
 		return () => document.removeEventListener('pointerdown', handler);
 	});
+
+	/* Escape closes the drawer, and the page behind it must not scroll while open. */
+	$effect(() => {
+		if (!browser || !navOpen) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') navOpen = false;
+		};
+		document.addEventListener('keydown', onKey);
+		const prev = document.body.style.overflow;
+		document.body.style.overflow = 'hidden';
+		return () => {
+			document.removeEventListener('keydown', onKey);
+			document.body.style.overflow = prev;
+		};
+	});
 </script>
 
 <div class="app-shell">
 	<header class="site-header">
 		<div class="site-title-group">
+			<button
+				class="nav-trigger"
+				onclick={() => (navOpen = true)}
+				aria-label="Open navigation"
+				aria-expanded={navOpen}
+			>
+				<i class="fas fa-bars"></i>
+			</button>
 			<button class="icon-picker-trigger" onpointerup={togglePicker} title="Change highlight color">
 				<i class="fas fa-cubes"></i>
 			</button>
@@ -78,6 +107,23 @@
 		</div>
 	</header>
 
+	{#if navOpen}
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="nav-scrim" onclick={() => (navOpen = false)}></div>
+		<div class="nav-drawer" role="dialog" aria-modal="true" aria-label="Navigation">
+			<div class="nav-drawer-head">
+				<span>Navigation</span>
+				<button onclick={() => (navOpen = false)} aria-label="Close navigation">
+					<i class="fas fa-xmark"></i>
+				</button>
+			</div>
+			<div class="nav-drawer-body">
+				<SideNav components={componentDefs} onnavigate={() => (navOpen = false)} />
+			</div>
+		</div>
+	{/if}
+
 	<div class="content-wrapper">
 		<aside class="sidebar">
 			<SideNav components={componentDefs} />
@@ -100,6 +146,74 @@
 		gap: var(--spacing-sm);
 		position: relative;
 	}
+	/*
+	 * Hidden on desktop, where the persistent sidebar is already visible. It only
+	 * appears at the breakpoint that hides that sidebar.
+	 */
+	.nav-trigger {
+		display: none;
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-size: 1.05rem;
+		color: var(--color-text);
+		padding: 8px;
+		align-items: center;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
+	}
+	.nav-scrim {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.45);
+		z-index: 400;
+	}
+	.nav-drawer {
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		width: min(300px, 86vw);
+		background: var(--color-bg);
+		border-right: 2px solid var(--color-border-dark);
+		z-index: 401;
+		display: flex;
+		flex-direction: column;
+	}
+	.nav-drawer-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: var(--spacing-sm) var(--spacing-md);
+		border-bottom: 1px solid var(--color-border);
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--color-text-muted);
+	}
+	.nav-drawer-head button {
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: var(--color-text);
+		font-size: 1rem;
+		padding: 4px 8px;
+	}
+	.nav-drawer-body {
+		flex: 1;
+		overflow-y: auto;
+		padding: var(--spacing-md) 0;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	@media (max-width: 768px) {
+		.nav-trigger {
+			display: flex;
+		}
+	}
+
 	.icon-picker-trigger {
 		background: none;
 		border: none;

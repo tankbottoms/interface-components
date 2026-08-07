@@ -14,7 +14,6 @@
 	 * Everything is wired through the one documented integration point: a single
 	 * `magx-panelValueChanged` listener on `document`, keyed by element id.
 	 */
-	import { onMount } from 'svelte';
 	import { onTick, hexToRgb, cssVar } from '$lib/anim';
 	import { walk, RESERVOIR, windowOf, driftOne, fmtBytes, fmtCompact } from '$lib/interface/generate';
 
@@ -132,8 +131,47 @@
 
 	/* ---------- sparkline plumbing ---------------------------------------- */
 	let gpuSpark: HTMLElement | null = $state(null);
+	let tempSpark: HTMLElement | null = $state(null);
 	let ingestSpark: HTMLElement | null = $state(null);
+	let loadSpark: HTMLElement | null = $state(null);
 	let confSpark: HTMLElement | null = $state(null);
+	let pagesSpark: HTMLElement | null = $state(null);
+
+	/*
+	 * Every readout on this page that is a rate or a trend gets a chart, not just
+	 * a number. Four of these are derived from the same reservoirs the numeric
+	 * readouts use, so the chart and the figure beside it can never disagree.
+	 */
+	const tempRes = $derived(
+		walk(56 + RESERVOIR, { seed: seed + 41 + device, min: 34, max: 88, start: 58, step: 5 })
+	);
+	const temps = $derived(windowOf(tempRes, 56, frame));
+
+	const loadRes = $derived(
+		walk(48 + RESERVOIR, { seed: seed + 19, min: 8, max: 98, start: 44, step: 9 })
+	);
+	const fleetLoad = $derived(windowOf(loadRes, 48, frame));
+
+	/**
+	 * Confidence over the last 40 pages rather than one point per queued file —
+	 * four datapoints is a line segment, not a chart, and OCR confidence is
+	 * genuinely a per-page measure. The band shifts when the OCR toggle does.
+	 */
+	const confRes = $derived(
+		walk(40 + RESERVOIR, {
+			seed: seed + (doOcr ? 5 : 61),
+			min: doOcr ? 78 : 48,
+			max: doOcr ? 99 : 86,
+			start: doOcr ? 94 : 71,
+			step: 4
+		})
+	);
+	const confTrend = $derived(windowOf(confRes, 40, frame));
+
+	const pagesRes = $derived(
+		walk(40 + RESERVOIR, { seed: seed + 77, min: 4, max: 120, start: 46, step: 16 })
+	);
+	const pageRate = $derived(windowOf(pagesRes, 40, frame));
 
 	function paint(el: HTMLElement | null, data: number[], token: string) {
 		const sp = (el as any)?.getSparkline?.();
@@ -152,28 +190,47 @@
 		sp.renderCanvas();
 	}
 
-	onMount(() => {
-		// Lit elements need a beat to upgrade before we reach into them.
-		const t = setTimeout(() => (ready = true), 80);
-		return () => clearTimeout(t);
+	/**
+	 * Wait for the Lit elements to upgrade, then let the paint effect run.
+	 *
+	 * Deliberately not `onMount` — that body was being dropped from the
+	 * production client bundle, so `ready` never flipped and every sparkline on
+	 * this page stayed an empty canvas in the deployed build while working
+	 * perfectly in dev. Poll for the upgrade instead of guessing a delay.
+	 */
+	$effect(() => {
+		let raf = 0;
+		let stop = false;
+		const attempt = (tries: number) => {
+			if (stop) return;
+			if (typeof (gpuSpark as any)?.getSparkline === 'function' || tries <= 0) {
+				ready = true;
+				return;
+			}
+			raf = requestAnimationFrame(() => attempt(tries - 1));
+		};
+		attempt(120);
+		return () => {
+			stop = true;
+			if (raf) cancelAnimationFrame(raf);
+		};
 	});
 
 	$effect(() => {
 		if (!ready) return;
 		paint(gpuSpark, util, '--stroke-aqua');
+		paint(tempSpark, temps, '--stroke-peach');
 		paint(ingestSpark, ingest, '--stroke-mint');
-		paint(
-			confSpark,
-			docs.map((d) => d.conf),
-			'--stroke-rose'
-		);
+		paint(loadSpark, fleetLoad, '--stroke-vanilla');
+		paint(confSpark, confTrend, '--stroke-rose');
+		paint(pagesSpark, pageRate, '--stroke-violet');
 	});
 
 	/**
 	 * The entire integration surface: one listener, keyed by element id. Every
 	 * control on this page — three consoles' worth — routes through here.
 	 */
-	onMount(() => {
+	$effect(() => {
 		const onChange = (e: Event) => {
 			const id = (e as CustomEvent).detail?.panelElementId as string | undefined;
 			if (!id) return;
@@ -306,7 +363,9 @@
 						<span>persistence</span><b>{persistence ? 'on' : 'off'}</b>
 					</div>
 				</magx-panel-html>
-				<magx-panel-sparkline bind:this={gpuSpark} title="SM Utilisation"
+				<magx-panel-sparkline bind:this={gpuSpark} title="SM Utilisation — %"
+				></magx-panel-sparkline>
+				<magx-panel-sparkline bind:this={tempSpark} title="Temperature — °C"
 				></magx-panel-sparkline>
 				<magx-panel-progressbar title="Memory" currentValue={memPct} maxValue="100"
 				></magx-panel-progressbar>
@@ -406,7 +465,9 @@
 			</magx-panel>
 
 			<magx-panel title="Throughput" x="608" y="0" style="--magx-panel-panel-width:{PANEL_W}px">
-				<magx-panel-sparkline bind:this={ingestSpark} title="Ingest (docs/min)"
+				<magx-panel-sparkline bind:this={ingestSpark} title="Ingest — docs/min"
+					></magx-panel-sparkline>
+				<magx-panel-sparkline bind:this={loadSpark} title="Fleet load — %"
 				></magx-panel-sparkline>
 				<magx-panel-html title="Now">
 					<div class="pc-kv">
@@ -454,7 +515,10 @@
 						{/each}
 					</div>
 				</magx-panel-html>
-				<magx-panel-sparkline bind:this={confSpark} title="Confidence"></magx-panel-sparkline>
+				<magx-panel-sparkline bind:this={confSpark} title="Confidence — % / page"
+					></magx-panel-sparkline>
+				<magx-panel-sparkline bind:this={pagesSpark} title="Pages — /min"
+				></magx-panel-sparkline>
 			</magx-panel>
 
 			<magx-panel title="Pipeline" x="304" y="0" style="--magx-panel-panel-width:{PANEL_W}px">
@@ -506,7 +570,9 @@
 	.pc-canvas {
 		position: relative;
 		min-width: calc(var(--w) * 3 + 32px);
-		min-height: 520px;
+		/* Tall enough for the fullest panel — every rate readout now carries its
+		   own chart, so the telemetry and pipeline panels grew. */
+		min-height: 700px;
 	}
 
 	.pc-kv {
