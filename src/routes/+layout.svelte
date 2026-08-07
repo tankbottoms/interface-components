@@ -9,6 +9,7 @@
 	import { searchQuery } from '$lib/stores/search';
 	import { accentColor, pastelSwatches } from '$lib/stores/highlight';
 	import { browser } from '$app/environment';
+	import { MagxHaptics } from 'magx-panel/Haptics';
 
 	let { children } = $props();
 	let pickerOpen = $state(false);
@@ -20,20 +21,82 @@
 	 */
 	let navOpen = $state(false);
 
+	/**
+	 * One glyph, two gestures.
+	 *
+	 * A tap opens whichever thing is missing: the navigation when the sidebar is
+	 * hidden, the highlight picker when it is already on screen. A press and hold
+	 * always opens the picker, so the colours stay reachable on a phone where the
+	 * tap is spoken for. A separate hamburger was the obvious alternative and it
+	 * was what shipped first, but it put two controls in a header that is already
+	 * tight at 360px and neither of them read as the site's own mark.
+	 */
+	const HOLD_MS = 450;
+	/** Movement past this many px is a scroll, not a press. */
+	const HOLD_SLOP = 10;
+
+	let narrow = $state(false);
+	let holdTimer = 0;
+	let holdFired = false;
+	let holdFrom: { x: number; y: number } | null = null;
+
+	$effect(() => {
+		if (!browser) return;
+		const mq = window.matchMedia('(max-width: 768px)');
+		const sync = () => (narrow = mq.matches);
+		sync();
+		mq.addEventListener('change', sync);
+		return () => mq.removeEventListener('change', sync);
+	});
+
+	function openPicker() {
+		pickerOpen = true;
+		justOpened = true;
+		setTimeout(() => (justOpened = false), 300);
+	}
+
 	function selectColor(color: string) {
 		$accentColor = color;
 		pickerOpen = false;
 	}
 
-	function togglePicker(e: Event) {
+	function glyphDown(e: PointerEvent) {
+		holdFired = false;
+		holdFrom = { x: e.clientX, y: e.clientY };
+		clearTimeout(holdTimer);
+		holdTimer = window.setTimeout(() => {
+			holdFired = true;
+			navOpen = false;
+			openPicker();
+			/* The hold has no visual until the popup lands, so confirm it by feel. */
+			MagxHaptics.trigger('medium');
+		}, HOLD_MS);
+	}
+
+	function glyphMove(e: PointerEvent) {
+		if (!holdFrom) return;
+		const dx = e.clientX - holdFrom.x;
+		const dy = e.clientY - holdFrom.y;
+		if (Math.hypot(dx, dy) > HOLD_SLOP) cancelHold();
+	}
+
+	function cancelHold() {
+		clearTimeout(holdTimer);
+		holdFrom = null;
+	}
+
+	function glyphUp(e: PointerEvent) {
+		clearTimeout(holdTimer);
+		holdFrom = null;
 		e.preventDefault();
 		e.stopPropagation();
+		if (holdFired) return; // the hold already opened the picker
 		if (pickerOpen) {
 			pickerOpen = false;
+		} else if (narrow) {
+			navOpen = true;
 		} else {
-			pickerOpen = true;
-			justOpened = true;
-			setTimeout(() => (justOpened = false), 300);
+			openPicker();
 		}
 	}
 
@@ -69,14 +132,17 @@
 	<header class="site-header">
 		<div class="site-title-group">
 			<button
-				class="nav-trigger"
-				onclick={() => (navOpen = true)}
-				aria-label="Open navigation"
-				aria-expanded={navOpen}
+				class="icon-picker-trigger"
+				onpointerdown={glyphDown}
+				onpointermove={glyphMove}
+				onpointerup={glyphUp}
+				onpointercancel={cancelHold}
+				onpointerleave={cancelHold}
+				oncontextmenu={(e) => e.preventDefault()}
+				aria-label={narrow ? 'Open navigation — hold for highlight colour' : 'Highlight colour'}
+				aria-expanded={navOpen || pickerOpen}
+				title={narrow ? 'Tap for navigation · hold for colour' : 'Highlight colour · hold to pin open'}
 			>
-				<i class="fas fa-bars"></i>
-			</button>
-			<button class="icon-picker-trigger" onpointerup={togglePicker} title="Change highlight color">
 				<i class="fas fa-cubes"></i>
 			</button>
 			<a href="/" class="site-title">
@@ -146,22 +212,6 @@
 		gap: var(--spacing-sm);
 		position: relative;
 	}
-	/*
-	 * Hidden on desktop, where the persistent sidebar is already visible. It only
-	 * appears at the breakpoint that hides that sidebar.
-	 */
-	.nav-trigger {
-		display: none;
-		background: none;
-		border: none;
-		cursor: pointer;
-		font-size: 1.05rem;
-		color: var(--color-text);
-		padding: 8px;
-		align-items: center;
-		touch-action: manipulation;
-		-webkit-tap-highlight-color: transparent;
-	}
 	.nav-scrim {
 		position: fixed;
 		inset: 0;
@@ -208,12 +258,6 @@
 		-webkit-overflow-scrolling: touch;
 	}
 
-	@media (max-width: 768px) {
-		.nav-trigger {
-			display: flex;
-		}
-	}
-
 	.icon-picker-trigger {
 		background: none;
 		border: none;
@@ -223,8 +267,14 @@
 		padding: 8px;
 		display: flex;
 		align-items: center;
+		/*
+		 * A press and hold on a phone otherwise selects the glyph or raises the
+		 * system callout, both of which eat the gesture before it completes.
+		 */
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
+		-webkit-touch-callout: none;
+		user-select: none;
 	}
 	.icon-picker-trigger:hover {
 		opacity: 0.8;

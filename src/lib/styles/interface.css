@@ -105,6 +105,17 @@
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 }
+/*
+ * The info glyph parks at the right edge of the header. When the card also has a
+ * unit label that label already claims the right side, so the glyph tucks in
+ * beside it instead of fighting it for the same auto margin.
+ */
+.ifc-card-hdr .infotip-trigger {
+	margin-left: auto;
+}
+.ifc-card-meta + .infotip-trigger {
+	margin-left: 4px;
+}
 .ifc-card-meta {
 	margin-left: auto;
 	font-size: 0.62rem;
@@ -584,27 +595,34 @@
 	shape-rendering: crispEdges;
 }
 
-/* Tooltip is positioned by the chart component in page-relative pixels. */
+/*
+ * Tooltip is positioned by the chart component in page-relative pixels.
+ *
+ * White in both themes, deliberately. It used to follow the page into dark mode,
+ * where a dark card on a dark chart reads as part of the chart; a white one is
+ * unambiguously a thing laid on top. Matches `InfoTip.svelte`, which is the same
+ * idea for the static "what is this" cards.
+ */
 .ifc-tip {
 	position: fixed;
 	z-index: 400;
 	pointer-events: none;
-	border: 1px solid var(--rule);
-	background: var(--tip-paper, #ffffff);
-	box-shadow: var(--brutal-shadow);
+	border: 1px solid #d8d4cc;
+	background: #ffffff;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
 	padding: 5px 8px;
 	font-size: 0.66rem;
 	line-height: 1.5;
 	white-space: nowrap;
 	font-variant-numeric: tabular-nums;
-	color: var(--ink);
+	color: #1b1b1b;
 }
 .ifc-tip-title {
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 	font-size: 0.6rem;
-	color: var(--ink-muted);
+	color: #6a655c;
 }
 .ifc-tip-row {
 	display: flex;
@@ -614,7 +632,8 @@
 .ifc-tip-key {
 	width: 8px;
 	height: 8px;
-	border: 1px solid var(--rule);
+	/* The card is white in both themes, so the swatch outline is fixed too. */
+	border: 1px solid #d8d4cc;
 	flex-shrink: 0;
 }
 .ifc-tip-val {

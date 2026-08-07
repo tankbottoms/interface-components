@@ -2,6 +2,7 @@
 	import Badge from './Badge.svelte';
 	import PropsTable from './PropsTable.svelte';
 	import CodeBlock from './CodeBlock.svelte';
+	import InfoTip from './InfoTip.svelte';
 	import type { ComponentDef } from '$lib/data/components';
 	import type { Snippet } from 'svelte';
 
@@ -11,6 +12,25 @@
 	}
 
 	let { component, children }: Props = $props();
+
+	/**
+	 * The card already prints the tag, the prose and the full props table. What
+	 * the tooltip adds is the shape of the thing at a glance — what it belongs
+	 * to, how much surface it has — which otherwise means reading the whole card.
+	 */
+	const facts = $derived([
+		{ k: 'Tag', v: `<${component.tagName}>` },
+		{ k: 'Group', v: component.group === 'panel' ? 'Panel system' : 'Sparkline' },
+		{ k: 'Kind', v: component.category },
+		{
+			k: 'Props',
+			v: component.properties.length ? `${component.properties.length} attributes` : 'none'
+		},
+		{
+			k: 'Events',
+			v: component.events.length ? component.events.map((e) => e.name).join(', ') : 'none'
+		}
+	]);
 </script>
 
 <section id={component.id} class="component-card">
@@ -19,6 +39,12 @@
 			<i class="fas {component.icon}"></i>
 			<h3>{component.name}</h3>
 			<code class="tag-name">&lt;{component.tagName}&gt;</code>
+			<InfoTip
+				title={component.name}
+				body={component.description}
+				rows={facts}
+				label="About {component.name}"
+			/>
 		</div>
 		<Badge category={component.category} />
 	</div>

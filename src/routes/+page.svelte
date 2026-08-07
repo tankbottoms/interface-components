@@ -51,7 +51,7 @@
 						<strong>Haptic Feedback</strong> — Panel components provide native haptic feedback on mobile devices.
 						<strong>iOS</strong> (Safari 18+): uses transparent <code>&lt;input switch&gt;</code> overlays — tapping buttons, checkboxes, inputs, color pickers, date/time pickers, and dropdowns triggers the Taptic Engine via real touch on a switch checkbox wrapped in a label.
 						<strong>Android</strong>: uses <code>navigator.vibrate()</code> with PWM intensity modulation.
-						<em>Known limitation: range slider drag haptics are not yet supported on iOS — the switch checkbox approach requires discrete taps and cannot fire during continuous drag gestures.</em>
+						<em class="note-caveat">Known limitation: range slider drag haptics are not yet supported on iOS — the switch checkbox approach requires discrete taps and cannot fire during continuous drag gestures.</em>
 					</div>
 				{/snippet}
 			</DemoContainer>
@@ -67,18 +67,17 @@
 						</magx-panel>
 					</div>
 					<div class="haptic-note">
-						<strong>Three presses, three contracts.</strong> A flat button that only darkens while
-						the finger is down tells you nothing afterwards, which is why it used to be impossible
-						to tell this component from a checkbox.
-						<strong>Run Once</strong> is momentary — it darkens, holds the darkening long enough to actually
-						register, then releases. Nothing persists.
-						<strong>Record</strong> is a toggle — it darkens and <em>stays</em> darkened, with an ON/OFF
-						marker on the right. That is the mode that overlaps a checkbox; the difference is that a
-						toggle button is an action you leave engaged, where a checkbox is a value you read back.
-						<strong>Purge</strong> is a countdown — it darkens and its label is replaced by a ticking
-						counter, then undarkens when it reaches zero. Press and hold it (or right-click, or alt-click)
-						to fire the secondary action instead. The strip under each button names the primary and
-						secondary action and underlines whichever fired last.
+						<strong>Three presses, three contracts.</strong> Each mode makes the outcome of a press
+						visible after the finger lifts.
+						<strong>Run Once</strong> is momentary: it darkens long enough to register, then releases.
+						Nothing persists.
+						<strong>Record</strong> is a toggle: it darkens and stays darkened, with an ON/OFF marker
+						on the right. It is the mode that overlaps a checkbox — a toggle button is an action you
+						leave engaged, a checkbox is a value you read back.
+						<strong>Purge</strong> is a countdown: the label becomes a ticking counter, then releases
+						at zero. Press and hold it (or right-click, or alt-click) to fire the secondary action
+						instead. The strip under each button names both actions and underlines whichever fired
+						last.
 					</div>
 				{/snippet}
 			</DemoContainer>
@@ -691,7 +690,13 @@
 		background: var(--color-bg);
 		border-radius: 2px;
 	}
-	.haptic-note em {
+	/*
+	 * Only the trailing caveat is its own paragraph. This used to be a bare `em`
+	 * selector, which also caught every inline emphasis mid-sentence and pushed
+	 * single words like "stays" onto lines of their own — three lines out of one
+	 * clause, and worst on a phone where the surrounding text already wraps.
+	 */
+	.haptic-note .note-caveat {
 		display: block;
 		margin-top: 6px;
 		color: var(--color-text-muted);

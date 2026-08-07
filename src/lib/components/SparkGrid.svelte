@@ -20,6 +20,7 @@
 	import { onTick, hexToRgb, cssVar } from '$lib/anim';
 	import { walk, spiky, diurnal } from '$lib/interface/generate';
 	import { chartSeries } from '$lib/data/palette';
+	import InfoTip from './InfoTip.svelte';
 
 	interface Props {
 		fps?: number;
@@ -113,6 +114,46 @@
 	];
 
 	const variants = $derived(limit > 0 ? ALL.slice(0, limit) : ALL);
+
+	/*
+	 * Tile captions are two or three words, which names a variant without saying
+	 * what it does. These are the setter calls behind each tile, so the tooltip
+	 * doubles as the API reference for whatever is on screen.
+	 */
+	const SHAPE_NOTE: Record<Shape, string> = {
+		walk: 'A bounded random walk — the everyday case of a metric drifting.',
+		spiky: 'A quiet floor with occasional spikes, like error or retry counts.',
+		diurnal: 'A smooth daily cycle with noise on top, like load or temperature.'
+	};
+	const FILL_NOTE: Record<Variant['fill'], string> = {
+		gradient: 'gradient, fading downward',
+		solid: 'solid',
+		abovebelow: 'split at the reference line',
+		none: 'none'
+	};
+	const LINE_NOTE: Record<Variant['line'], string> = {
+		solid: 'one colour',
+		abovebelow: 'recoloured across the reference line',
+		firstlastdiff: 'green or red by net change'
+	};
+
+	function factsFor(v: Variant) {
+		const rows = [
+			{ k: 'Type', v: v.type === 'bar' ? 'Bar chart' : 'Line chart' },
+			{ k: 'Stroke', v: `${LINE_NOTE[v.line]}, ${v.lineWidth ?? 1.25}px` },
+			{ k: 'Fill', v: FILL_NOTE[v.fill] },
+			{
+				k: 'Reference',
+				v: v.ref === 'none' ? 'none' : v.ref === 'custom' ? `fixed at ${v.refPos}` : v.ref
+			},
+			{ k: 'Y axis', v: v.bounds ? `locked ${v.bounds[0]}–${v.bounds[1]}` : 'tracks the data' },
+			{ k: 'Points', v: String(v.points ?? POINTS) }
+		];
+		if (v.cap?.[0] || v.cap?.[1])
+			rows.push({ k: 'Cap', v: 'out-of-range points drawn flat at the edge' });
+		if (v.endpoint) rows.push({ k: 'Endpoint', v: 'dot marks the latest value' });
+		return rows;
+	}
 
 	const POINTS = 40;
 
@@ -288,7 +329,15 @@
 				aria-label={v.label}
 			></magx-sparkline>
 			{#if captions}
-				<figcaption>{v.label}</figcaption>
+				<figcaption>
+					<span>{v.label}</span>
+					<InfoTip
+						title={v.label}
+						body={SHAPE_NOTE[v.shape]}
+						rows={factsFor(v)}
+						label="About {v.label}"
+					/>
+				</figcaption>
 			{/if}
 		</figure>
 	{/each}
@@ -307,12 +356,23 @@
 		min-width: 0;
 	}
 	figcaption {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 4px;
 		font-family: var(--font-mono);
 		font-size: 0.6rem;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		color: var(--color-text-muted);
 		margin-top: 4px;
+	}
+	/* The caption may be longer than a narrow tile; the glyph must not be pushed off. */
+	figcaption span {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	@media (max-width: 768px) {

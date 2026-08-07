@@ -86,4 +86,49 @@
 		font-size: 0.75rem;
 		color: var(--color-accent);
 	}
+
+	@media (max-width: 768px) {
+		/*
+		 * Four columns in a 390px viewport leaves the description about four
+		 * characters per line, which is how a six-row table came out taller than
+		 * the panel it documents. Below the breakpoint each row becomes a block:
+		 * the property name, a small type/default byline, then the prose at full
+		 * width. Same markup, same source of truth — only the layout changes.
+		 */
+		.props-table thead {
+			display: none;
+		}
+		.props-table,
+		.props-table tbody,
+		.props-table tr,
+		.props-table td {
+			display: block;
+			width: 100%;
+		}
+		.props-table tr {
+			padding: var(--spacing-xs) 0;
+			border-bottom: 1px solid var(--color-border-light);
+		}
+		.props-table td {
+			border: none;
+			padding: 0;
+		}
+		.props-table td:nth-child(2),
+		.props-table td:nth-child(3) {
+			display: inline;
+			width: auto;
+			font-size: 0.68rem;
+			color: var(--color-text-muted);
+		}
+		.props-table td:nth-child(2)::before {
+			content: 'type ';
+		}
+		.props-table td:nth-child(3)::before {
+			content: ' · default ';
+		}
+		.props-table td:nth-child(4) {
+			margin-top: 4px;
+			line-height: 1.55;
+		}
+	}
 </style>

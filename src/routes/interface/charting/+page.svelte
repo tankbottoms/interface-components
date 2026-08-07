@@ -9,6 +9,27 @@
 	import DonutChart from '$lib/interface/charts/DonutChart.svelte';
 	import MeterBar from '$lib/interface/charts/MeterBar.svelte';
 	import AnimBar from '$lib/interface/AnimBar.svelte';
+	import InfoTip from '$lib/components/InfoTip.svelte';
+
+	/**
+	 * What each chart form is for, said once.
+	 *
+	 * The cards carry a title and a unit, which names the data but not the reason
+	 * this shape was chosen for it. Every card header now carries an info glyph
+	 * pointing at one of these; the text is about the form, not the sample data,
+	 * so it stays true wherever the chart is reused.
+	 */
+	const CHART_INFO = {
+		combo: 'Bars for the quantity, a line for its rolling mean. The pairing keeps day-to-day spread visible while the trend stays legible over it.',
+		stacked: 'Stacked bars: each column is a total, split by category. Read the column heights for the total and the band thicknesses for the mix.',
+		heatmap: 'A matrix where colour encodes magnitude, one cell per row/column pair. Best for spotting periodic structure — a weekday shape, a nightly lull.',
+		area: 'A filled line over a continuous range. The fill carries the sense of accumulated volume; the stroke carries the shape.',
+		spark: 'A sparkline: shape only, no axes. Sized to sit inline with a number, so the figure and its recent history read as one unit.',
+		hbar: 'A ranked horizontal bar list. Horizontal because the labels are words — they stay readable at any length without rotating.',
+		treemap: 'Nested rectangles sized by value. Shows relative share across many items in a fixed box, where a bar chart would run off the page.',
+		donut: 'A donut: parts of one whole, with the total in the middle. Reliable up to about six slices; past that a ranked list reads better.',
+		meter: 'A single value against its range, with the number stated alongside. The bar is for the glance, the number is for the answer.'
+	};
 	import {
 		walk,
 		spiky,
@@ -252,6 +273,7 @@
 		<div class="ifc-card-hdr">
 			<span class="ifc-card-title">Daily consumption</span>
 			<span class="ifc-card-meta">kWh · last 30 days</span>
+			<InfoTip title="Daily consumption" body={CHART_INFO.combo} />
 		</div>
 		<BarLineCombo
 			values={daily}
@@ -281,6 +303,7 @@
 		<div class="ifc-card-hdr">
 			<span class="ifc-card-title">Twelve months by tariff tier</span>
 			<span class="ifc-card-meta">kWh</span>
+			<InfoTip title="Twelve months by tariff tier" body={CHART_INFO.stacked} />
 		</div>
 		<StackedBars
 			data={monthly}
@@ -305,6 +328,7 @@
 			<div class="ifc-card-hdr">
 				<span class="ifc-card-title">Mean load by hour</span>
 				<span class="ifc-card-meta">kW</span>
+				<InfoTip title="Mean load by hour" body={CHART_INFO.heatmap} />
 			</div>
 			<Heatmap matrix={load} rowLabels={WEEKDAYS} colLabels={hours} token="aqua" unit=" kW" />
 		</div>
@@ -312,6 +336,7 @@
 			<div class="ifc-card-hdr">
 				<span class="ifc-card-title">Baseline &amp; always-on floor</span>
 				<span class="ifc-card-meta">W · 30-min buckets</span>
+				<InfoTip title="Baseline & always-on floor" body={CHART_INFO.area} />
 			</div>
 			<AreaChart
 				series={[baseline]}
@@ -336,6 +361,7 @@
 				<div class="ifc-card-hdr">
 					<span class="ifc-card-title">{g.name}</span>
 					<span class="ifc-card-meta">{g.temp.toFixed(0)}°C</span>
+					<InfoTip title={g.name} body={CHART_INFO.meter} />
 				</div>
 				<MeterBar label="UTIL" value={g.util} display={`${g.util.toFixed(0)}%`} />
 				<MeterBar
@@ -355,6 +381,7 @@
 		<div class="ifc-card-hdr">
 			<span class="ifc-card-title">Inference latency</span>
 			<span class="ifc-card-meta">ms · last 60 min</span>
+			<InfoTip title="Inference latency" body={CHART_INFO.area} />
 		</div>
 		<AreaChart
 			series={[latP95, latP50]}
@@ -383,6 +410,7 @@
 			<div class="ifc-card">
 				<div class="ifc-card-hdr">
 					<span class="ifc-card-title">{card.t}</span>
+					<InfoTip title={card.t} body={CHART_INFO.spark} />
 				</div>
 				<div class="ifc-tile-value" style="text-align:left">
 					{card.v[card.v.length - 1].toFixed(card.u === '%' ? 1 : 0)}<span
@@ -411,6 +439,7 @@
 			<div class="ifc-card-hdr">
 				<span class="ifc-card-title">Size by top-level folder</span>
 				<span class="ifc-card-meta">bar behind label</span>
+				<InfoTip title="Size by top-level folder" body={CHART_INFO.hbar} />
 			</div>
 			<HBarList
 				items={folders}
@@ -423,6 +452,7 @@
 			<div class="ifc-card-hdr">
 				<span class="ifc-card-title">Namespace share</span>
 				<span class="ifc-card-meta">hover · size + share</span>
+				<InfoTip title="Namespace share" body={CHART_INFO.treemap} />
 			</div>
 			<Treemap nodes={namespaces} tokens={chartTokens} height={252} />
 		</div>
@@ -439,6 +469,7 @@
 			<div class="ifc-card-hdr">
 				<span class="ifc-card-title">Request mix</span>
 				<span class="ifc-card-meta">last 24h</span>
+				<InfoTip title="Request mix" body={CHART_INFO.donut} />
 			</div>
 			<DonutChart slices={mix} tokens={chartTokens} centerLabel="REQUESTS" format={fmtCompact} />
 		</div>
@@ -446,6 +477,7 @@
 			<div class="ifc-card-hdr">
 				<span class="ifc-card-title">Quota windows</span>
 				<span class="ifc-card-meta">resets</span>
+				<InfoTip title="Quota windows" body={CHART_INFO.meter} />
 			</div>
 			<div class="ifc-stack" style="gap:var(--spacing-sm)">
 				{#each quotas as q}

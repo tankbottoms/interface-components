@@ -65,21 +65,30 @@
 	});
 
 	/**
-	 * Re-arm the observer — but hold the reset for a moment first.
+	 * Re-arm the observer, snapping the words back to the start first.
 	 *
-	 * Simply recreating the observer looks like nothing happens: it writes zero
-	 * and the very next callback writes one again, both inside a single frame, so
-	 * the browser never sees a starting state to transition away from. Flushing
-	 * layout pins the zero, and the short pause makes the return to one a real
-	 * transition rather than a same-frame no-op.
+	 * The reset has to be instant. Left transitioned, each word's return to zero
+	 * inherits its own stagger — 0, 110, 220, 330ms — and the observer writes one
+	 * again long before the later delays elapse, so their transitions are replaced
+	 * before they begin. Only the first word actually moved; the second twitched
+	 * and the last two sat still. Killing transitions for a frame pins all four at
+	 * the start state, and turning them back on before the observer re-attaches
+	 * makes the whole stagger a real animation.
 	 */
+	let revealResetting = $state(false);
+
 	function replayReveal() {
 		const el = revealEl;
 		if (!el) return;
+		revealResetting = true;
 		el.style.setProperty('--live-visible', '0');
 		el.style.setProperty('--const-has-entered', '0');
-		void el.offsetHeight;
-		setTimeout(() => (revealArm += 1), 120);
+		void el.offsetHeight; // flush: the snapped-to-zero state is now the start
+		requestAnimationFrame(() => {
+			revealResetting = false;
+			void el.offsetHeight; // flush again so transitions are live before the write
+			revealArm += 1;
+		});
 	}
 
 	const series = $derived(
@@ -250,15 +259,17 @@
 				<span>identical JS</span>
 			</div>
 			<p class="lp-note">
-				Byte-for-byte the same helper as the tile on the left. Only the stylesheet differs, which is
-				the entire argument for the pattern.
+				Byte-for-byte the same helper as the tile on the left — only the stylesheet differs, which is
+				the whole argument for the pattern. Here the two ratios place a conic hue wheel and the
+				radial mask that reveals it, so the spectrum rotates under the cursor instead of sliding
+				past.
 			</p>
 		</div>
 
 		<div class="ifc-card">
 			<div class="ifc-card-title">Reveal on entry</div>
 			<div class="ifc-card-sub">--live-visible · --const-has-entered</div>
-			<div bind:this={revealEl} class="reveal-stage">
+			<div bind:this={revealEl} class="reveal-stage" class:is-resetting={revealResetting}>
 				{#each ['scroll', 'observe', 'latch', 'settle'] as word, i (word)}
 					<span class="reveal-word" style="--i:{i}">{word}</span>
 				{/each}
@@ -452,17 +463,45 @@
 		text-transform: uppercase;
 		color: var(--ink-soft);
 	}
+	/*
+	 * A full hue wheel, revealed only where the pointer is.
+	 *
+	 * The colour is a conic gradient centred on the cursor, so the spectrum turns
+	 * as you move rather than sliding past; the soft circle is a mask, not a
+	 * second gradient, which keeps the edge feathered without washing the hues
+	 * out against the card. Both still read the same two ratios the tile on the
+	 * left reads — the JS is untouched.
+	 */
 	.glow-stage::before {
 		content: '';
 		position: absolute;
 		inset: 0;
-		background: radial-gradient(
-			120px circle at calc(var(--live-pointer-x-ratio, 0.5) * 100%)
-				calc(var(--live-pointer-y-ratio, 0.5) * 100%),
-			var(--color-accent),
-			transparent 70%
+		--px: calc(var(--live-pointer-x-ratio, 0.5) * 100%);
+		--py: calc(var(--live-pointer-y-ratio, 0.5) * 100%);
+		background: conic-gradient(
+			from calc(var(--live-pointer-x-ratio, 0.5) * 360deg) at var(--px) var(--py),
+			#ff5c7a,
+			#ff9f5c,
+			#ffe066,
+			#7ee081,
+			#5ccfd6,
+			#6aa9ff,
+			#b98cff,
+			#ff5c7a
 		);
-		opacity: calc(var(--live-pointer-inside, 0) * 0.34);
+		-webkit-mask-image: radial-gradient(
+			130px circle at var(--px) var(--py),
+			#000 0%,
+			rgba(0, 0, 0, 0.6) 45%,
+			transparent 72%
+		);
+		mask-image: radial-gradient(
+			130px circle at var(--px) var(--py),
+			#000 0%,
+			rgba(0, 0, 0, 0.6) 45%,
+			transparent 72%
+		);
+		opacity: calc(var(--live-pointer-inside, 0) * 0.62);
 		transition: opacity 240ms cubic-bezier(0.16, 1, 0.3, 1);
 	}
 	.glow-stage span {
@@ -499,6 +538,10 @@
 			opacity 480ms cubic-bezier(0.16, 1, 0.3, 1),
 			transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
 		transition-delay: calc(var(--i) * 110ms);
+	}
+	/* Replay snaps to the start state in one frame — see `replayReveal`. */
+	.reveal-stage.is-resetting .reveal-word {
+		transition: none;
 	}
 
 	.reveal-bar {

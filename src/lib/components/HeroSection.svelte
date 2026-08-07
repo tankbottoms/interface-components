@@ -13,7 +13,6 @@
 	import { onTick, hexToRgb, cssVar } from '$lib/anim';
 	import { walk, spiky, diurnal } from '$lib/interface/generate';
 	import { chartSeries } from '$lib/data/palette';
-	import { fitStage } from '$lib/interface/fitStage';
 	import { whenCharts } from '$lib/interface/chartsReady';
 	import { magxById } from '$lib/interface/magx';
 
@@ -162,13 +161,83 @@
 		);
 	});
 
-	/* Size each column to its panel rather than to a guessed min-height. */
+	/**
+	 * One stage for all three panels, laid out side by side.
+	 *
+	 * They used to sit in a column each, and a panel's drag is clamped to its own
+	 * parent — so a 336px column meant a panel could be nudged a few pixels and
+	 * nothing more, which is the opposite of the point. Sharing one full-width
+	 * stage makes the whole row draggable while the default positions still read
+	 * as a tidy three-up.
+	 *
+	 * Placement is arithmetic rather than grid because the panels are absolutely
+	 * positioned; the number of columns comes from the measured stage so the row
+	 * folds to two and then one on the way down to a phone.
+	 */
+	const DASH_GAP = 24;
+	let dashStage: HTMLDivElement | null = $state(null);
+	/* Once a panel has been dragged the arrangement is the reader's, not ours. */
+	let dashMoved = $state(false);
+
+	function layoutDash(stage: HTMLElement) {
+		const panels = [...stage.querySelectorAll('magx-panel')] as any[];
+		if (!panels.length) return;
+
+		const cols = Math.max(1, Math.floor((stage.clientWidth + DASH_GAP) / (PANEL_W + DASH_GAP)));
+		const colY = new Array(cols).fill(0);
+
+		for (const [i, p] of panels.entries()) {
+			const c = i % cols;
+			/*
+			 * The bounds check clamps against the stage height the panel last
+			 * observed, and we are about to change that height — so place with the
+			 * check off and hand it straight back. Dragging stays bounded.
+			 */
+			p.setOutOfBoundsCheck?.(false);
+			p.setPosition?.(c * (PANEL_W + DASH_GAP), colY[c]);
+			p.setOutOfBoundsCheck?.(true);
+			const box = p.shadowRoot?.getElementById('panel') as HTMLElement | null;
+			colY[c] += (box?.offsetHeight ?? 320) + DASH_GAP;
+		}
+
+		stage.style.height = `${Math.max(...colY) - DASH_GAP}px`;
+	}
+
 	$effect(() => {
-		if (!ready) return;
-		const stops = [...document.querySelectorAll<HTMLElement>('.hero-dash .panel-stage')].map((s) =>
-			fitStage(s, 12)
-		);
-		return () => stops.forEach((f) => f());
+		const stage = dashStage;
+		if (!ready || !stage) return;
+
+		let raf = 0;
+		const relayout = () => {
+			if (dashMoved) return;
+			cancelAnimationFrame(raf);
+			raf = requestAnimationFrame(() => layoutDash(stage));
+		};
+
+		relayout();
+		/* Panels grow and shrink as they collapse, so watch them, not just the stage. */
+		const ro = new ResizeObserver(relayout);
+		ro.observe(stage);
+		for (const p of stage.querySelectorAll('magx-panel')) {
+			const box = (p as any).shadowRoot?.getElementById('panel');
+			if (box) ro.observe(box);
+		}
+
+		const onGrab = (e: Event) => {
+			/* A title-bar press is the start of a drag; a click inside a control is not. */
+			const path = e.composedPath() as HTMLElement[];
+			const onBar = path.some(
+				(n) => n?.id === 'title_bar' || n?.classList?.contains?.('title_bar_filler')
+			);
+			if (onBar) dashMoved = true;
+		};
+		stage.addEventListener('pointerdown', onGrab, true);
+
+		return () => {
+			cancelAnimationFrame(raf);
+			ro.disconnect();
+			stage.removeEventListener('pointerdown', onGrab, true);
+		};
 	});
 
 	/**
@@ -232,13 +301,11 @@
 <section class="hero">
 	<h1 class="hero-title"><i class="fas fa-cubes"></i> Interface Components</h1>
 	<p class="hero-subtitle">
-		A collection of draggable panel UI components and sparkline charts built as Lit web components.
-		Based on the <a href="https://github.com/mlalma/magx/tree/main" target="_blank" rel="noopener"
-			>magx</a
-		> project by <a href="https://github.com/mlalma" target="_blank" rel="noopener">mlalma</a> —
-		I liked the components enough to build them into a library I could use for my own webapps.
-		Everything below this line is live: the panels are draggable, the canvases are real, and the
-		controls regenerate and animate the synthetic data in place.
+		A library of draggable panel controls and canvas sparklines, built as Lit web components on the
+		<a href="https://github.com/mlalma/magx/tree/main" target="_blank" rel="noopener">magx</a>
+		project by <a href="https://github.com/mlalma" target="_blank" rel="noopener">mlalma</a>. Every
+		example below is live: panels drag, canvases draw for real, and the controls reseed and animate
+		their data in place.
 		<span class="build-version">{__BUILD_VERSION__}</span>
 	</p>
 
@@ -264,14 +331,21 @@
 	<DemoControls
 		bind:fps
 		onreshuffle={() => (seed = Math.floor(Math.random() * 100000))}
-		note="Reshuffle redraws every canvas from a new seed · FPS streams new points into all eight panel sparklines at once"
+		note="Reshuffle reseeds every canvas · FPS streams new points into all eight panel sparklines"
 	/>
 
 	<div class="hero-dash" style="--panel-w:{PANEL_W}px">
-		<!-- Column 1 — one panel using every element the system ships. -->
-		<div class="dash-col">
-			<div class="panel-stage tall">
-				<magx-panel title="Live Panel" x="0" y="0" style="--magx-panel-panel-width:{PANEL_W}px">
+		<p class="dash-hint">
+			<i class="fat fa-arrows-up-down-left-right"></i>
+			<span>
+				All three panels share one stage: drag a title bar to move a panel anywhere across it,
+				double-click to collapse.
+			</span>
+		</p>
+
+		<div class="dash-stage" bind:this={dashStage}>
+			<!-- One panel using every element the system ships. -->
+			<magx-panel title="Live Panel" x="0" y="0" style="--magx-panel-panel-width:{PANEL_W}px">
 					<magx-panel-sparkline id="hs-throughput" title="Throughput — packets/s"
 					></magx-panel-sparkline>
 					<magx-panel-progressbar title="Load" currentValue={load} maxValue="100"
@@ -300,20 +374,10 @@
 						<span class="pill">{posture}</span> · {clock}
 					</magx-panel-html>
 					<magx-panel-button title="Capture" readout secondary="Reset"></magx-panel-button>
-				</magx-panel>
-			</div>
-			<p class="col-note">
-				Every element in the library, in one panel: sparkline, progress bar, range, toggle,
-				checkbox, dropdown, text input, text area, date, <strong>clock</strong>, colour picker,
-				file chooser, image, arbitrary HTML and button. The clock ticks on wall time; the
-				throughput chart is a simulated network trace — mostly idle with bursts.
-			</p>
-		</div>
+			</magx-panel>
 
-		<!-- Column 2 — telemetry, all sparkline. -->
-		<div class="dash-col">
-			<div class="panel-stage mid">
-				<magx-panel
+			<!-- Telemetry, all sparkline. -->
+			<magx-panel
 					title="Cluster Telemetry"
 					x="0"
 					y="0"
@@ -332,14 +396,10 @@
 					</magx-panel-dropdown>
 					<magx-panel-toggle title="Autoscale" labelOn="AUTO" labelOff="PINNED" checked
 					></magx-panel-toggle>
-				</magx-panel>
-			</div>
-		</div>
+			</magx-panel>
 
-		<!-- Column 3 — the toolkit no responsible person should ship. -->
-		<div class="dash-col">
-			<div class="panel-stage mid">
-				<magx-panel
+			<!-- The toolkit no responsible person should ship. -->
+			<magx-panel
 					title="World Domination Toolkit"
 					x="0"
 					y="0"
@@ -372,13 +432,25 @@
 					></magx-panel-checkbox>
 					<magx-panel-button title="Execute" mode="countdown" seconds="5" secondary="Abort"
 					></magx-panel-button>
-				</magx-panel>
-			</div>
+			</magx-panel>
+		</div>
+
+		<div class="dash-notes">
 			<p class="col-note">
-				The same elements, arranged as a fictional control console — because a component library
-				is only worth anything if it survives being pointed at an absurd problem. Readiness is
-				derived from the severity range, the arm toggle and the deniability checkbox; the posture
-				word above is derived from readiness. Nothing here reaches anything. Probably.
+				<b>Live Panel</b> carries every element in the library at once: sparkline, progress bar,
+				range, toggle, checkbox, dropdown, text input, text area, date, clock, colour picker, file
+				chooser, image, arbitrary HTML and button. The clock runs on wall time; throughput is a
+				simulated network trace, mostly idle with bursts.
+			</p>
+			<p class="col-note">
+				<b>Cluster Telemetry</b> is the same system reduced to four sparklines and a node selector —
+				the shape most monitoring panels actually take.
+			</p>
+			<p class="col-note">
+				<b>World Domination Toolkit</b> points the same elements at an absurd problem, which is the
+				only honest test of a component library. Readiness derives from the severity range, the arm
+				toggle and the deniability checkbox; the posture word derives from readiness. Nothing here
+				reaches anything. Probably.
 			</p>
 		</div>
 	</div>
@@ -449,42 +521,51 @@
 		font-size: 0.85rem;
 	}
 
-	/*
-	 * Three panel stages side by side. `auto-fit` rather than a fixed three-up
-	 * so the row degrades to two and then one column without a media query —
-	 * the panels are a fixed 300px and must never be squeezed.
-	 */
 	.hero-dash {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, var(--panel-w));
-		justify-content: start;
-		gap: var(--spacing-lg);
-		align-items: start;
 		margin-bottom: var(--spacing-lg);
 	}
-	.dash-col {
+	.dash-hint {
 		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-sm);
-		width: var(--panel-w);
+		/*
+		 * Top, not centre. The line wraps to two or three lines on a phone, and a
+		 * centred icon then floats beside the middle of the block with the first
+		 * line hanging out past it.
+		 */
+		align-items: flex-start;
+		gap: var(--spacing-xs);
+		font-size: 0.72rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+		margin-bottom: var(--spacing-sm);
 	}
-	/* The panel positions itself absolutely, so it needs a sized stage to sit in. */
-	.panel-stage {
+	.dash-hint i {
+		flex-shrink: 0;
+		/* Optical alignment with the cap height of the first line. */
+		margin-top: 0.2em;
+	}
+	/*
+	 * All three panels share this box. They position themselves absolutely, so
+	 * the height is written by `layoutDash` after it measures them; the min-height
+	 * is only what the page reserves before that runs.
+	 */
+	.dash-stage {
 		position: relative;
-		width: var(--panel-w);
+		width: 100%;
+		min-height: 420px;
 	}
-	/* Fallbacks only — `fitStage` measures each panel and sets a real height, so
-	   a column never carries dead space below its panel. */
-	.panel-stage.tall {
-		min-height: 400px;
-	}
-	.panel-stage.mid {
-		min-height: 300px;
+	.dash-notes {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: var(--spacing-md);
+		margin-top: var(--spacing-md);
 	}
 	.col-note {
 		font-size: 0.75rem;
 		line-height: 1.55;
 		color: var(--color-text-muted);
+	}
+	.col-note b {
+		color: var(--color-text);
 	}
 	/* Light-DOM children of magx-panel-html — not scoped away by Svelte. */
 	:global(.hero-dash .pill) {
@@ -523,14 +604,8 @@
 	}
 
 	@media (max-width: 768px) {
-		.hero-dash {
-			grid-template-columns: minmax(0, 1fr);
-		}
-		.dash-col {
-			width: 100%;
-		}
-		.panel-stage {
-			width: 100%;
+		/* One column of panels, and nothing may spill past the viewport edge. */
+		.dash-stage {
 			overflow: hidden;
 		}
 	}
