@@ -2,7 +2,7 @@
 
 ## Project
 
-SvelteKit + Lit 3 web component library with live demos. Deploys to Cloudflare Workers (workers.dev) and Pages (pages.dev).
+SvelteKit + Lit 3 web component library with live demos. Deploys to Cloudflare Workers (workers.dev).
 
 ## Stack
 
@@ -10,7 +10,7 @@ SvelteKit + Lit 3 web component library with live demos. Deploys to Cloudflare W
 - **Framework:** SvelteKit 2 + Svelte 5
 - **Components:** Lit 3 (magx Panel + Sparkline)
 - **Build:** Vite 6
-- **Deploy:** Cloudflare Workers with assets (`wrangler deploy`) + Pages (`wrangler pages deploy build`)
+- **Deploy:** Cloudflare Workers with assets (`wrangler deploy`)
 
 ## Commands
 
@@ -18,7 +18,7 @@ SvelteKit + Lit 3 web component library with live demos. Deploys to Cloudflare W
 bun run dev       # dev server
 bun run build     # production build
 bun run preview   # preview build
-bun run deploy    # build + deploy to CF Pages
+bun run deploy    # build + deploy to CF Workers
 ```
 
 ## Build Version Convention
@@ -37,7 +37,7 @@ bun run deploy    # build + deploy to CF Pages
 
 **On deploy, always report:**
 1. List of features/fixes added
-2. Confirmation of CF push (workers.dev + pages.dev URLs)
+2. Confirmation of CF push (workers.dev URL)
 3. Build version string (version + SHA) for verification
 
 ## Architecture

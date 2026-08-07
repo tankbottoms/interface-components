@@ -2,7 +2,7 @@
 
 Documentation and live demos for **magx** draggable panel UI components and sparkline charts, built as Lit web components and showcased with SvelteKit.
 
-**Live:** [interface-components.pages.dev](https://interface-components.pages.dev/)
+**Live:** [interface-components.tankbottoms.workers.dev](https://interface-components.tankbottoms.workers.dev/)
 
 ![Hero and demo panels](static/screenshots/hero.png)
 
@@ -72,7 +72,7 @@ Tabbed interface with real-time search. Browse the full catalog at the [Font Awe
 | Documentation site | [SvelteKit](https://kit.svelte.dev/) + Svelte 5 (runes) |
 | Runtime | [Bun](https://bun.sh/) |
 | Icons | [Font Awesome Pro 6.5.1](https://fontawesome.com/) |
-| Hosting | [Cloudflare Pages](https://pages.cloudflare.com/) |
+| Hosting | [Cloudflare Workers](https://workers.cloudflare.com/) |
 
 ## Architecture
 

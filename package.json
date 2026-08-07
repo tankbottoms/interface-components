@@ -10,7 +10,7 @@
     "dev": "bunx --bun vite dev",
     "build": "bunx --bun vite build",
     "preview": "bunx --bun vite preview",
-    "deploy": "bun run build && bunx wrangler pages deploy build"
+    "deploy": "bun run build && bunx wrangler deploy"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
