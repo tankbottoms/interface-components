@@ -138,6 +138,12 @@
 	let loadSpark: HTMLElement | null = $state(null);
 	let confSpark: HTMLElement | null = $state(null);
 	let pagesSpark: HTMLElement | null = $state(null);
+	let powerSpark: HTMLElement | null = $state(null);
+	let cadenceSpark: HTMLElement | null = $state(null);
+	let matchSpark: HTMLElement | null = $state(null);
+	let rttSpark: HTMLElement | null = $state(null);
+	let latencySpark: HTMLElement | null = $state(null);
+	let charsSpark: HTMLElement | null = $state(null);
 
 	/*
 	 * Every readout on this page that is a rate or a trend gets a chart, not just
@@ -175,21 +181,105 @@
 	);
 	const pageRate = $derived(windowOf(pagesRes, 40, frame));
 
+	/*
+	 * A control panel with no chart in it asks the operator to trust a number.
+	 * Every panel on this page now carries its own trace, so each one can be read
+	 * on its own once it has been dragged away from the others — which is the
+	 * whole premise of a surface you are allowed to rearrange.
+	 */
+
+	/** Draw follows the limit, so lowering the slider visibly clips the trace. */
+	const powerRes = $derived(
+		walk(48 + RESERVOIR, { seed: seed + 23 + device, min: 40, max: 100, start: 72, step: 7 })
+	);
+	const powerTrend = $derived(windowOf(powerRes, 48, frame).map((p) => (p / 100) * powerLimit));
+
+	/**
+	 * Sampling jitter. At rest this shows the cadence the sampler will produce
+	 * once started, at full scale, rather than a flat zero — a chart that is
+	 * empty on arrival reads as broken, and the Rate readout beside it already
+	 * says whether sampling is actually running. Above zero it scales with fps,
+	 * so moving the slider visibly compresses the trace.
+	 */
+	const cadenceRes = $derived(
+		walk(40 + RESERVOIR, { seed: seed + 91, min: 6, max: 34, start: 18, step: 5 })
+	);
+	const cadence = $derived(
+		windowOf(cadenceRes, 40, frame).map((c) => (fps === 0 ? c : c * (fps / 30)))
+	);
+
+	/** How many nodes the current filter admits, over time. */
+	const matchRes = $derived(
+		walk(40 + RESERVOIR, { seed: seed + 13, min: 0, max: 6, start: 6, step: 2 })
+	);
+	const matchTrend = $derived(
+		windowOf(matchRes, 40, frame).map((m) => Math.min(m, visibleNodes.length || 0.001))
+	);
+
+	const rttRes = $derived(
+		walk(48 + RESERVOIR, { seed: seed + 57, min: 0.4, max: 9, start: 2.4, step: 1.1 })
+	);
+	const rttTrend = $derived(windowOf(rttRes, 48, frame));
+
+	/** Stage latency climbs while the pipeline is actually running. */
+	const latencyRes = $derived(
+		walk(40 + RESERVOIR, { seed: seed + 33 + engine, min: 40, max: 900, start: 180, step: 120 })
+	);
+	const latency = $derived(
+		windowOf(latencyRes, 40, frame).map((l) => l * (running ? 1.8 : 1) * (doOcr ? 1 : 0.4))
+	);
+
+	const charsRes = $derived(
+		walk(40 + RESERVOIR, { seed: seed + 67, min: 200, max: 4200, start: 1800, step: 600 })
+	);
+	const chars = $derived(windowOf(charsRes, 40, frame));
+
 	function paint(el: HTMLElement | null, data: number[], token: string) {
 		const sp = (el as any)?.getSparkline?.();
-		if (!sp || !data.length) return;
+		if (!sp) return;
+
+		// A NaN reaching the canvas becomes a non-finite gradient stop, which
+		// throws — so drop them here rather than letting one bad sample through.
+		const clean = data.filter((n) => Number.isFinite(n));
+		if (!clean.length) return;
+
+		const lo = Math.min(...clean);
+		const hi = Math.max(...clean);
+		/*
+		 * A series with no spread — a paused sampler reading a flat zero — gives
+		 * the gradient a zero-height box to place its stops in, and the resulting
+		 * division throws. A flat line is a legitimate reading, so render it with
+		 * a solid fill instead of suppressing the chart.
+		 */
+		const flat = !(hi > lo);
+
 		const c = hexToRgb(cssVar(token, '#3792a4'));
 		const bg = hexToRgb(cssVar('--color-bg-alt', '#faf8f3'));
 		sp.setBackgroundColor({ ...bg, a: 1 });
-		sp.setDataPointNum(data.length);
+		sp.setDataPointNum(clean.length);
 		sp.setType('line');
 		sp.setLineWidth(1.5);
 		sp.setLineColor('solid', { ...c, a: 1 });
-		sp.setFill('gradient', { above: { ...c, a: 0.38 }, below: { ...c, a: 0.03 } });
+		if (flat) sp.setFill('solid', { ...c, a: 0.16 });
+		else sp.setFill('gradient', { above: { ...c, a: 0.38 }, below: { ...c, a: 0.03 } });
 		sp.setReferenceLine('average');
 		sp.setReferenceLineColor({ r: 150, g: 150, b: 150, a: 0.4 }, 1);
-		sp.setData(data);
+		sp.setData(clean);
 		sp.renderCanvas();
+	}
+
+	/**
+	 * One chart failing must not blank the ones after it. These all run in a
+	 * single effect, so an exception thrown partway through used to abandon every
+	 * remaining paint — which is exactly how four healthy charts on this page
+	 * ended up empty because a fifth had a flat series.
+	 */
+	function paintSafe(el: HTMLElement | null, data: number[], token: string) {
+		try {
+			paint(el, data, token);
+		} catch (err) {
+			console.error('sparkline paint failed', token, err);
+		}
 	}
 
 	/**
@@ -238,12 +328,18 @@
 
 	$effect(() => {
 		if (!ready) return;
-		paint(gpuSpark, util, '--stroke-aqua');
-		paint(tempSpark, temps, '--stroke-peach');
-		paint(ingestSpark, ingest, '--stroke-mint');
-		paint(loadSpark, fleetLoad, '--stroke-vanilla');
-		paint(confSpark, confTrend, '--stroke-rose');
-		paint(pagesSpark, pageRate, '--stroke-violet');
+		paintSafe(gpuSpark, util, '--stroke-aqua');
+		paintSafe(tempSpark, temps, '--stroke-peach');
+		paintSafe(ingestSpark, ingest, '--stroke-mint');
+		paintSafe(loadSpark, fleetLoad, '--stroke-vanilla');
+		paintSafe(confSpark, confTrend, '--stroke-rose');
+		paintSafe(pagesSpark, pageRate, '--stroke-violet');
+		paintSafe(powerSpark, powerTrend, '--stroke-amber');
+		paintSafe(cadenceSpark, cadence, '--stroke-teal');
+		paintSafe(matchSpark, matchTrend, '--stroke-lilac');
+		paintSafe(rttSpark, rttTrend, '--stroke-coral');
+		paintSafe(latencySpark, latency, '--stroke-indigo');
+		paintSafe(charsSpark, chars, '--stroke-green');
 	});
 
 	/**
@@ -437,6 +533,8 @@
 				></magx-panel-button>
 				<magx-panel-button id="pc-reset" title="Reset to defaults" mode="momentary"
 				></magx-panel-button>
+				<magx-panel-sparkline bind:this={powerSpark} title="Power draw — W"
+				></magx-panel-sparkline>
 				<magx-panel-html title="Last action">
 					<div class="pc-log">{lastAction}</div>
 				</magx-panel-html>
@@ -448,6 +546,8 @@
 				<magx-panel-html title="Rate">
 					<div class="pc-log">{fps === 0 ? 'static — sampling paused' : `${fps} fps · frame ${frame}`}</div>
 				</magx-panel-html>
+				<magx-panel-sparkline bind:this={cadenceSpark} title="Sample cadence — Hz"
+				></magx-panel-sparkline>
 				<magx-panel-button id="pc-reshuffle" title="Reshuffle data" mode="momentary"
 				></magx-panel-button>
 				<magx-panel-html title="Note">
@@ -485,6 +585,8 @@
 				<magx-panel-html title="Result">
 					<div class="pc-log">{visibleNodes.length} of {nodes.length} nodes</div>
 				</magx-panel-html>
+				<magx-panel-sparkline bind:this={matchSpark} title="Matched nodes"
+				></magx-panel-sparkline>
 			</magx-panel>
 
 			<magx-panel title="Nodes" x="304" y="0" style="--magx-panel-panel-width:{PANEL_W}px">
@@ -504,6 +606,8 @@
 						</div>
 					{/if}
 				</magx-panel-html>
+				<magx-panel-sparkline bind:this={rttSpark} title="p95 RTT — ms"
+				></magx-panel-sparkline>
 			</magx-panel>
 
 			<magx-panel title="Throughput" x="608" y="0" style="--magx-panel-panel-width:{PANEL_W}px">
@@ -579,12 +683,16 @@
 					mode="momentary"
 					secondary="Clear queue"
 				></magx-panel-button>
+				<magx-panel-sparkline bind:this={latencySpark} title="Stage latency — ms"
+				></magx-panel-sparkline>
 			</magx-panel>
 
 			<magx-panel title="Extracted text" x="608" y="0" style="--magx-panel-panel-width:{PANEL_W}px">
 				<magx-panel-html title={docs[0].name}>
 					<pre class="pc-pre">{extracted}</pre>
 				</magx-panel-html>
+				<magx-panel-sparkline bind:this={charsSpark} title="Characters — /page"
+				></magx-panel-sparkline>
 			</magx-panel>
 		</div>
 	</div>
