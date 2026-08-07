@@ -14,6 +14,8 @@
 	import { walk, spiky, diurnal } from '$lib/interface/generate';
 	import { chartSeries } from '$lib/data/palette';
 	import { fitStage } from '$lib/interface/fitStage';
+	import { whenCharts } from '$lib/interface/chartsReady';
+	import { magxById } from '$lib/interface/magx';
 
 	declare const __BUILD_VERSION__: string;
 
@@ -95,7 +97,7 @@
 	}
 
 	function sparkOf(id: string) {
-		return (document.getElementById(id) as any)?.getSparkline?.() ?? null;
+		return (magxById(id) as any)?.getSparkline?.() ?? null;
 	}
 
 	function paintSpark(s: Spark, seedIn: number) {
@@ -141,28 +143,23 @@
 	 * sparkline grid ended up rendering eight healthy-looking but empty
 	 * canvases. An effect survives the build, and reading `seed` gives
 	 * reshuffle for free.
+	 *
+	 * The wait is on the canvases rather than on element upgrade — see
+	 * `chartsReady`. Waiting on upgrade passed instantly when arriving through
+	 * client-side nav, because the class was already registered from the first
+	 * visit, and the paint then landed before Lit had built any canvas to paint
+	 * on. Every chart in the hero came back blank on the second visit.
 	 */
 	$effect(() => {
 		const s = seed;
-		let raf = 0;
-		let stop = false;
-		const attempt = (tries: number) => {
-			if (stop) return;
-			const first = document.getElementById(SPARKS[0].id) as any;
-			const upgraded = typeof first?.getSparkline === 'function';
-			if (upgraded || tries <= 0) {
+		return whenCharts(
+			SPARKS.map((sp) => sp.id),
+			() => {
 				ready = true;
 				paintAll(s);
 				load = 30 + ((s * 37) % 55);
-				return;
 			}
-			raf = requestAnimationFrame(() => attempt(tries - 1));
-		};
-		attempt(120);
-		return () => {
-			stop = true;
-			if (raf) cancelAnimationFrame(raf);
-		};
+		);
 	});
 
 	/* Size each column to its panel rather than to a guessed min-height. */
@@ -181,7 +178,7 @@
 	 * `input` events, so an inline `onchange=` on the tag would never run.
 	 */
 	$effect(() => {
-		const val = (id: string) => (document.getElementById(id) as any)?.getValue?.();
+		const val = (id: string) => (magxById(id) as any)?.getValue?.();
 		const onChange = (e: Event) => {
 			const id = (e as CustomEvent).detail?.panelElementId;
 			// The dropdown returns `{ index, label }`, not a bare value.
@@ -200,7 +197,7 @@
 			const d = new Date();
 			const p = (n: number) => String(n).padStart(2, '0');
 			clock = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
-			const el = document.getElementById('hs-clock') as any;
+			const el = magxById('hs-clock') as any;
 			if (el) el.timeValue = clock;
 		};
 		tick();

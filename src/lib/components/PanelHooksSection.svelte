@@ -15,6 +15,7 @@
 	 * surface — there is no per-element subscription API to learn.
 	 */
 	import { fitStage } from '$lib/interface/fitStage';
+	import { magxById } from '$lib/interface/magx';
 
 	const GLYPHS = [
 		'fa-gauge-high',
@@ -37,7 +38,7 @@
 	const glyph = $derived(GLYPHS[glyphIndex % GLYPHS.length]);
 
 	function valueOf(id: string): any {
-		return (document.getElementById(id) as any)?.getValue?.();
+		return (magxById(id) as any)?.getValue?.();
 	}
 
 	/**

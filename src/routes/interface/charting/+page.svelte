@@ -32,6 +32,7 @@
 		driftOne
 	} from '$lib/interface/generate';
 	import { onTick } from '$lib/anim';
+	import { fitStage } from '$lib/interface/fitStage';
 
 	/**
 	 * Every dataset below is generated, never fetched. `seed` advances on each
@@ -190,6 +191,20 @@
 	);
 
 	const chartTokens = ['cyan', 'rose', 'amber', 'indigo', 'green', 'violet', 'peach', 'teal'];
+
+	/* -- 08 · the same charts, hosted in draggable panels ----------------- */
+
+	/** Panel width in px. Three of these plus gaps set the stage's min width. */
+	const CP_W = 336;
+	let panelStage: HTMLDivElement | null = $state(null);
+
+	/*
+	 * `magx-panel` positions itself absolutely and so contributes no height —
+	 * without this the section would collapse to nothing and the panels would
+	 * overlap whatever follows. `fitStage` measures the real panels and re-measures
+	 * after a drag or a collapse.
+	 */
+	$effect(() => (panelStage ? fitStage(panelStage, 12) : undefined));
 </script>
 
 <svelte:head>
@@ -445,4 +460,72 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- 08 ------------------------------------------------------------ -->
+	<div class="ifc-sec">
+		<span class="ifc-sec-tag">08</span>
+		<span class="ifc-sec-title">The same charts, in panels</span>
+		<span class="ifc-sec-hint">drag · collapse · close</span>
+	</div>
+	<p class="ifc-sec-note">
+		Everything above sits in a fixed document grid. The same charts drop into <code>magx-panel</code
+		> without a line of chart code changing — they are SVG that scales to whatever box it is given,
+		and a panel is just another box. What you gain is arrangement: drag one chart alongside another
+		to compare them, double-click a title bar to collapse a chart you are done with, close the ones
+		you never wanted. What you give up is a layout that survives a reload. Hover still opens the same
+		white-plate popovers, and the Reshuffle and FPS controls at the top of the page drive these three
+		exactly as they drive the rest.
+	</p>
+	<div class="ifc-card">
+		<div bind:this={panelStage} class="cp-stage">
+			<magx-panel title="Baseline draw" x="0" y="0" style="--magx-panel-panel-width:{CP_W}px">
+				<magx-panel-html title="watts · 30-minute buckets">
+					<!-- The SVG is a 720-wide viewBox scaled to its box, and a panel is
+					     less than half the width of a page card, which halves the drawn
+					     height too. A taller box lands at the same size on screen. -->
+					<AreaChart
+						series={[baseline]}
+						labels={halfHours}
+						tokens={['mint']}
+						unit=" W"
+						height={300}
+						yFormat={(v) => v.toFixed(0)}
+					/>
+				</magx-panel-html>
+			</magx-panel>
+
+			<magx-panel title="Request mix" x="352" y="0" style="--magx-panel-panel-width:{CP_W}px">
+				<magx-panel-html title="last 24h">
+					<DonutChart slices={mix} tokens={chartTokens} centerLabel="REQUESTS" format={fmtCompact} />
+				</magx-panel-html>
+			</magx-panel>
+
+			<magx-panel title="Volume report" x="704" y="0" style="--magx-panel-panel-width:{CP_W}px">
+				<magx-panel-html title="size by top-level folder">
+					<HBarList items={folders.slice(0, 5)} token="teal" format={fmtBytes} />
+				</magx-panel-html>
+				<magx-panel-html title="quota">
+					<MeterBar
+						label=""
+						value={quotas[0].pct}
+						display={`${quotas[0].pct.toFixed(0)}%`}
+						warn={75}
+						crit={92}
+					/>
+				</magx-panel-html>
+			</magx-panel>
+		</div>
+	</div>
 </div>
+
+<style>
+	/* Panels are absolutely positioned, so the stage needs its own box. The
+	   min-width keeps all three side by side before any dragging; `fitStage`
+	   supplies the height, and the min-height below is only a pre-measure
+	   fallback so the section never flashes at zero. */
+	.cp-stage {
+		position: relative;
+		min-width: 1056px;
+		min-height: 300px;
+	}
+</style>

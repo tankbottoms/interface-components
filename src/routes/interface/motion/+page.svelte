@@ -30,7 +30,57 @@
 
 	$effect(() => (tiltEl ? pointerRatios(tiltEl) : undefined));
 	$effect(() => (glowEl ? pointerRatios(glowEl) : undefined));
-	$effect(() => (revealEl ? visibility(revealEl) : undefined));
+
+	/*
+	 * Reveal-on-entry is a one-shot by design: it plays as the card scrolls into
+	 * view and then latches, so scrolling past it repeatedly does not replay it.
+	 * That is correct behaviour and completely invisible as a demo — by the time
+	 * you have scrolled far enough to look at the card, the entrance you came to
+	 * watch has already finished. Re-arming the observer replays it on demand,
+	 * and the two numbers it writes are printed beside it so the mechanism is
+	 * legible even when the motion is over.
+	 */
+	let revealArm = $state(0);
+	let revealRatio = $state(0);
+	let revealLatched = $state(false);
+
+	$effect(() => {
+		revealArm;
+		if (!revealEl) return;
+		return visibility(revealEl);
+	});
+
+	/* Mirror the live properties into text. CSS can read them; a reader cannot. */
+	$effect(() => {
+		const el = revealEl;
+		if (!el) return;
+		let raf = 0;
+		const read = () => {
+			revealRatio = Number(el.style.getPropertyValue('--live-visible') || 0);
+			revealLatched = el.style.getPropertyValue('--const-has-entered') === '1';
+			raf = requestAnimationFrame(read);
+		};
+		read();
+		return () => cancelAnimationFrame(raf);
+	});
+
+	/**
+	 * Re-arm the observer — but hold the reset for a moment first.
+	 *
+	 * Simply recreating the observer looks like nothing happens: it writes zero
+	 * and the very next callback writes one again, both inside a single frame, so
+	 * the browser never sees a starting state to transition away from. Flushing
+	 * layout pins the zero, and the short pause makes the return to one a real
+	 * transition rather than a same-frame no-op.
+	 */
+	function replayReveal() {
+		const el = revealEl;
+		if (!el) return;
+		el.style.setProperty('--live-visible', '0');
+		el.style.setProperty('--const-has-entered', '0');
+		void el.offsetHeight;
+		setTimeout(() => (revealArm += 1), 120);
+	}
 
 	const series = $derived(
 		windowOf(walk(48 + RESERVOIR, { seed, min: 8, max: 96, start: 40, step: 9 }), 48, frame)
@@ -213,9 +263,26 @@
 					<span class="reveal-word" style="--i:{i}">{word}</span>
 				{/each}
 			</div>
+			<div class="reveal-bar">
+				<span class="reveal-read">
+					<code>--live-visible</code>
+					<b>{revealRatio.toFixed(3)}</b>
+				</span>
+				<span class="reveal-read">
+					<code>--const-has-entered</code>
+					<b>{revealLatched ? '1' : '0'}</b>
+				</span>
+				<button class="reveal-replay" onclick={replayReveal}>Replay</button>
+			</div>
 			<p class="lp-note">
-				An <code>IntersectionObserver</code> with 21 thresholds turns a boolean callback into a
-				signal. The latch keeps the words in place once seen, so scrolling back does not replay it.
+				The four words start invisible and 28px low. An <code>IntersectionObserver</code> with 21
+				thresholds reports how much of the card is on screen as a number rather than a boolean, and
+				that number is written to <code>--live-visible</code>; the words fade and rise in proportion
+				to it, staggered 110ms apart. Once 15% of the card has been seen,
+				<code>--const-has-entered</code> latches to 1 and pins them in place — so scrolling back and
+				forth does not replay the entrance. That latch is why it looks like nothing happens: by the
+				time the card is comfortably in view the reveal is already over.
+				<b>Replay</b> re-arms the observer from zero.
 			</p>
 		</div>
 	</div>
@@ -425,11 +492,50 @@
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
 		opacity: var(--settled);
-		transform: translateY(calc((1 - var(--settled)) * 14px));
+		/* 28px and 110ms — far enough and slow enough to actually be seen when
+		   the Replay button re-arms the observer. */
+		transform: translateY(calc((1 - var(--settled)) * 28px));
 		transition:
 			opacity 480ms cubic-bezier(0.16, 1, 0.3, 1),
 			transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
-		transition-delay: calc(var(--i) * 60ms);
+		transition-delay: calc(var(--i) * 110ms);
+	}
+
+	.reveal-bar {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-sm);
+		flex-wrap: wrap;
+		margin-top: var(--spacing-xs);
+	}
+	.reveal-read {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 6px;
+		font-size: 0.62rem;
+	}
+	.reveal-read code {
+		color: var(--color-text-dim);
+	}
+	.reveal-read b {
+		font-variant-numeric: tabular-nums;
+		color: var(--color-accent);
+	}
+	.reveal-replay {
+		margin-left: auto;
+		border: 1px solid var(--rule);
+		background: var(--paper-card);
+		color: var(--color-text);
+		font: inherit;
+		font-size: 0.62rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		padding: 4px 10px;
+		cursor: pointer;
+	}
+	.reveal-replay:hover {
+		border-color: var(--color-accent);
+		color: var(--color-accent);
 	}
 
 	/* --- 03 one property, four readouts -------------------------------- */

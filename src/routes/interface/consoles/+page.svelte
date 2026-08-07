@@ -18,6 +18,8 @@
 	import { walk, RESERVOIR, windowOf, driftOne, fmtBytes, fmtCompact } from '$lib/interface/generate';
 	import DemoControls from '$lib/components/DemoControls.svelte';
 	import { fitStage } from '$lib/interface/fitStage';
+	import { whenCharts } from '$lib/interface/chartsReady';
+	import { magxById } from '$lib/interface/magx';
 
 	const PANEL_W = 288;
 
@@ -283,29 +285,34 @@
 	}
 
 	/**
-	 * Wait for the Lit elements to upgrade, then let the paint effect run.
+	 * Wait for the charts to become paintable, then let the paint effect run.
 	 *
 	 * Deliberately not `onMount` — that body was being dropped from the
 	 * production client bundle, so `ready` never flipped and every sparkline on
 	 * this page stayed an empty canvas in the deployed build while working
-	 * perfectly in dev. Poll for the upgrade instead of guessing a delay.
+	 * perfectly in dev.
+	 *
+	 * The wait is on the canvases, not on element upgrade: arriving here through
+	 * client-side nav finds the custom elements already registered, so an
+	 * upgrade check passes on the first frame — before Lit has built a canvas to
+	 * draw on. See `chartsReady`.
 	 */
 	$effect(() => {
-		let raf = 0;
-		let stop = false;
-		const attempt = (tries: number) => {
-			if (stop) return;
-			if (typeof (gpuSpark as any)?.getSparkline === 'function' || tries <= 0) {
-				ready = true;
-				return;
-			}
-			raf = requestAnimationFrame(() => attempt(tries - 1));
-		};
-		attempt(120);
-		return () => {
-			stop = true;
-			if (raf) cancelAnimationFrame(raf);
-		};
+		const refs = [
+			gpuSpark,
+			tempSpark,
+			ingestSpark,
+			loadSpark,
+			confSpark,
+			pagesSpark,
+			powerSpark,
+			cadenceSpark,
+			matchSpark,
+			rttSpark,
+			latencySpark,
+			charsSpark
+		];
+		return whenCharts(refs, () => (ready = true));
 	});
 
 	/* Size each console to its panels once they have upgraded and laid out. */
@@ -323,7 +330,7 @@
 	$effect(() => {
 		const rate = fps;
 		if (!ready) return;
-		(document.getElementById('pc-fps') as any)?.setValue?.(rate);
+		(magxById('pc-fps') as any)?.setValue?.(rate);
 	});
 
 	$effect(() => {
@@ -350,7 +357,7 @@
 		const onChange = (e: Event) => {
 			const id = (e as CustomEvent).detail?.panelElementId as string | undefined;
 			if (!id) return;
-			const el = document.getElementById(id) as any;
+			const el = magxById(id) as any;
 			const v = el?.getValue?.();
 			if (v === undefined || v === null) return;
 
@@ -380,8 +387,8 @@
 					fanPct = 62;
 					// The sliders are the source of truth for their own thumbs, so the
 					// reset has to be pushed back into them, not just into local state.
-					(document.getElementById('pc-power') as any)?.setValue?.(300);
-					(document.getElementById('pc-fan') as any)?.setValue?.(62);
+					(magxById('pc-power') as any)?.setValue?.(300);
+					(magxById('pc-fan') as any)?.setValue?.(62);
 					lastAction = 'reset to defaults';
 					break;
 				case 'pc-reshuffle':
