@@ -1,29 +1,40 @@
+/*
+ * Light mode is the tiles.wtf gallery palette: a white site, warm off-white
+ * cards, a hairline in warm grey, teal for anything clickable and amber for
+ * the mark. Ink is black at 93/60/33 percent rather than a stack of greys, so
+ * every muted tone sits on whatever surface is behind it. Dark mode below is
+ * unchanged — the toggle crosses from Tokyo-night to this.
+ */
 :root {
-	--color-bg: #fafaf9;
-	--color-bg-secondary: #f5f5f4;
-	--color-bg-alt: #e7e5e4;
-	--color-text: #1c1917;
-	--color-text-muted: #78716c;
-	--color-border: #d6d3d1;
-	--color-border-light: #e7e5e4;
-	--color-border-dark: #a8a29e;
-	--color-hover-bg: #f5f5f4;
-	--color-link: #2f7f8f;
-	--color-accent: #3792a4;
-	--color-success: #5e9463;
-	--color-shadow: #d6d3d1;
+	--color-bg: #ffffff;
+	--color-bg-secondary: #fbf9f6;
+	--color-bg-alt: #f3f1ec;
+	--color-text: #000000ee;
+	--color-text-muted: #00000099;
+	--color-border: #e7e3dc;
+	--color-border-light: #f3f1ec;
+	--color-border-dark: #00000055;
+	--color-hover-bg: #f3f1ec;
+	--color-link: #18b4c7;
+	--color-accent: #18b4c7;
+	--color-accent-bright: #3dd1e4;
+	--color-brand: #f5a312;
+	--color-warn: #ff4524;
+	--color-success: #0f8534;
+	--color-shadow: #e7e3dc;
 
 	/* --- Interface section: house-style paper surface ------------------ */
-	--paper: #f4f3ee;
-	--paper-card: #fbfaf6;
+	--paper: #ffffff;
+	--paper-card: #fbf9f6;
 	--paper-pane: #ffffff;
-	--ink: #1a1a1a;
-	--ink-muted: #6b6b6b;
-	--ink-soft: #8f8f89;
-	--ink-note: #5a5a55;
-	--rule: #1a1a1a;
-	--rule-soft: #d4d3cc;
-	--rule-hair: #e2e1da;
+	--tip-paper: #fbf9f6;
+	--ink: #000000ee;
+	--ink-muted: #00000099;
+	--ink-soft: #00000055;
+	--ink-note: #00000077;
+	--rule: #000000ee;
+	--rule-soft: #e7e3dc;
+	--rule-hair: #f3f1ec;
 	--brutal-shadow: 3px 3px 0 var(--rule);
 
 	/* --- 8 Elegant Pastels (fills) ------------------------------------ */
@@ -119,6 +130,9 @@
 	--color-hover-bg: #292e42;
 	--color-link: #7dcfff;
 	--color-accent: #80deea;
+	--color-accent-bright: #b3ecf5;
+	--color-brand: #fcdc9c;
+	--color-warn: #ff9b8a;
 	--color-success: #9ece6a;
 	--color-shadow: #414868;
 
@@ -212,6 +226,9 @@
 		--color-hover-bg: #292e42;
 		--color-link: #7dcfff;
 		--color-accent: #80deea;
+		--color-accent-bright: #b3ecf5;
+		--color-brand: #fcdc9c;
+		--color-warn: #ff9b8a;
 		--color-success: #9ece6a;
 		--color-shadow: #414868;
 

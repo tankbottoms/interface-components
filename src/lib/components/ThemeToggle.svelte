@@ -39,17 +39,29 @@
 </button>
 
 <style>
+	/*
+	 * A bare glyph, not a badge. It used to carry the same filled box, hairline
+	 * border and 2px offset shadow every button on the site wears, which read as
+	 * a control you submit rather than a switch you flip — and it was the only
+	 * bordered thing sitting beside the borderless cubes mark. gpumon floats its
+	 * hamburger and gear the same way: lines only, colour on hover.
+	 */
 	.theme-toggle {
-		background: var(--color-bg-alt);
-		border: 1px solid var(--color-border);
-		color: var(--color-text);
-		padding: 0.4rem 0.6rem;
+		background: none;
+		border: 0;
+		color: var(--color-text-muted);
+		padding: 4px 6px;
 		cursor: pointer;
-		font-size: 0.9rem;
-		box-shadow: 2px 2px 0 var(--color-shadow);
+		font-size: 1rem;
+		line-height: 1;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		font-family: var(--font-mono);
+		transition: color 0.12s ease;
+		-webkit-tap-highlight-color: transparent;
 	}
 	.theme-toggle:hover {
-		background: var(--color-hover-bg);
+		color: var(--color-accent);
 	}
 </style>
