@@ -16,7 +16,13 @@
 	--color-border-dark: #00000055;
 	--color-hover-bg: #f3f1ec;
 	--color-link: #18b4c7;
-	--color-accent: #18b4c7;
+	/*
+	 * The highlight resolves per theme rather than per pick. The header picker
+	 * writes --accent-light / --accent-dark inline (see stores/highlight.ts) and
+	 * each theme block reads its own, so amber can be deep enough for 10px
+	 * uppercase on paper and bright enough to be a mark on navy.
+	 */
+	--color-accent: var(--accent-light, #a86f08);
 	--color-accent-bright: #3dd1e4;
 	--color-brand: #f5a312;
 	--color-warn: #ff4524;
@@ -129,7 +135,7 @@
 	--color-border-dark: #414868;
 	--color-hover-bg: #292e42;
 	--color-link: #7dcfff;
-	--color-accent: #80deea;
+	--color-accent: var(--accent-dark, #f5a312);
 	--color-accent-bright: #b3ecf5;
 	--color-brand: #fcdc9c;
 	--color-warn: #ff9b8a;
@@ -225,7 +231,7 @@
 		--color-border-dark: #414868;
 		--color-hover-bg: #292e42;
 		--color-link: #7dcfff;
-		--color-accent: #80deea;
+		--color-accent: var(--accent-dark, #f5a312);
 		--color-accent-bright: #b3ecf5;
 		--color-brand: #fcdc9c;
 		--color-warn: #ff9b8a;

@@ -84,9 +84,16 @@ export const statusColors = {
 /**
  * Site highlight options offered in the header picker. These are *strokes*, not
  * pastel fills — an accent has to survive being 1px of text on paper.
- * Deliberately no purple: teal leads.
+ * Deliberately no purple: amber leads, teal holds the links.
+ *
+ * `dark` is the value the accent takes on dark paper. Most of these are
+ * mid-tone strokes that hold up on either ground and so carry no companion, but
+ * amber cannot: the brand orange is 2.0:1 on the light sidebar and unreadable at
+ * 10px, while the deepened amber that fixes that goes muddy on navy. One hue,
+ * two luminances — same trade the pastels already make in theme.css.
  */
 export const accentSwatches = [
+	{ name: 'Amber', color: '#A86F08', dark: '#F5A312' },
 	{ name: 'Teal', color: '#3792A4' },
 	{ name: 'Deep Aqua', color: '#2E8FA6' },
 	{ name: 'Pine', color: '#3E8F86' },
@@ -101,21 +108,15 @@ export const accentSwatches = [
 	{ name: 'Graphite', color: '#4A4A46' }
 ];
 
-export const DEFAULT_ACCENT = '#3792A4';
+export const DEFAULT_ACCENT = '#A86F08';
+export const DEFAULT_ACCENT_DARK = '#F5A312';
 
 /**
- * The three accents the site picks between on load — rose, aqua and mint from
- * the eight elegant pastels, in their stroke form so they can hold a link or a
- * 1px rule. Rotating on load keeps the palette feeling alive without letting the
- * page land on something illegible; a saved preference always wins over this.
+ * The dark-paper companion for a chosen accent, or the accent itself when it
+ * does not need one. Matching is case-insensitive: the swatches are written in
+ * caps, but a value round-tripped through localStorage or the DOM may not be.
  */
-export const loadAccents = [
-	{ name: 'Rose', color: '#C75F81', token: 'rose' },
-	{ name: 'Aqua', color: '#2E8FA6', token: 'aqua' },
-	{ name: 'Mint', color: '#3E9B72', token: 'mint' }
-] as const;
-
-/** Picks one of the three load accents at random. */
-export function randomLoadAccent(): string {
-	return loadAccents[Math.floor(Math.random() * loadAccents.length)].color;
+export function accentDark(color: string): string {
+	const hit = accentSwatches.find((a) => a.color.toLowerCase() === color.trim().toLowerCase());
+	return hit?.dark ?? color;
 }

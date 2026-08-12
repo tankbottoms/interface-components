@@ -5,7 +5,8 @@
 		chartSeries,
 		statusColors,
 		accentSwatches,
-		DEFAULT_ACCENT
+		DEFAULT_ACCENT,
+		DEFAULT_ACCENT_DARK
 	} from '$lib/data/palette';
 	import { accentColor } from '$lib/stores/highlight';
 	import { fitStage } from '$lib/interface/fitStage';
@@ -72,10 +73,12 @@
 		<span class="ifc-sec-hint">stroke weight · no purple</span>
 	</div>
 	<p class="ifc-sec-note">
-		The site highlight is <strong>Teal {DEFAULT_ACCENT}</strong> — the darkened companion of the
-		palette's aqua, and the accent the house sheet already uses. It reads as a link, survives on
-		cream paper and on dark, and is not purple. Pick any of the twelve below from the header icon;
-		anyone still holding a retired purple is migrated to teal automatically.
+		The site highlight is <strong>Amber {DEFAULT_ACCENT}</strong> on paper and
+		<strong>{DEFAULT_ACCENT_DARK}</strong> on dark — one hue at two luminances, because the brand
+		orange that carries a mark on navy falls to 2.0:1 against white and stops being readable at
+		10px. It is the only accent here that needs the pair; the rest are mid-tone strokes that hold
+		on either ground. Pick any of the thirteen below from the header icon; anyone still holding a
+		retired purple is migrated automatically.
 	</p>
 	<div class="ifc-grid ifc-grid-auto">
 		{#each accentSwatches as a}
