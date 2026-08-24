@@ -67,7 +67,7 @@
 </script>
 
 <div class="donut">
-	<div class="ifc-chart" style="max-width:{size}px">
+	<div class="ifc-chart donut-dial" style="flex-basis:{size}px">
 		<svg viewBox="0 0 {size} {size}" role="img" aria-label="Donut chart" onmouseleave={leave}>
 			{#each arcs as a}
 				<path
@@ -114,17 +114,31 @@
 </div>
 
 <style>
+	/*
+	 * The dial and its legend are a pair, and the pair — not the dial alone — is
+	 * what gets centred. Left-aligned, a 200px dial in a 560px card reads as a
+	 * mistake; centring the flex line keeps the whole unit under the card title.
+	 * The dial is `flex: 0 1 <size>` rather than `max-width`, so when the legend
+	 * wraps below on a narrow card the dial keeps its size instead of stretching,
+	 * and `margin-inline: auto` re-centres it on that wrapped line.
+	 */
 	.donut {
 		display: flex;
 		gap: var(--spacing-lg);
 		align-items: center;
+		justify-content: center;
 		flex-wrap: wrap;
+	}
+	.donut-dial {
+		flex: 0 1 auto;
+		margin-inline: auto;
 	}
 	.donut-legend {
 		display: flex;
 		flex-direction: column;
 		gap: 3px;
 		font-size: 0.68rem;
+		flex: 0 1 auto;
 		min-width: 150px;
 	}
 	.donut-row {

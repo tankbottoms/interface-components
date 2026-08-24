@@ -182,7 +182,7 @@
 
 	{#if hint && !touched && !reduced}
 		<span class="rt-hint" aria-hidden="true">
-			<i class="fas fa-arrow-pointer"></i>
+			<i class="fat fa-arrow-pointer"></i>
 			{hint}
 		</span>
 	{/if}

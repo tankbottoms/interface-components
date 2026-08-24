@@ -15,7 +15,7 @@
 
 {#if properties.length > 0}
 	<div class="props-section">
-		<h4 class="props-heading"><i class="fas fa-cog"></i> PROPERTIES</h4>
+		<h4 class="props-heading"><i class="fat fa-cog"></i> PROPERTIES</h4>
 		<div class="props-table-wrapper">
 			<table class="props-table">
 				<thead>

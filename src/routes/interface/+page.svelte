@@ -22,11 +22,25 @@
 			body: 'Breadcrumbs and tools, metadata badge rows, title blocks with serif citations, enriched metadata, tag groups, extracted insights, and a split source/text pane.'
 		},
 		{
-			href: '/interface/palette',
+			href: '/interface/wayfinding',
 			tag: '04',
+			name: 'Wayfinding',
+			icon: 'fa-location-crosshairs',
+			body: 'Corner circle-i affordances, numbered key locations on a page wireframe, control clusters over maps and 3-D viewers, and a guided tour that highlights without darkening the page.'
+		},
+		{
+			href: '/interface/settings',
+			tag: '05',
+			name: 'Settings & Analytics',
+			icon: 'fa-gear',
+			body: 'The gear glyph and its two surfaces — anchored popover or dedicated page, same four groups either way — plus the built-in per-site analytics page: KPI strip with filled sparklines, traffic shape, dense table.'
+		},
+		{
+			href: '/interface/palette',
+			tag: '06',
 			name: 'Palette',
 			icon: 'fa-palette',
-			body: 'The eight elegant pastels, the house palette, chart series order, the status ramp, and the twelve accent options behind the header picker.'
+			body: 'The eight elegant pastels, the house palette, chart series order, the status ramp, and the eight accent options behind the header picker.'
 		}
 	];
 </script>
@@ -52,7 +66,7 @@
 			<a class="ifc-card idx" href={s.href}>
 				<div class="ifc-card-hdr">
 					<span class="ifc-sec-tag">{s.tag}</span>
-					<span class="ifc-card-title"><i class="fas {s.icon}"></i> {s.name}</span>
+					<span class="ifc-card-title"><i class="fat {s.icon}"></i> {s.name}</span>
 				</div>
 				<p class="ifc-mono-note">{s.body}</p>
 			</a>

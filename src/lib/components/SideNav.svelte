@@ -28,6 +28,8 @@
 		{ href: '/interface/charting', name: 'Charting', icon: 'fa-chart-column' },
 		{ href: '/interface/layout', name: 'Layout & Data', icon: 'fa-table-cells-large' },
 		{ href: '/interface/documents', name: 'Documents', icon: 'fa-file-lines' },
+		{ href: '/interface/wayfinding', name: 'Wayfinding', icon: 'fa-location-crosshairs' },
+	{ href: '/interface/settings', name: 'Settings & Analytics', icon: 'fa-gear' },
 		{ href: '/interface/motion', name: 'Motion', icon: 'fa-wand-magic-sparkles' },
 		{ href: '/interface/consoles', name: 'Panel Consoles', icon: 'fa-sliders' },
 		{ href: '/interface/palette', name: 'Palette', icon: 'fa-palette' }
@@ -87,16 +89,16 @@
 
 <nav class="sidenav" aria-label="Sections">
 	<a class="nav-home" href="/" onclick={goHome}>
-		<i class="fas fa-house"></i>
+		<i class="fat fa-house"></i>
 		<span>Overview</span>
-		<i class="fas fa-arrow-turn-up nav-home-hint" aria-hidden="true"></i>
+		<i class="fat fa-arrow-turn-up nav-home-hint" aria-hidden="true"></i>
 	</a>
 
 	<div class="nav-section">Components</div>
 
 	<div class="nav-group">
 		<a class="nav-group-title nav-group-link" href="/" onclick={goHome} title="Back to the top">
-			<i class="fas fa-layer-group"></i> Panel System
+			<i class="fat fa-layer-group"></i> Panel System
 		</a>
 		{#each panelComponents as comp}
 			<button
@@ -105,14 +107,14 @@
 				onclick={() => jump(comp.id)}
 				aria-current={onHome && activeId === comp.id ? 'true' : undefined}
 			>
-				<i class="fas {comp.icon}"></i>
+				<i class="fat {comp.icon}"></i>
 				{comp.name}
 			</button>
 		{/each}
 	</div>
 
 	<div class="nav-group">
-		<div class="nav-group-title"><i class="fas fa-chart-line"></i> Sparkline</div>
+		<div class="nav-group-title"><i class="fat fa-chart-line"></i> Sparkline</div>
 		{#each sparklineComponents as comp}
 			<button
 				class="nav-item"
@@ -120,7 +122,7 @@
 				onclick={() => jump(comp.id)}
 				aria-current={onHome && activeId === comp.id ? 'true' : undefined}
 			>
-				<i class="fas {comp.icon}"></i>
+				<i class="fat {comp.icon}"></i>
 				{comp.name}
 			</button>
 		{/each}
@@ -130,7 +132,7 @@
 			onclick={() => jump('sparkline-animated')}
 			aria-current={onHome && activeId === 'sparkline-animated' ? 'true' : undefined}
 		>
-			<i class="fas fa-film"></i>
+			<i class="fat fa-film"></i>
 			Sparkline (Animated)
 		</button>
 	</div>
@@ -138,7 +140,7 @@
 	<div class="nav-section">Interface</div>
 
 	<div class="nav-group">
-		<div class="nav-group-title"><i class="fas fa-shapes"></i> Patterns</div>
+		<div class="nav-group-title"><i class="fat fa-shapes"></i> Patterns</div>
 		{#each interfaceLinks as link}
 			<a
 				class="nav-item"
@@ -147,7 +149,7 @@
 				onclick={() => onnavigate?.()}
 				aria-current={path.startsWith(link.href) ? 'page' : undefined}
 			>
-				<i class="fas {link.icon}"></i>
+				<i class="fat {link.icon}"></i>
 				{link.name}
 			</a>
 		{/each}

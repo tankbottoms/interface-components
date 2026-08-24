@@ -1,22 +1,25 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import { accentSwatches, DEFAULT_ACCENT, accentDark } from '$lib/data/palette';
+import { accentSwatches, accentValues, DEFAULT_ACCENT, accentDark } from '$lib/data/palette';
 
 const STORAGE_KEY = 'interface-components-accent';
 
-/** Accents retired in the teal rebrand — migrate anyone still holding one. */
-const RETIRED = new Set(['#7c3aed', '#a78bfa', '#c4b5fd']);
-
 /**
- * The site opens on amber and stays there until someone picks otherwise. It
- * used to roll between rose, aqua and mint on each load, which was lively but
- * meant the mark was a different colour every visit — a library's own chrome is
- * the one thing that should not reseed.
+ * The site opens on mint — series 04 of the chart order — and stays there until
+ * someone picks otherwise. It used to reseed on every load, which was lively but
+ * meant the mark was a different colour every visit; a library's own chrome is
+ * the one thing that should not.
+ *
+ * The picker's options have changed twice (purple → amber/teal → chart series),
+ * so rather than keep a growing list of retired hexes, a stored value is simply
+ * checked against the palette that exists *now*. Anything the picker can no
+ * longer offer — a purple from the first set, the amber from the second — falls
+ * back to mint instead of pinning the header to a colour with no swatch.
  */
 function getInitial(): string {
 	if (!browser) return DEFAULT_ACCENT;
-	const stored = localStorage.getItem(STORAGE_KEY);
-	if (stored && !RETIRED.has(stored.toLowerCase())) return stored;
+	const stored = localStorage.getItem(STORAGE_KEY)?.trim().toLowerCase();
+	if (stored && accentValues.has(stored)) return stored;
 	return DEFAULT_ACCENT;
 }
 
@@ -38,7 +41,7 @@ if (browser) {
 	});
 }
 
-/** Drop the saved preference and go back to the house amber. */
+/** Drop the saved preference and go back to the house mint. */
 export function clearAccentPreference(): void {
 	if (!browser) return;
 	accentColor.set(DEFAULT_ACCENT);

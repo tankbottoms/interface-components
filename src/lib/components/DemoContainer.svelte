@@ -22,15 +22,15 @@
 
 <div class="demo-container">
 	<div class="demo-label">
-		<i class="fas fa-play"></i> LIVE DEMO
+		<i class="fat fa-play"></i> LIVE DEMO
 		<button class="demo-reset" onclick={reset} aria-label="Reset demo">
 			<i class="fat fa-arrow-rotate-right"></i> Reset
 		</button>
 		<button class="demo-theme-toggle" onclick={toggle} aria-label="Toggle demo theme">
 			{#if isDark}
-				<i class="fas fa-sun"></i> Light
+				<i class="fat fa-sun"></i> Light
 			{:else}
-				<i class="fas fa-moon"></i> Dark
+				<i class="fat fa-moon"></i> Dark
 			{/if}
 		</button>
 	</div>

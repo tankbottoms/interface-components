@@ -36,7 +36,7 @@
 <section id={component.id} class="component-card">
 	<div class="card-header">
 		<div class="card-title">
-			<i class="fas {component.icon}"></i>
+			<i class="fat {component.icon}"></i>
 			<h3>{component.name}</h3>
 			<code class="tag-name">&lt;{component.tagName}&gt;</code>
 			<InfoTip

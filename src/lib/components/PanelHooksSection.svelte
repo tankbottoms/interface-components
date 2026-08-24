@@ -101,7 +101,7 @@
 </script>
 
 <section id="panel-hooks" class="hooks">
-	<h2 class="hooks-title"><i class="fas fa-plug-circle-bolt"></i> What the Mock Panel Hooks Into</h2>
+	<h2 class="hooks-title"><i class="fat fa-plug-circle-bolt"></i> What the Mock Panel Hooks Into</h2>
 
 	<p class="hooks-intro">
 		The panel in the hero is a real control surface, not a mock-up, but it is worth being explicit

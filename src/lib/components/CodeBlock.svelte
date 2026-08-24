@@ -20,7 +20,7 @@
 	<div class="code-header">
 		<span class="code-lang">{language}</span>
 		<button class="copy-btn" onclick={copy}>
-			<i class="fas {copied ? 'fa-check' : 'fa-copy'}"></i>
+			<i class="fat {copied ? 'fa-check' : 'fa-copy'}"></i>
 			{copied ? 'Copied' : 'Copy'}
 		</button>
 	</div>

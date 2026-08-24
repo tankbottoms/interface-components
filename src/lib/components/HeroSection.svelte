@@ -299,7 +299,7 @@
 </script>
 
 <section class="hero">
-	<h1 class="hero-title"><i class="fas fa-cubes"></i> Interface Components</h1>
+	<h1 class="hero-title"><i class="fat fa-cubes"></i> Interface Components</h1>
 	<p class="hero-subtitle">
 		A library of draggable panel controls and canvas sparklines, built as Lit web components on the
 		<a href="https://github.com/mlalma/magx/tree/main" target="_blank" rel="noopener">magx</a>
@@ -311,19 +311,19 @@
 
 	<div class="hero-stats">
 		<div class="stat">
-			<i class="fas fa-box-open"></i>
+			<i class="fat fa-box-open"></i>
 			<span>{components.length} Components</span>
 		</div>
 		<div class="stat">
-			<i class="fas fa-code"></i>
+			<i class="fat fa-code"></i>
 			<span>TypeScript</span>
 		</div>
 		<div class="stat">
-			<i class="fas fa-feather"></i>
+			<i class="fat fa-feather"></i>
 			<span>Lightweight</span>
 		</div>
 		<div class="stat">
-			<i class="fas fa-puzzle-piece"></i>
+			<i class="fat fa-puzzle-piece"></i>
 			<span>Web Components</span>
 		</div>
 	</div>

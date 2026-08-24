@@ -21,6 +21,90 @@
 	import { magxById } from '$lib/interface/magx';
 
 	let seed = $state(11);
+	let navOpen = $state<string | null>(null);
+	let drillOpen = $state<string | null>(null);
+	let softBorders = $state(true);
+
+	/**
+	 * The nav dropdown is a *menu*, not a select: entries navigate, they do not set a
+	 * value. That is why it closes on choose, closes on Escape, closes on an outside
+	 * click, and never remembers what was picked last — the page you are on is the
+	 * state, and it is already shown in the crumb.
+	 */
+	const navGroups = [
+		{
+			id: 'reports',
+			label: 'Reports',
+			icon: 'fa-file-lines',
+			items: [
+				{ name: 'Summary', hint: 'one page, all funds', icon: 'fa-file-invoice' },
+				{ name: 'By category', hint: '18 categories', icon: 'fa-layer-group' },
+				{ name: 'By counterparty', hint: '412 rows', icon: 'fa-building-columns' },
+				{ name: 'Reconciliation', hint: 'unmatched only', icon: 'fa-scale-balanced' }
+			]
+		},
+		{
+			id: 'periods',
+			label: 'Period',
+			icon: 'fa-calendar-range',
+			items: [
+				{ name: 'Last 30 days', hint: 'rolling', icon: 'fa-clock-rotate-left' },
+				{ name: 'Quarter to date', hint: 'Q3 2026', icon: 'fa-calendar-day' },
+				{ name: 'Year to date', hint: '2026', icon: 'fa-calendar' },
+				{ name: 'All time', hint: 'from 2019-04', icon: 'fa-infinity' }
+			]
+		},
+		{
+			id: 'export',
+			label: 'Export',
+			icon: 'fa-arrow-down-to-line',
+			items: [
+				{ name: 'CSV', hint: 'current view', icon: 'fa-file-csv' },
+				{ name: 'JSON', hint: 'with metadata', icon: 'fa-file-code' },
+				{ name: 'Print', hint: 'paginated', icon: 'fa-print' }
+			]
+		}
+	];
+
+	/** Drill-in rows: a summary line that opens a detail block *in place*. */
+	const drillRows = [
+		{
+			id: 'd1',
+			name: 'Professional services',
+			count: 42,
+			total: '$184,220',
+			share: 0.31,
+			detail: [
+				{ k: 'Legal', v: '$96,400', n: 18 },
+				{ k: 'Audit', v: '$54,120', n: 11 },
+				{ k: 'Advisory', v: '$33,700', n: 13 }
+			]
+		},
+		{
+			id: 'd2',
+			name: 'Infrastructure',
+			count: 128,
+			total: '$92,880',
+			share: 0.16,
+			detail: [
+				{ k: 'Compute', v: '$61,040', n: 74 },
+				{ k: 'Storage', v: '$19,610', n: 31 },
+				{ k: 'Egress', v: '$12,230', n: 23 }
+			]
+		},
+		{
+			id: 'd3',
+			name: 'Payroll',
+			count: 24,
+			total: '$318,400',
+			share: 0.53,
+			detail: [
+				{ k: 'Salaries', v: '$268,900', n: 12 },
+				{ k: 'Contractors', v: '$38,200', n: 9 },
+				{ k: 'Benefits', v: '$11,300', n: 3 }
+			]
+		}
+	];
 	let fps = $state(0);
 	let frame = $state(0);
 	const reshuffle = () => (seed = (seed * 37 + 5) % 99991);
@@ -250,6 +334,16 @@
 	});
 </script>
 
+<svelte:window
+	onclick={(e) => {
+		/* Outside click closes the menu; the trigger stops its own propagation via the check below. */
+		if (navOpen && !(e.target as HTMLElement).closest('.lp-navitem')) navOpen = null;
+	}}
+	onkeydown={(e) => {
+		if (e.key === 'Escape') navOpen = null;
+	}}
+/>
+
 <svelte:head>
 	<title>Layout &amp; Data — Interface Components</title>
 </svelte:head>
@@ -286,26 +380,26 @@
 	</div>
 	<div class="ifc-stack">
 		<div class="ifc-banner">
-			<i class="fas fa-triangle-exclamation"></i>
+			<i class="fat fa-triangle-exclamation"></i>
 			<div>
 				<strong>Development build.</strong> Figures on this page are generated on load and do not
 				describe any real system.
 			</div>
 		</div>
 		<div class="ifc-banner is-info">
-			<i class="fas fa-circle-info"></i>
+			<i class="fat fa-circle-info"></i>
 			<div>Corpus re-indexed 4 minutes ago. Full-text search reflects the latest ingest.</div>
 		</div>
 		<div class="ifc-banner is-ok">
-			<i class="fas fa-circle-check"></i>
+			<i class="fat fa-circle-check"></i>
 			<div>All five nodes reporting. Replication lag under one second.</div>
 		</div>
 		<div class="ifc-banner is-crit">
-			<i class="fas fa-circle-exclamation"></i>
+			<i class="fat fa-circle-exclamation"></i>
 			<div>Two documents failed OCR and were quarantined for manual review.</div>
 		</div>
 		<div class="ifc-notice">
-			<i class="fas fa-wand-magic-sparkles"></i>
+			<i class="fat fa-wand-magic-sparkles"></i>
 			<span>Detected a scanned filing without a text layer.</span>
 			<button class="ifc-notice-action ifc-btn">Run OCR →</button>
 		</div>
@@ -350,9 +444,9 @@
 	</div>
 	<div class="ifc-inline" style="margin-bottom:var(--spacing-sm)">
 		<span class="ifc-badge is-raised b-aqua">18,402 documents</span>
-		<span class="ifc-badge b-mint"><i class="fas fa-check"></i> verified</span>
-		<span class="ifc-badge b-blush"><i class="fas fa-xmark"></i> failed</span>
-		<span class="ifc-badge b-vanilla"><i class="fas fa-clock"></i> queued</span>
+		<span class="ifc-badge b-mint"><i class="fat fa-check"></i> verified</span>
+		<span class="ifc-badge b-blush"><i class="fat fa-xmark"></i> failed</span>
+		<span class="ifc-badge b-vanilla"><i class="fat fa-clock"></i> queued</span>
 		<span class="ifc-badge">plain</span>
 	</div>
 	<div class="ifc-pills" style="margin-bottom:var(--spacing-sm)">
@@ -383,13 +477,13 @@
 		<div class="popbar">
 			<div class="pop-anchor">
 				<button class="ifc-btn" class:is-active={menuOpen} onclick={() => (menuOpen = !menuOpen)}>
-					<i class="fas fa-bars"></i> Menu
+					<i class="fat fa-bars"></i> Menu
 				</button>
 				{#if menuOpen}
 					<div class="popover">
 						<div class="pop-head">Navigate</div>
 						{#each ['Overview', 'Agencies', 'Documents', 'Statutes', 'Parties', 'Timeline'] as item}
-							<button class="pop-item"><i class="fas fa-angle-right"></i> {item}</button>
+							<button class="pop-item"><i class="fat fa-angle-right"></i> {item}</button>
 						{/each}
 					</div>
 				{/if}
@@ -401,7 +495,7 @@
 					class:is-active={settingsOpen}
 					onclick={() => (settingsOpen = !settingsOpen)}
 				>
-					<i class="fas fa-gear"></i> Settings
+					<i class="fat fa-gear"></i> Settings
 				</button>
 				{#if settingsOpen}
 					<div class="popover align-right">
@@ -467,7 +561,7 @@
 					{#if openRow === key}
 						<div class="ifc-row-detail">
 							<div class="ifc-inline" style="margin-bottom:6px">
-								<a class="ifc-btn" href="/interface/documents"><i class="fas fa-file-lines"></i> Open</a>
+								<a class="ifc-btn" href="/interface/documents"><i class="fat fa-file-lines"></i> Open</a>
 								<span class="ifc-badge b-cyan">doc #{d.id}</span>
 								<span class="ifc-chip"
 									><span class="ifc-chip-dot"></span><span class="ifc-chip-label">{d.src}</span
@@ -667,6 +761,152 @@
 		</div>
 	</div>
 
+	<div class="ifc-sec">
+		<span class="ifc-sec-tag">09</span>
+		<span class="ifc-sec-title">Soft surfaces</span>
+		<span class="ifc-sec-hint">the lighter border · hairline over box</span>
+	</div>
+	<p class="ifc-sec-note">
+		The boxed card is right when a card is a <em>figure</em>: one chart, one thing, clearly
+		bounded. It is wrong when twenty of them stack down a report, because twenty boxes read as a
+		grid of cages and the reader stops seeing the contents. The soft variant keeps the padding and
+		the ground and drops to a hairline, with a single top rule doing the separating —
+		<code>.ifc-card.is-soft</code> for report sections and category blocks,
+		<code>.ifc-card.is-hair</code> when a box is still wanted but should whisper. Toggle it to see
+		the difference at scale; the content below is identical either way.
+	</p>
+	<div class="ifc-inline" style="margin-bottom:8px">
+		<button class="ifc-btn" onclick={() => (softBorders = !softBorders)}>
+			<i class="fat {softBorders ? 'fa-square' : 'fa-minus'}"></i>
+			{softBorders ? 'Boxed borders' : 'Soft borders'}
+		</button>
+		<span class="ifc-mono-note">
+			{softBorders ? '.ifc-card.is-soft — hairline top rule, no box, no shadow' : '.ifc-card — full rule box'}
+		</span>
+	</div>
+	<div class="lp-soft">
+		{#each [['Professional services', '$184,220', 42], ['Infrastructure', '$92,880', 128], ['Payroll', '$318,400', 24]] as [name, total, n]}
+			<div class="ifc-card" class:is-soft={softBorders}>
+				<div class="ifc-stack-hdr"><span>{name}</span><span class="n">{n} entries</span></div>
+				<div class="ifc-stack-row"><span>Recorded</span><span class="num">{total}</span></div>
+				<div class="ifc-stack-row"><span>Reconciled</span><span class="num">{total}</span></div>
+				<div class="ifc-stack-row ifc-stack-sub"><span>Variance</span><span class="num">$0</span></div>
+			</div>
+		{/each}
+	</div>
+
+	<div class="ifc-sec">
+		<span class="ifc-sec-tag">10</span>
+		<span class="ifc-sec-title">Nav-bar dropdown</span>
+		<span class="ifc-sec-hint">menu, not select · one open at a time</span>
+	</div>
+	<p class="ifc-sec-note">
+		A nav dropdown is a <strong>menu</strong>, not a select: its entries navigate, they do not hold
+		a value, so it never shows a check mark and never remembers the last pick — the page you are on
+		is the state and the crumb already says so. Opening one closes any other, because two open
+		menus is a state nobody meant to reach. It closes on choose, on <kbd>Esc</kbd>, and on a click
+		outside; the trigger keeps its accent while open so the reader can see where the panel came
+		from. Each row carries a glyph, a name, and a dim hint that says how much is behind it — the
+		hint is what turns a list of words into a decision.
+	</p>
+	<div class="ifc-card lp-navcard">
+		<nav class="lp-nav">
+			<span class="lp-brand"><i class="fat fa-hexagon-nodes"></i> Ledger</span>
+			{#each navGroups as g (g.id)}
+				<div class="lp-navitem">
+					<button
+						class="lp-navbtn"
+						class:on={navOpen === g.id}
+						aria-expanded={navOpen === g.id}
+						onclick={() => (navOpen = navOpen === g.id ? null : g.id)}
+					>
+						<i class="fat {g.icon}"></i>
+						{g.label}
+						<i class="fat fa-chevron-down chev"></i>
+					</button>
+					{#if navOpen === g.id}
+						<div class="lp-menu">
+							{#each g.items as it (it.name)}
+								<button class="lp-menuitem" onclick={() => (navOpen = null)}>
+									<i class="fat {it.icon}"></i>
+									<span class="mi-name">{it.name}</span>
+									<span class="mi-hint">{it.hint}</span>
+								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
+			{/each}
+			<span class="lp-navspacer"></span>
+			<button class="ifc-btn is-glyph" title="Settings" aria-label="Settings">
+				<i class="fat fa-gear"></i>
+			</button>
+		</nav>
+		<p class="ifc-mono-note" style="margin-top:8px">
+			Click a trigger, then another — the first closes itself. Click anywhere outside to dismiss.
+		</p>
+	</div>
+
+	<div class="ifc-sec">
+		<span class="ifc-sec-tag">11</span>
+		<span class="ifc-sec-title">Drill-in rows</span>
+		<span class="ifc-sec-hint">detail in place · never a new page</span>
+	</div>
+	<p class="ifc-sec-note">
+		A summary row that opens its own breakdown underneath it, rather than navigating away. Two
+		things make it work. The <strong>chevron rotates</strong> so the row states plainly that it is
+		openable before anyone clicks — a row that only reveals its affordance on hover is invisible on
+		a touch screen. And the detail is <strong>indented and hairlined</strong>, not boxed, so it
+		reads as part of the parent rather than as a card that happened to appear. The whole row is the
+		hit target, and it toggles: clicking an open row closes it. One open at a time keeps the page
+		from growing under the reader's scroll position.
+	</p>
+	<div class="ifc-card is-hair">
+		<div class="ifc-stack">
+			<div class="ifc-stack-hdr">
+				<span>Category</span><span class="n">entries · total</span>
+			</div>
+			{#each drillRows as r (r.id)}
+				<button
+					class="lp-drill"
+					class:open={drillOpen === r.id}
+					aria-expanded={drillOpen === r.id}
+					onclick={() => (drillOpen = drillOpen === r.id ? null : r.id)}
+				>
+					<i class="fat fa-chevron-right dchev"></i>
+					<span class="dname">{r.name}</span>
+					<span class="dbar"><span style="width:{(r.share * 100).toFixed(0)}%"></span></span>
+					<span class="dcount">{r.count}</span>
+					<span class="dtotal">{r.total}</span>
+				</button>
+				{#if drillOpen === r.id}
+					<div class="lp-drilldetail">
+						{#each r.detail as d (d.k)}
+							<div class="dd-row">
+								<span class="dd-k">{d.k}</span>
+								<span class="dd-n">{d.n}</span>
+								<span class="dd-v">{d.v}</span>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			{/each}
+		</div>
+	</div>
+
+	<div class="ifc-sec">
+		<span class="ifc-sec-tag">12</span>
+		<span class="ifc-sec-title">Controls over pictures</span>
+		<span class="ifc-sec-hint">maps · three.js viewers</span>
+	</div>
+	<p class="ifc-sec-note">
+		Controls laid over a map or a 3-D viewer are their own surface — translucent paper, a blur
+		behind, a hairline, glyph-only buttons, and fixed corners by convention so the picture is never
+		the thing you have to search. Those live with the wayfinding patterns, next to the corner
+		circle-i they share a corner budget with:
+		<a href="/interface/wayfinding">Wayfinding → controls over a map</a>.
+	</p>
+
 	<div class="ifc-hr"></div>
 	<div class="ifc-mono-note">
 		Build footer pattern — version, commit, node, and generation time in one hairline row.
@@ -779,5 +1019,221 @@
 	.ifc-table.compact th {
 		padding-top: 0.15rem;
 		padding-bottom: 0.15rem;
+	}
+
+	/* --- 09 soft surfaces --- */
+	.lp-soft {
+		display: grid;
+		gap: var(--spacing-sm);
+	}
+
+	/* --- 10 nav dropdown --- */
+	.lp-nav {
+		display: flex;
+		align-items: center;
+		gap: 2px;
+		border-bottom: 1px solid var(--rule);
+		padding-bottom: 6px;
+	}
+	.lp-brand {
+		font-family: var(--font-mono);
+		font-size: 0.66rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		margin-right: var(--spacing-sm);
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.lp-navspacer {
+		flex: 1;
+	}
+	.lp-navitem {
+		position: relative;
+	}
+	.lp-navbtn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		border: 1px solid transparent;
+		background: none;
+		color: var(--ink-muted);
+		font-family: var(--font-mono);
+		font-size: 0.62rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		padding: 5px 8px;
+		cursor: pointer;
+	}
+	.lp-navbtn:hover {
+		color: var(--ink);
+		border-color: var(--rule-hair);
+	}
+	.lp-navbtn.on {
+		color: var(--color-accent);
+		border-color: var(--rule-soft);
+		background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+	}
+	.lp-navbtn .chev {
+		font-size: 0.5rem;
+		transition: transform 0.15s ease;
+	}
+	.lp-navbtn.on .chev {
+		transform: rotate(180deg);
+	}
+	.lp-menu {
+		position: absolute;
+		top: calc(100% + 5px);
+		left: 0;
+		z-index: 20;
+		min-width: 208px;
+		background: var(--tip-paper, var(--paper-card));
+		border: 1px solid var(--rule);
+		box-shadow: var(--brutal-shadow);
+		padding: 3px;
+		animation: lp-menu-in 0.12s ease-out;
+	}
+	@keyframes lp-menu-in {
+		from {
+			opacity: 0;
+			transform: translateY(-3px);
+		}
+	}
+	.lp-menuitem {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		width: 100%;
+		border: none;
+		background: none;
+		cursor: pointer;
+		padding: 6px 7px;
+		text-align: left;
+		color: var(--ink);
+		font-size: 0.72rem;
+		font-family: inherit;
+	}
+	.lp-menuitem i {
+		width: 13px;
+		color: var(--ink-soft);
+		font-size: 0.7rem;
+	}
+	.lp-menuitem:hover {
+		background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+	}
+	.lp-menuitem:hover i {
+		color: var(--color-accent);
+	}
+	.mi-hint {
+		margin-left: auto;
+		font-family: var(--font-mono);
+		font-size: 0.56rem;
+		color: var(--ink-note);
+	}
+
+	/* --- 11 drill-in rows --- */
+	.lp-drill {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-sm);
+		width: 100%;
+		border: none;
+		border-bottom: 1px solid var(--rule-hair);
+		background: none;
+		cursor: pointer;
+		padding: 7px 0;
+		font-family: inherit;
+		font-size: 0.74rem;
+		color: var(--ink);
+		text-align: left;
+	}
+	.lp-drill:hover {
+		background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+	}
+	.dchev {
+		font-size: 0.6rem;
+		width: 12px;
+		color: var(--ink-soft);
+		transition: transform 0.16s ease;
+	}
+	.lp-drill.open .dchev {
+		transform: rotate(90deg);
+		color: var(--color-accent);
+	}
+	.lp-drill.open {
+		border-bottom-color: transparent;
+	}
+	.dname {
+		min-width: 10rem;
+	}
+	.dbar {
+		flex: 1;
+		height: 5px;
+		background: color-mix(in srgb, var(--ink) 8%, transparent);
+		min-width: 40px;
+	}
+	.dbar > span {
+		display: block;
+		height: 100%;
+		background: var(--color-accent);
+		opacity: 0.55;
+	}
+	.dcount,
+	.dtotal {
+		font-family: var(--font-mono);
+		font-variant-numeric: tabular-nums;
+		font-size: 0.66rem;
+	}
+	.dcount {
+		color: var(--ink-note);
+		width: 3rem;
+		text-align: right;
+	}
+	.dtotal {
+		width: 5.5rem;
+		text-align: right;
+	}
+	.lp-drilldetail {
+		margin: 0 0 0 20px;
+		border-left: 1px solid var(--rule-soft);
+		padding-left: var(--spacing-sm);
+		border-bottom: 1px solid var(--rule-hair);
+	}
+	.dd-row {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-sm);
+		padding: 4px 0;
+		font-size: 0.68rem;
+		color: var(--ink-muted);
+	}
+	.dd-k {
+		min-width: 8rem;
+	}
+	.dd-n {
+		margin-left: auto;
+		font-family: var(--font-mono);
+		font-size: 0.6rem;
+		color: var(--ink-note);
+		width: 3rem;
+		text-align: right;
+	}
+	.dd-v {
+		font-family: var(--font-mono);
+		font-variant-numeric: tabular-nums;
+		width: 5.5rem;
+		text-align: right;
+		color: var(--ink);
+	}
+
+	@media (max-width: 640px) {
+		.lp-nav {
+			flex-wrap: wrap;
+		}
+		.dbar,
+		.dcount {
+			display: none;
+		}
 	}
 </style>

@@ -32,9 +32,9 @@
 
 <button class="theme-toggle" onclick={toggle} aria-label="Toggle theme">
 	{#if dark}
-		<i class="fas fa-sun"></i>
+		<i class="fat fa-sun"></i>
 	{:else}
-		<i class="fas fa-moon"></i>
+		<i class="fat fa-moon"></i>
 	{/if}
 </button>
 

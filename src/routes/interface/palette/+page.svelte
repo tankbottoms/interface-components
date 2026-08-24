@@ -70,15 +70,16 @@
 	<div class="ifc-sec">
 		<span class="ifc-sec-tag">01</span>
 		<span class="ifc-sec-title">Accent</span>
-		<span class="ifc-sec-hint">stroke weight · no purple</span>
+		<span class="ifc-sec-hint">chart series order · stroke weight</span>
 	</div>
 	<p class="ifc-sec-note">
-		The site highlight is <strong>Amber {DEFAULT_ACCENT}</strong> on paper and
-		<strong>{DEFAULT_ACCENT_DARK}</strong> on dark — one hue at two luminances, because the brand
-		orange that carries a mark on navy falls to 2.0:1 against white and stops being readable at
-		10px. It is the only accent here that needs the pair; the rest are mid-tone strokes that hold
-		on either ground. Pick any of the thirteen below from the header icon; anyone still holding a
-		retired purple is migrated automatically.
+		The accents are the chart series of section 04, in the same order — the same eight hues, so the
+		colour a reader picks for the chrome is always one they have already seen carrying data. The
+		value taken is each pastel's <strong>stroke</strong>, never its fill: an accent has to survive
+		being 10px of uppercase text on cream, and the fills are far too light for that. Every one
+		carries a lifted companion for dark paper — the site opens on <strong>Mint {DEFAULT_ACCENT}</strong>
+		/ <strong>{DEFAULT_ACCENT_DARK}</strong>. Pick any of the eight below or from the header icon;
+		an accent saved from an earlier palette is migrated to mint automatically.
 	</p>
 	<div class="ifc-grid ifc-grid-auto">
 		{#each accentSwatches as a}
@@ -184,7 +185,7 @@
 				</magx-panel-html>
 				<magx-panel-button id="pl-apply" title="Apply to site" mode="momentary"
 				></magx-panel-button>
-				<magx-panel-button id="pl-reset" title="Reset to teal" mode="momentary"
+				<magx-panel-button id="pl-reset" title="Reset to mint" mode="momentary"
 				></magx-panel-button>
 			</magx-panel>
 

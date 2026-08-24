@@ -83,7 +83,7 @@
 	onblur={() => (open = false)}
 	onclick={() => (open ? (open = false) : show())}
 >
-	<i class="fas fa-circle-info"></i>
+	<i class="fat fa-circle-info"></i>
 </button>
 
 {#if open}

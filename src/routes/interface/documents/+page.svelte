@@ -129,7 +129,7 @@
 			enriched metadata, tag groups, extracted insights, and a split source/text pane.
 		</p>
 		<div class="ifc-btn-row" style="margin-top:var(--spacing-sm)">
-			<button class="ifc-btn" onclick={reshuffle}><i class="fas fa-rotate"></i> Load another</button>
+			<button class="ifc-btn" onclick={reshuffle}><i class="fat fa-rotate"></i> Load another</button>
 			<span class="ifc-mono-note" style="align-self:center">doc #{doc.id}</span>
 		</div>
 	</header>
@@ -152,10 +152,15 @@
 					>FS</span
 				><span class="ifc-chip-lat">{doc.fsMs.toFixed(1)} ms</span></span
 			>
-			<button class="ifc-btn" title="Copy link" aria-label="Copy link"
-				><i class="fas fa-link"></i></button
+			<button class="ifc-btn is-glyph" title="Copy link" aria-label="Copy link"
+				><i class="fat fa-link"></i></button
 			>
-			<button class="ifc-btn" title="Print" aria-label="Print"><i class="fas fa-print"></i></button>
+			<button class="ifc-btn is-glyph" title="Print" aria-label="Print"
+				><i class="fat fa-print"></i></button
+			>
+			<button class="ifc-btn is-glyph" title="Settings" aria-label="Settings"
+				><i class="fat fa-gear"></i></button
+			>
 		</span>
 	</nav>
 
@@ -175,15 +180,15 @@
 	<p class="doc-cite">{doc.citation}</p>
 
 	<div class="ifc-btn-row" style="margin:var(--spacing-sm) 0">
-		<button class="ifc-btn"><i class="fas fa-file-pdf"></i> PDF</button>
-		<button class="ifc-btn"><i class="fas fa-file-lines"></i> Source</button>
-		<button class="ifc-btn"><i class="fas fa-brackets-curly"></i> JSON</button>
-		<button class="ifc-btn"><i class="fas fa-quote-right"></i> Cite</button>
+		<button class="ifc-btn"><i class="fat fa-file-pdf"></i> PDF</button>
+		<button class="ifc-btn"><i class="fat fa-file-lines"></i> Source</button>
+		<button class="ifc-btn"><i class="fat fa-brackets-curly"></i> JSON</button>
+		<button class="ifc-btn"><i class="fat fa-quote-right"></i> Cite</button>
 	</div>
 
 	{#if doc.scanned}
 		<div class="ifc-notice" style="margin-bottom:var(--spacing-md)">
-			<i class="fas fa-triangle-exclamation"></i>
+			<i class="fat fa-triangle-exclamation"></i>
 			<span
 				>Scanned filing — text layer produced by OCR at {doc.ocr.toFixed(1)}% mean confidence.</span
 			>
@@ -249,13 +254,13 @@
 	</div>
 	<div class="ifc-btn-row" style="margin-bottom:var(--spacing-sm)">
 		<button class="ifc-btn" class:is-active={view === 'pdf'} onclick={() => (view = 'pdf')}>
-			<i class="fas fa-file-pdf"></i> Both
+			<i class="fat fa-file-pdf"></i> Both
 		</button>
 		<button class="ifc-btn" class:is-active={view === 'text'} onclick={() => (view = 'text')}>
-			<i class="fas fa-align-left"></i> Text only
+			<i class="fat fa-align-left"></i> Text only
 		</button>
 		<button class="ifc-btn" class:is-active={stripWs} onclick={() => (stripWs = !stripWs)}>
-			<i class="fas fa-scissors"></i> Strip whitespace {stripWs ? 'on' : 'off'}
+			<i class="fat fa-scissors"></i> Strip whitespace {stripWs ? 'on' : 'off'}
 		</button>
 	</div>
 
@@ -263,7 +268,7 @@
 		{#if view === 'pdf'}
 			<div class="ifc-pane">
 				<div class="ifc-pane-hdr">
-					<i class="fas fa-file-pdf"></i> Page 1 of {doc.pages}
+					<i class="fat fa-file-pdf"></i> Page 1 of {doc.pages}
 					<span style="margin-left:auto">{fmtBytes(doc.size)}</span>
 				</div>
 				<div class="pdf-stage">
@@ -284,7 +289,7 @@
 		{/if}
 		<div class="ifc-pane">
 			<div class="ifc-pane-hdr">
-				<i class="fas fa-align-left"></i> Text layer
+				<i class="fat fa-align-left"></i> Text layer
 				<span style="margin-left:auto">{stripWs ? 'normalised' : 'verbatim'}</span>
 			</div>
 			<pre class="ifc-fulltext">{rendered}</pre>

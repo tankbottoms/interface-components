@@ -21,7 +21,7 @@
 </script>
 
 <section id="sparkline-animated" class="anim">
-	<h2 class="anim-title"><i class="fas fa-film"></i> Sparkline (Animated)</h2>
+	<h2 class="anim-title"><i class="fat fa-film"></i> Sparkline (Animated)</h2>
 
 	<p class="anim-intro">
 		Every variant from the standalone section, streaming instead of static. One

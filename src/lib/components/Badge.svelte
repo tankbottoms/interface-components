@@ -25,7 +25,7 @@
 </script>
 
 <span class="badge" style="color: {c.color}; background: {c.bg}; border-color: {c.color};">
-	<i class="fas {c.icon}"></i>
+	<i class="fat {c.icon}"></i>
 	{category.toUpperCase()}
 </span>
 

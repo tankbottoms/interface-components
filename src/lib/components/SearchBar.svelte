@@ -13,7 +13,7 @@
 </script>
 
 <div class="search-bar">
-	<i class="fas fa-search search-icon"></i>
+	<i class="fat fa-search search-icon"></i>
 	<input
 		type="text"
 		class="search-input"
@@ -23,7 +23,7 @@
 	/>
 	{#if value}
 		<button class="search-clear" onclick={() => oninput('')} aria-label="Clear search">
-			<i class="fas fa-times"></i>
+			<i class="fat fa-times"></i>
 		</button>
 	{/if}
 </div>

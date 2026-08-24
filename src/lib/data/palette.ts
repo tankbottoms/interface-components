@@ -82,34 +82,38 @@ export const statusColors = {
 } as const;
 
 /**
- * Site highlight options offered in the header picker. These are *strokes*, not
- * pastel fills — an accent has to survive being 1px of text on paper.
- * Deliberately no purple: amber leads, teal holds the links.
+ * Site highlight options offered in the header picker.
  *
- * `dark` is the value the accent takes on dark paper. Most of these are
- * mid-tone strokes that hold up on either ground and so carry no companion, but
- * amber cannot: the brand orange is 2.0:1 on the light sidebar and unreadable at
- * 10px, while the deepened amber that fixes that goes muddy on navy. One hue,
- * two luminances — same trade the pastels already make in theme.css.
+ * These are the eight elegant pastels *in chart-series order* — the same eight,
+ * in the same sequence, that section 04 of the palette page publishes as
+ * `--chart-1` … `--chart-8`. One ordered set of hues now drives both the charts
+ * and the site chrome, so the accent a reader picks is always a colour they
+ * have already seen carrying data on the page.
+ *
+ * The value taken is the **stroke**, not the pastel fill: an accent has to
+ * survive being 1px of 10px text on paper, and the fills are far too light for
+ * that. `dark` is the companion the accent takes on dark paper — the same hue
+ * lifted in luminance, because the strokes that read on cream go muddy on navy.
+ * One hue, two luminances — the same trade the pastels already make in
+ * theme.css.
  */
 export const accentSwatches = [
-	{ name: 'Amber', color: '#A86F08', dark: '#F5A312' },
-	{ name: 'Teal', color: '#3792A4' },
-	{ name: 'Deep Aqua', color: '#2E8FA6' },
-	{ name: 'Pine', color: '#3E8F86' },
-	{ name: 'Moss', color: '#5E9463' },
-	{ name: 'Olive', color: '#6F9435' },
-	{ name: 'Ochre', color: '#B08A2A' },
-	{ name: 'Clay', color: '#C97E45' },
-	{ name: 'Terracotta', color: '#C06060' },
-	{ name: 'Raspberry', color: '#C75F81' },
-	{ name: 'Slate Blue', color: '#4A72B0' },
-	{ name: 'Indigo', color: '#6E6FA8' },
-	{ name: 'Graphite', color: '#4A4A46' }
+	{ name: 'Aqua', color: '#2E8FA6', dark: '#67C9E0' },
+	{ name: 'Rose', color: '#C75F81', dark: '#EE9AB4' },
+	{ name: 'Vanilla', color: '#B39B3C', dark: '#E3C86A' },
+	{ name: 'Mint', color: '#3E9B72', dark: '#6FD6A6' },
+	{ name: 'Peach', color: '#C97E45', dark: '#EDA875' },
+	{ name: 'Violet', color: '#A855C4', dark: '#D49AE6' },
+	{ name: 'Blush', color: '#C77070', dark: '#EDA1A1' },
+	{ name: 'Orchid', color: '#9A6BB0', dark: '#C6A2DA' }
 ];
 
-export const DEFAULT_ACCENT = '#A86F08';
-export const DEFAULT_ACCENT_DARK = '#F5A312';
+/** Every accent the picker will accept, lower-cased, for migrating a stored value. */
+export const accentValues = new Set(accentSwatches.map((a) => a.color.toLowerCase()));
+
+/** Mint — series 04, and the colour the site opens on. */
+export const DEFAULT_ACCENT = '#3E9B72';
+export const DEFAULT_ACCENT_DARK = '#6FD6A6';
 
 /**
  * The dark-paper companion for a chosen accent, or the accent itself when it

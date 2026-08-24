@@ -143,7 +143,7 @@
 				aria-expanded={navOpen || pickerOpen}
 				title={narrow ? 'Tap for navigation · hold for colour' : 'Highlight colour · hold to pin open'}
 			>
-				<i class="fas fa-cubes"></i>
+				<i class="fat fa-cubes"></i>
 			</button>
 			<a href="/" class="site-title">
 				<span>Interface Components</span>
@@ -181,7 +181,7 @@
 			<div class="nav-drawer-head">
 				<span>Navigation</span>
 				<button onclick={() => (navOpen = false)} aria-label="Close navigation">
-					<i class="fas fa-xmark"></i>
+					<i class="fat fa-xmark"></i>
 				</button>
 			</div>
 			<div class="nav-drawer-body">

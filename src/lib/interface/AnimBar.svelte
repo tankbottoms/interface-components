@@ -42,12 +42,12 @@
 <div class="ifc-anim">
 	{#if onreshuffle}
 		<button class="ifc-btn" onclick={onreshuffle}>
-			<i class="fas fa-rotate"></i> Reshuffle data
+			<i class="fat fa-rotate"></i> Reshuffle data
 		</button>
 	{/if}
 
 	<button class="ifc-btn" class:is-on={fps > 0} onclick={toggle}>
-		<i class="fas {fps > 0 ? 'fa-pause' : 'fa-play'}"></i>
+		<i class="fat {fps > 0 ? 'fa-pause' : 'fa-play'}"></i>
 		{fps > 0 ? 'Pause' : 'Animate'}
 	</button>
 

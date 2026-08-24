@@ -157,6 +157,28 @@
 	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 }
 
+/*
+ * Grid rows stretch every card to the tallest in the row, so a short chart
+ * beside a tall one used to sit pinned under its title with a pool of blank
+ * paper beneath it. Making the card a column and letting the chart take
+ * `margin-block: auto` puts that slack above and below the chart instead —
+ * the header stays anchored at the top where it belongs, and the drawing
+ * floats in the middle of the space it actually has.
+ */
+.ifc-grid > .ifc-card {
+	display: flex;
+	flex-direction: column;
+}
+.ifc-grid > .ifc-card > .ifc-card-hdr,
+.ifc-grid > .ifc-card > .ifc-card-sub {
+	flex: 0 0 auto;
+}
+.ifc-grid > .ifc-card > .ifc-chart,
+.ifc-grid > .ifc-card > .donut,
+.ifc-grid > .ifc-card > .hbl {
+	margin-block: auto;
+}
+
 /* --- KPI tiles ------------------------------------------------------ */
 
 .ifc-tiles {
@@ -552,6 +574,43 @@
 	gap: 6px;
 }
 
+/*
+ * Glyph-only tool button — copy, print, settings in a page's title row.
+ *
+ * A bordered button is a promise that something substantial happens. These are
+ * utilities sitting beside a heading, and eight of them boxed up turn the title
+ * row into a toolbar competing with the title. Stripping the chrome leaves the
+ * glyph doing the work; the hit area stays 26px square, so it is still a comfortable
+ * target on touch even though nothing is drawn around it.
+ */
+.ifc-btn.is-glyph {
+	border: none;
+	background: none;
+	padding: 0;
+	width: 26px;
+	height: 26px;
+	justify-content: center;
+	gap: 0;
+	font-size: 0.78rem;
+	color: var(--ink-soft);
+	opacity: 0.7;
+	transition:
+		opacity 0.12s ease,
+		color 0.12s ease;
+}
+.ifc-btn.is-glyph:hover,
+.ifc-btn.is-glyph:focus-visible {
+	background: none;
+	color: var(--color-accent);
+	opacity: 1;
+}
+.ifc-btn.is-glyph.is-active {
+	background: none;
+	border: none;
+	color: var(--color-accent);
+	opacity: 1;
+}
+
 /* --- Key/value metadata block --------------------------------------- */
 
 .ifc-kv {
@@ -587,6 +646,8 @@
 .ifc-chart {
 	position: relative;
 	width: 100%;
+	/* A chart capped below the card width centres rather than hugging the left. */
+	margin-inline: auto;
 }
 .ifc-chart svg {
 	display: block;
@@ -756,4 +817,217 @@
 .ifc-table tr.is-hoverable:hover {
 	background: var(--color-hover-bg);
 	cursor: help;
+}
+
+/* ------------------------------------------------------------------ *
+ * Corner affordance
+ *
+ * The circle-i sits inside the container, so the container has to be a
+ * positioning context. Kept separate from `.ifc-card` because maps,
+ * viewers and panes want it too.
+ * ------------------------------------------------------------------ */
+.ifc-has-corner {
+	position: relative;
+}
+
+/* ------------------------------------------------------------------ *
+ * Soft surfaces — the lighter border style
+ *
+ * The default card draws a full `--rule` box, which is right when a card
+ * is a *figure*: one chart, one thing, clearly bounded. It is wrong when
+ * twenty of them stack down a page, because twenty boxes read as a grid
+ * of cages and the reader stops seeing the contents.
+ *
+ * The soft variant keeps the same padding and the same background and
+ * drops to a hairline, with the top rule doing the separating. Rows of
+ * data, category blocks and long report sections use it; a lone chart
+ * still gets the box.
+ * ------------------------------------------------------------------ */
+.ifc-card.is-soft {
+	border: none;
+	border-top: 1px solid var(--rule-soft);
+	background: none;
+	box-shadow: none;
+	padding: var(--spacing-sm) 0 var(--spacing-md);
+}
+.ifc-card.is-soft + .ifc-card.is-soft {
+	margin-top: 0;
+}
+.ifc-card.is-hair {
+	border: 1px solid var(--rule-hair);
+	box-shadow: none;
+}
+.ifc-card.is-hair:hover {
+	border-color: var(--rule-soft);
+}
+
+/* A block of rows under one heading — the household-accounting shape:
+   a heading rule, then rows separated by hairlines, never by boxes. */
+.ifc-stack {
+	border-top: 1px solid var(--rule);
+}
+.ifc-stack-hdr {
+	display: flex;
+	align-items: baseline;
+	gap: var(--spacing-sm);
+	padding: 7px 0 6px;
+	font-size: 0.62rem;
+	font-weight: 800;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--ink-soft);
+	border-bottom: 1px solid var(--rule-soft);
+}
+.ifc-stack-hdr .n {
+	margin-left: auto;
+	font-family: var(--font-mono);
+	font-weight: 600;
+	letter-spacing: 0;
+	color: var(--ink-note);
+}
+.ifc-stack-row {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-sm);
+	padding: 6px 0;
+	border-bottom: 1px solid var(--rule-hair);
+	font-size: 0.72rem;
+}
+.ifc-stack-row:last-child {
+	border-bottom: none;
+}
+.ifc-stack-row .num {
+	margin-left: auto;
+	font-family: var(--font-mono);
+	font-variant-numeric: tabular-nums;
+}
+.ifc-stack-sub {
+	font-weight: 700;
+	border-top: 1px solid var(--rule);
+	border-bottom: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Overlay controls — maps and 3-D viewers
+ *
+ * A control laid over a canvas has two jobs the page chrome never has:
+ * stay legible over whatever colour happens to be beneath it, and take
+ * up as little of the picture as possible. So: translucent paper with a
+ * blur behind it, a hairline, and glyph-only buttons in a vertical
+ * cluster. Corners are assigned by convention — zoom top-right, layers
+ * top-left, scale and attribution bottom — so the picture is never the
+ * thing you have to search.
+ * ------------------------------------------------------------------ */
+.ifc-viewport {
+	position: relative;
+	overflow: hidden;
+	border: 1px solid var(--rule);
+	background: var(--paper-pane, var(--paper-card));
+	min-height: 260px;
+}
+.ovl {
+	position: absolute;
+	z-index: 3;
+	display: flex;
+	gap: 4px;
+}
+.ovl.tl {
+	top: 8px;
+	left: 8px;
+}
+.ovl.tr {
+	top: 8px;
+	right: 8px;
+}
+.ovl.bl {
+	bottom: 8px;
+	left: 8px;
+}
+.ovl.br {
+	bottom: 8px;
+	right: 8px;
+}
+.ovl.col {
+	flex-direction: column;
+}
+.ovl-group {
+	display: flex;
+	flex-direction: column;
+	background: color-mix(in srgb, var(--paper-card) 84%, transparent);
+	backdrop-filter: blur(6px);
+	border: 1px solid var(--rule-soft);
+	box-shadow: 0 1px 4px rgb(0 0 0 / 0.12);
+}
+.ovl-group.row {
+	flex-direction: row;
+}
+.ovl-btn {
+	width: 26px;
+	height: 26px;
+	border: none;
+	background: none;
+	color: var(--ink);
+	font-size: 0.72rem;
+	cursor: pointer;
+	display: grid;
+	place-items: center;
+	font-family: inherit;
+}
+.ovl-group > .ovl-btn + .ovl-btn {
+	border-top: 1px solid var(--rule-hair);
+}
+.ovl-group.row > .ovl-btn + .ovl-btn {
+	border-top: none;
+	border-left: 1px solid var(--rule-hair);
+}
+.ovl-btn:hover {
+	color: var(--color-accent);
+	background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+.ovl-btn.on {
+	color: var(--color-accent);
+	background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+.ovl-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 8px;
+	font-size: 0.6rem;
+	font-family: var(--font-mono);
+	color: var(--ink-muted);
+	background: color-mix(in srgb, var(--paper-card) 84%, transparent);
+	backdrop-filter: blur(6px);
+	border: 1px solid var(--rule-soft);
+}
+.ovl-scale {
+	display: flex;
+	align-items: flex-end;
+	gap: 5px;
+	font-size: 0.58rem;
+	font-family: var(--font-mono);
+	color: var(--ink-muted);
+}
+.ovl-scale i {
+	display: block;
+	width: 54px;
+	height: 5px;
+	border: 1px solid var(--ink-soft);
+	border-top: none;
+}
+.ovl-readout {
+	font-family: var(--font-mono);
+	font-size: 0.6rem;
+	line-height: 1.5;
+	padding: 5px 8px;
+	color: var(--ink-muted);
+	background: color-mix(in srgb, var(--paper-card) 84%, transparent);
+	backdrop-filter: blur(6px);
+	border: 1px solid var(--rule-soft);
+	min-width: 108px;
+}
+.ovl-readout b {
+	color: var(--ink);
+	float: right;
+	font-variant-numeric: tabular-nums;
 }
