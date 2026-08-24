@@ -16,7 +16,6 @@
 	import { whenCharts } from '$lib/interface/chartsReady';
 	import { magxById } from '$lib/interface/magx';
 
-	declare const __BUILD_VERSION__: string;
 
 	interface Props {
 		components: ComponentDef[];

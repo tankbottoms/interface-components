@@ -1,4 +1,4 @@
-import { css, html, LitElement, PropertyValueMap } from 'lit';
+import { css, html, LitElement, type PropertyValueMap } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 // Reference line type. Also re-positions the y-axis of data

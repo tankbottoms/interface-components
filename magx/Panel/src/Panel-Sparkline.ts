@@ -51,11 +51,15 @@ export class MagxPanelSparkline extends MagxPanelBaseElement {
             sparkline.setBackgroundColor({ r: r, g: g, b: b, a: 1.0 });
             sparkline.renderCanvas();
         } else if (bckgCol.startsWith("rgb")) {
-            let rgbVals = bckgCol.match(/[.?\d]+/g) ?? [];
-            if (Array.isArray(rgbVals) && rgbVals.length >= 3) {
-                const r = parseFloat(rgbVals[0]);
-                const g = parseFloat(rgbVals[1]);
-                const b = parseFloat(rgbVals[2]);
+            const rgbVals = bckgCol.match(/[.?\d]+/g) ?? [];
+            if (rgbVals.length >= 3) {
+                // Destructured with defaults rather than indexed: a match array is
+                // typed as possibly-sparse, and the length guard above does not
+                // narrow the element type.
+                const [rs = '0', gs = '0', bs = '0'] = rgbVals;
+                const r = parseFloat(rs);
+                const g = parseFloat(gs);
+                const b = parseFloat(bs);
                 sparkline.setBackgroundColor({ r: r, g: g, b: b, a: 1.0 });
                 sparkline.renderCanvas();
             }

@@ -1,6 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import path from 'path';
 import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
 
@@ -18,12 +17,6 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	define: {
 		__BUILD_VERSION__: JSON.stringify(getBuildVersion())
-	},
-	resolve: {
-		alias: {
-			'magx-panel': path.resolve('./magx/Panel/src'),
-			'magx-sparkline': path.resolve('./magx/Sparkline/src')
-		}
 	},
 	optimizeDeps: {
 		include: ['lit']

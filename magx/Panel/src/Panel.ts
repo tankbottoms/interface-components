@@ -1,4 +1,4 @@
-import { LitElement, css, html, PropertyValueMap } from 'lit'
+import { LitElement, css, html, type PropertyValueMap } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 import { MagxPanelBaseElement } from "./Panel-BaseElement";
 import { MagxPanelConstants } from "./Panel-Constants";
