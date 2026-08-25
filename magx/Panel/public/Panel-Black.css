@@ -37,7 +37,6 @@
     --magx-panel-scrollbar-active: #777777;
     --magx-panel-scrollbar-color: #666666 #333333;
     --magx-panel-scrollbar-thumb: #666666;
-    --magx-panel-select-bg: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAn0lEQVRIS+2SwQ3AIAhFPzM4iUe3cTS38eYmzmDzm5jYpgWTpjc4Cv4PDwTAwI8hbmDRdUQWITii74hCCOi9PwppuflB3UFKCTlnlFJQa72YaLm1UDWgOIUYq8kU5zuNmXsL84ruJhTi2444a0yDKTgnGWNARMzOt3awjs2uY4yneGtNxbK9gztXXg3j7aqe9rCFyDx2pcANTHqOyER0AGnMUQHV+W35AAAAAElFTkSuQmCC');
     --magx-panel-select-font: 12px sans-serif;
     --magx-panel-selected-container-background: #000000;
     --magx-panel-selected-container-border: 1px solid #cccccc;
@@ -47,4 +46,21 @@
     --magx-panel-text-bg-focused: #333333;
     --magx-panel-text-color: #bbbbbb;
     --magx-panel-title-bg: #000000;
+}
+
+/* ---------------------------------------------------------------------------
+   Popup picker, glyphs and de-boxed inputs (dark)
+   Same keys as Panel.css; only the values differ.
+   --------------------------------------------------------------------------- */
+:root {
+    --magx-panel-icon-family: "Font Awesome 6 Pro";
+    --magx-panel-icon-weight: 100;
+    --magx-panel-icon-color: #8a8a8a;
+    --magx-panel-accent: #268bd2;
+    --magx-panel-rule: #444444;
+    --magx-panel-rule-hair: #2a2a2a;
+    --magx-panel-popup-bg: #0d0d0d;
+    --magx-panel-popup-alt: #1c1c1c;
+    --magx-panel-popup-radius: 3px;
+    --magx-panel-popup-shadow: 0 6px 18px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.4);
 }

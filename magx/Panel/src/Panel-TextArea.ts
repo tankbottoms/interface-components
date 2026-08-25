@@ -71,6 +71,7 @@ export class MagxPanelTextArea extends MagxPanelBaseElement {
             <div class="container_base" id="container">
                 <div class="label"><b>${this.title}</b></div>
                 <div class="textarea-wrapper">
+                    <i class="mgx-i field-glyph" aria-hidden="true">\u{f036}</i>
                     <textarea id=${this.id} class="textarea" @input=${this._valueChanged} .value=${this.text} @blur=${this._handleBlur} @focus=${this._addFocus} .placeholder=${this.placeholder} maxlength="${this.maxLength}" />
                     <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticFocus} /></label>
                 </div>
@@ -131,8 +132,23 @@ export class MagxPanelTextArea extends MagxPanelBaseElement {
             background: var(--magx-panel-scrollbar-active);
         }
 
+        /*
+         * Same row as the single-line fields, but the glyph is pinned to the
+         * first line rather than centred: a five-line field with a glyph
+         * floating halfway down it reads as a bullet, not as a label.
+         */
         .textarea-wrapper {
             position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .textarea-wrapper .field-glyph {
+            font-size: 10px;
+            width: 11px;
+            text-align: center;
+            margin-top: 5px;
         }
 
         .haptic-overlay {

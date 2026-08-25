@@ -4,6 +4,25 @@ import { MagxPanelBaseElement } from './Panel-BaseElement';
 import { MagxPanelConstants } from './Panel-Constants';
 import { MagxHaptics } from './Haptics';
 
+/*
+ * Codepoints for the leading glyph, keyed by input type.
+ *
+ * These are bare codepoints rather than `fat` class names on purpose: the
+ * utility classes are document-scoped and never cross into a shadow root,
+ * while the @font-face that backs them is global. The .mgx-i carrier in the
+ * base stylesheet names the family and weight, and the character itself is
+ * rendered as ordinary text, which keeps it out of CSS escaping entirely.
+ */
+const TYPE_GLYPHS: Record<string, string> = {
+    text: "f031",       // fa-font
+    number: "f292",     // fa-hashtag
+    password: "f023",   // fa-lock
+    search: "f002",     // fa-magnifying-glass
+    email: "f0e0",      // fa-envelope
+    url: "f0c1",        // fa-link
+    tel: "f095"         // fa-phone
+};
+
 // Single-line text input component. Text input style can be numbers, password or arbitrary text
 @customElement(MagxPanelConstants.PANEL_TEXTINPUT)
 export class MagxPanelTextInput extends MagxPanelBaseElement {
@@ -16,8 +35,16 @@ export class MagxPanelTextInput extends MagxPanelBaseElement {
     @property({type: Number}) public min: number = Number.MIN_VALUE;
     @property({type: Number}) public max: number = Number.MAX_VALUE;
 
+    // Overrides the type-derived glyph. Give it a bare Font Awesome codepoint,
+    // e.g. glyph="f002", when the type says nothing useful about the field.
+    @property({type: String}) public glyph: string = "";
+
     @state() private _text: string = "";
     @state() private _type: string = "";
+
+    // The placeholder is pulled while the field is being edited, so the caret
+    // lands on a clean line instead of sharing it with hint text.
+    @state() private _editing: boolean = false;
 
     set text(val: string) {
         if (this._text !== val && this._inputField !== null) {
@@ -36,6 +63,7 @@ export class MagxPanelTextInput extends MagxPanelBaseElement {
         super();
 
         this.placeholder = this.getAttribute("placeholder") ?? "";
+        this.glyph = (this.getAttribute("glyph") ?? "").replace(/^\\+/, "");
         this._text = this.getAttribute("value") ?? "";
         const typeAttr = this.getAttribute("type") ?? "";
         if (typeAttr === "password" || typeAttr === "number") {
@@ -113,9 +141,24 @@ export class MagxPanelTextInput extends MagxPanelBaseElement {
 
     // Reset haptic overlay when focus leaves so next tap fires again
     private _handleBlur(): void {
+        this._editing = false;
         this._removeFocus();
         const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
         if (overlay) overlay.style.display = '';
+    }
+
+    // The character to draw ahead of the field, explicit attribute first
+    private get _glyphChar(): string {
+        const code = this.glyph || TYPE_GLYPHS[this._type] || TYPE_GLYPHS.text;
+        const point = parseInt(code, 16);
+        return Number.isNaN(point) ? "" : String.fromCodePoint(point);
+    }
+
+    // Focus is what turns the hint off, so a click lands on an empty line and
+    // the field reads as being edited in place rather than overwritten.
+    private _onFocus(): void {
+        this._editing = true;
+        this._addFocus();
     }
 
     // Renders the element
@@ -124,7 +167,8 @@ export class MagxPanelTextInput extends MagxPanelBaseElement {
             <div class="container_base" id="container">
                 <div class="label"><b>${this.title}</b></div>
                 <div class="input-wrapper">
-                    <input id=${this.id} class="text_input" type="${this._type}" @input=${this._valueChanged} .value=${this.text} @blur=${this._handleBlur} @focus=${this._addFocus} .placeholder=${this.placeholder} maxlength="${this.maxLength}" />
+                    <i class="mgx-i field-glyph" aria-hidden="true">${this._glyphChar}</i>
+                    <input id=${this.id} class="text_input" type="${this._type}" @input=${this._valueChanged} .value=${this.text} @blur=${this._handleBlur} @focus=${this._onFocus} .placeholder=${this._editing ? "" : this.placeholder} maxlength="${this.maxLength}" />
                     <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticFocus} /></label>
                 </div>
             </div>
@@ -139,8 +183,12 @@ export class MagxPanelTextInput extends MagxPanelBaseElement {
 
     // Stylesheet
     static styles = [MagxPanelBaseElement._baseStyle, css`
-        .input-wrapper {
-            position: relative;
+        /* The underline is drawn by the wrapper now, so the field itself
+           carries nothing at all. */
+        .text_input,
+        .text_input:hover,
+        .text_input:focus {
+            border-bottom-color: transparent;
         }
 
         .haptic-overlay {

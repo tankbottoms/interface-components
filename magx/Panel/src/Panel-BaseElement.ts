@@ -101,6 +101,17 @@ export abstract class MagxPanelBaseElement extends LitElement {
             min-height: 44px;
         }
 
+        /*
+         * A popup picker is a child of its container, so the container's own
+         * clip would cut the list off two rows in. While a popup is open the
+         * clip is lifted and the container is raised above its siblings; it
+         * goes straight back afterwards so nothing else leaks out.
+         */
+        .container_base.is-open {
+            overflow: visible;
+            z-index: 5;
+        }
+
         .container_base_selected {            
             border: var(--magx-panel-selected-container-border);
 	        background-color: var(--magx-panel-selected-container-background);
@@ -114,23 +125,99 @@ export abstract class MagxPanelBaseElement extends LitElement {
 	        font: var(--magx-panel-font);
         }
 
-        .text_input {            
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
+        /*
+         * Glyph carrier for the shadow root.
+         *
+         * The fat utility classes are document-scoped and stop at the shadow
+         * boundary, but @font-face is global, so the family and weight are
+         * named here and each control supplies its own codepoint in content.
+         * Weight 100 is Font Awesome Thin.
+         */
+        .mgx-i {
+            font-family: var(--magx-panel-icon-family, "Font Awesome 6 Pro");
+            font-weight: var(--magx-panel-icon-weight, 100);
+            font-style: normal;
+            font-variant: normal;
+            line-height: 1;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            display: inline-block;
+            flex: none;
+            color: var(--magx-panel-icon-color, #8b9299);
+        }
+
+        /*
+         * Shared row for a field and its leading glyph.
+         *
+         * The glyph sits on the same line as the value and inside the same
+         * underline, so a field reads as one object rather than as an icon
+         * placed next to a box. The rule is drawn here, once, rather than on
+         * each control, which is also what lets the date, time and text fields
+         * line up with each other when they sit in the same panel.
+         */
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.14s ease;
+        }
+
+        .input-wrapper:hover {
+            border-bottom-color: var(--magx-panel-rule, #e2ded8);
+        }
+
+        .input-wrapper:focus-within {
+            border-bottom-color: var(--magx-panel-accent, #3792a4);
+        }
+
+        .input-wrapper:focus-within .field-glyph {
+            color: var(--magx-panel-accent, #3792a4);
+        }
+
+        .field-glyph {
+            font-size: 10px;
+            width: 11px;
+            text-align: center;
+        }
+
+        /*
+         * Text fields carry no box.
+         *
+         * A field drawn as a filled rectangle competes with the container it
+         * sits in, and at this size the two borders end up a few pixels apart
+         * and read as a double rule. What is left is a leading glyph, the
+         * value, and a hairline that only shows once the field is live: hover
+         * says it is editable, focus tints the rule with the accent.
+         */
+        .text_input {
             box-sizing: border-box;
             width: 100%;
-            padding: 0 0 0 5px;
+            padding: 0 0 0 2px;
             height: var(--magx-panel-common-height);
-            border: var(--magx-panel-text-border);
-            background-color: var(--magx-panel-text-bg);
+            border: 0;
+            border-bottom: 1px solid transparent;
+            border-radius: 0;
+            background: transparent;
             color: var(--magx-panel-text-color);
             font: var(--magx-panel-input-font);
+            transition: border-color 0.14s ease;
+        }
+
+        .text_input:hover {
+            border-bottom-color: var(--magx-panel-rule, #e2ded8);
         }
 
         .text_input:focus {
             outline: none;
-	        background: var(--magx-panel-text-bg-focused);
-	        border: var(--magx-panel-text-border-focused);
+            background: transparent;
+            border-bottom-color: var(--magx-panel-accent, #3792a4);
+        }
+
+        .text_input::placeholder {
+            color: var(--magx-panel-icon-color, #8b9299);
+            opacity: 1;
         }
 
         /*

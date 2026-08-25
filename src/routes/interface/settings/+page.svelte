@@ -17,6 +17,25 @@
 	let demoNumbers = $state(true);
 	let demoMotion = $state(true);
 
+	/**
+	 * The map picker is the one setting that is also a URL parameter, because a
+	 * map you are looking at is a thing you send to someone. It serialises as
+	 * `mapset=<mode>@<id>:<basemap>` — one opaque-looking token rather than three
+	 * query keys, so a link stays readable and a future fourth field does not
+	 * need a new parameter.
+	 */
+	let demoBasemap = $state('osm');
+	let demoLive = $state(true);
+
+	const basemaps = [
+		{ id: 'osm', icon: 'fa-map', name: 'Street' },
+		{ id: 'sat', icon: 'fa-satellite', name: 'Satellite' },
+		{ id: 'topo', icon: 'fa-mountains', name: 'Terrain' },
+		{ id: 'dark', icon: 'fa-moon-stars', name: 'Night' }
+	];
+
+	const mapset = $derived(`${demoLive ? 'live' : 'trip'}@1:${demoBasemap}`);
+
 	const accents = [
 		{ name: 'Aqua', color: '#2E8FA6' },
 		{ name: 'Rose', color: '#C75F81' },
@@ -240,6 +259,29 @@
 							<span class="st-lbl">Thousands separators</span>
 							<span class="st-sw" class:on={demoNumbers}></span>
 						</button>
+
+						<div class="st-grp">Map</div>
+						<div class="st-field">
+							<span class="st-lbl">Basemap</span>
+							<div class="mapchips">
+								{#each basemaps as b (b.id)}
+									<button
+										class="mapchip"
+										class:is-on={demoBasemap === b.id}
+										onclick={() => (demoBasemap = b.id)}
+										title={b.name}
+										aria-label={b.name}
+									>
+										<i class="fat {b.icon}"></i>
+									</button>
+								{/each}
+							</div>
+						</div>
+						<button class="st-field as-row" onclick={() => (demoLive = !demoLive)}>
+							<span class="st-lbl">Live positions</span>
+							<span class="st-sw" class:on={demoLive}></span>
+						</button>
+						<div class="st-param">?mapset={encodeURIComponent(mapset)}</div>
 
 						<div class="st-grp">Behaviour</div>
 						<button class="st-field as-row" onclick={() => (demoMotion = !demoMotion)}>
@@ -501,6 +543,60 @@
 		color: var(--ink-muted);
 	}
 	.st-seg,
+	/*
+	 * Chips, not buttons. The row is a single object with one border around it
+	 * and hairlines between the cells, which is how the map controls are drawn
+	 * over on the vehicle dashboard — the same control in a popover and floating
+	 * over a map should not be two different controls. Selection is the pane
+	 * fill plus the accent, so it survives a photographic tile underneath it in a
+	 * way a tint alone would not.
+	 */
+	.mapchips {
+		margin-left: auto;
+		display: inline-flex;
+		align-items: stretch;
+		height: 21px;
+		border: 1px solid var(--rule-soft);
+		border-radius: 3px;
+		overflow: hidden;
+		background: var(--paper-card);
+	}
+	.mapchip {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 26px;
+		border: none;
+		background: none;
+		cursor: pointer;
+		color: var(--ink-muted);
+		border-left: 1px solid var(--rule-hair);
+	}
+	.mapchip:first-child {
+		border-left: 0;
+	}
+	.mapchip i {
+		font-size: 0.72rem;
+	}
+	.mapchip:hover {
+		background: var(--paper-pane);
+		color: var(--ink);
+	}
+	.mapchip.is-on {
+		background: var(--paper-pane);
+		color: var(--color-accent);
+	}
+
+	/* The link the settings above produce, shown where they are set. */
+	.st-param {
+		font-family: var(--font-mono);
+		font-size: 0.54rem;
+		color: var(--ink-note);
+		border-top: 1px solid var(--rule-hair);
+		margin-top: 5px;
+		padding-top: 4px;
+		overflow-wrap: anywhere;
+	}
 	.st-dots {
 		margin-left: auto;
 		display: flex;

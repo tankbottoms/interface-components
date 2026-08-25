@@ -91,6 +91,7 @@ export class MagxPanelDate extends MagxPanelBaseElement {
         <div class="container_base" id="container">
             <div class="label"><b>${this.title}</b></div>
             <div class="input-wrapper">
+                <i class="mgx-i field-glyph" aria-hidden="true">\u{f133}</i>
                 <input id=${this.id} class="text_input" type="date" .value=${this.dateValue} @input=${this._valueChanged} .min=${this._minDate} .max=${this._maxDate} @blur=${this._handleBlur} @focus=${this._addFocus}/>
                 <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticTap} /></label>
             </div>
@@ -108,10 +109,6 @@ export class MagxPanelDate extends MagxPanelBaseElement {
     static styles = [MagxPanelBaseElement._baseStyle, css`
         input::-webkit-calendar-picker-indicator {
             cursor: pointer;
-        }
-
-        .input-wrapper {
-            position: relative;
         }
 
         .haptic-overlay {

@@ -58,7 +58,7 @@ export class MagxPanelFileChooser extends MagxPanelBaseElement {
                 <div class="label"><b>${this.title}</b></div>
                 <div class="file-wrapper">
                     <input id=${this.id} type="file" class="file_chooser" @change=${this._valueChanged} @blur=${this._handleBlur} @focus=${this._addFocus} />
-                    <label id="file_chooser_label" class="file_chooser_label" for=${this.id}>${this.placeholderLabel}</label>
+                    <label id="file_chooser_label" class="file_chooser_label" for=${this.id}><i class="mgx-i field-glyph" aria-hidden="true">\u{f0c6}</i>${this.placeholderLabel}</label>
                     <label class="haptic-overlay" aria-hidden="true"><input type="checkbox" switch tabindex="-1" class="haptic-switch" @change=${this._hapticTap} /></label>
                 </div>
             </div>
@@ -105,6 +105,14 @@ export class MagxPanelFileChooser extends MagxPanelBaseElement {
 
         .file-wrapper {
             position: relative;
+        }
+
+        /* The label is the whole control here, so the glyph goes inside it. */
+        .file_chooser_label .field-glyph {
+            font-size: 10px;
+            width: 11px;
+            text-align: center;
+            margin-right: 6px;
         }
 
         .haptic-overlay {

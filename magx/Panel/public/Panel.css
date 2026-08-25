@@ -37,7 +37,6 @@
     --magx-panel-scrollbar-active: #999999;
     --magx-panel-scrollbar-color: #cccccc #ffffff;
     --magx-panel-scrollbar-thumb: #cccccc;
-    --magx-panel-select-bg: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAp0lEQVRIS+2SsQ3FIAwF7RVYhA5mgQFhFuhYhJKWL0eKxI8SGylKZ0p4+OBsHGNM+HChAiS7qkgyBKrovaLeOxhjbgtxZ+cFtgelFMg5QwgBvPd/EO5sDbKAlBLUWo/8CjmL075zDmKMj6rEKbpCqBL9aqc4ZUQAhVbInBMQUXz5Vg/WfxOktXZsWWtZLds9uIqlqaH1NFV3jdhSJA47E1CAaE8ViYp+wGiWMZ/T+cgAAAAASUVORK5CYII=');
     --magx-panel-select-font: 12px sans-serif;
     --magx-panel-selected-container-background: #ffffff;
     --magx-panel-selected-container-border: none;
@@ -47,4 +46,24 @@
     --magx-panel-text-bg-focused: #ffffff;
     --magx-panel-text-color: #000000;
     --magx-panel-title-bg: #eeeeee;
+}
+/* ---------------------------------------------------------------------------
+   Popup picker, glyphs and de-boxed inputs (light)
+
+   The panel elements draw their own glyphs from the document-global Font
+   Awesome @font-face. The `fat` utility classes cannot cross a shadow
+   boundary, but the font family can, so the components name the family and
+   weight directly and set the codepoint in `content`.
+   --------------------------------------------------------------------------- */
+:root {
+    --magx-panel-icon-family: "Font Awesome 6 Pro";
+    --magx-panel-icon-weight: 100;
+    --magx-panel-icon-color: #8b9299;
+    --magx-panel-accent: #3792a4;
+    --magx-panel-rule: #e2ded8;
+    --magx-panel-rule-hair: #f1efeb;
+    --magx-panel-popup-bg: #ffffff;
+    --magx-panel-popup-alt: #f6f4f1;
+    --magx-panel-popup-radius: 3px;
+    --magx-panel-popup-shadow: 0 6px 18px rgba(28, 30, 32, 0.09), 0 1px 2px rgba(28, 30, 32, 0.05);
 }
