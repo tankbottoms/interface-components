@@ -200,12 +200,26 @@
 				<span>Built on <a href="https://github.com/mlalma/magx/tree/main" target="_blank" rel="noopener">magx</a> by <a href="https://github.com/mlalma" target="_blank" rel="noopener">mlalma</a></span>
 				<span class="sep">|</span>
 				<span>Lit + SvelteKit</span>
+				<span class="sep">|</span>
+				<!--
+					The build stamp lives in the footer of every page, not just the
+					home hero, because the question it answers is "is this page the
+					one I just deployed, or the one my browser kept?" — and that
+					question gets asked from whichever page happens to be open.
+				-->
+				<span class="build-stamp" title="Build {__BUILD_VERSION__}">v{__BUILD_VERSION__}</span>
 			</footer>
 		</main>
 	</div>
 </div>
 
 <style>
+	.build-stamp {
+		font-family: var(--font-mono);
+		letter-spacing: 0.02em;
+		/* No ellipsis, no max-width: a half-shown hash is worse than none. */
+		white-space: nowrap;
+	}
 	.site-title-group {
 		display: flex;
 		align-items: center;
