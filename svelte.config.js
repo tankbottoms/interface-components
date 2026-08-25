@@ -17,6 +17,31 @@ const config = {
 			'magx-panel': './magx/Panel/src',
 			'magx-sparkline': './magx/Sparkline/src'
 		},
+		/*
+		 * Hash mode, not nonce: every page here is prerendered, so there is no
+		 * server to mint a per-request nonce. SvelteKit hashes its own inline
+		 * hydration script at build time and writes the CSP into each page.
+		 *
+		 * `style-src` keeps 'unsafe-inline' because the pattern pages set swatch
+		 * and chart colours through `style=` attributes — that is the palette
+		 * being demonstrated, and hashing an attribute is not a thing CSP does.
+		 * Scripts, which is where this actually matters, stay hash-only.
+		 */
+		csp: {
+			mode: 'hash',
+			directives: {
+				'default-src': ['self'],
+				'script-src': ['self'],
+				'style-src': ['self', 'unsafe-inline'],
+				'img-src': ['self', 'data:'],
+				'font-src': ['self'],
+				'connect-src': ['self'],
+				'object-src': ['none'],
+				'base-uri': ['self'],
+				'form-action': ['self'],
+				'frame-ancestors': ['none']
+			}
+		},
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',

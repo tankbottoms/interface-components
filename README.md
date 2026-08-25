@@ -2,13 +2,28 @@
 
 Documentation and live demos for **magx** draggable panel UI components and sparkline charts, built as Lit web components and showcased with SvelteKit.
 
-**Live:** [interface-components.tankbottoms.workers.dev](https://interface-components.tankbottoms.workers.dev/)
+**Live:** [interface-components.atsignhandle.workers.dev](https://interface-components.atsignhandle.workers.dev/)
 
 ![Hero and demo panels](static/screenshots/hero.png)
 
 ## Overview
 
-A showcase and documentation site for 16 Lit 3 web components across two families. Each component has a live interactive demo, property table, code examples, and light/dark theme toggle. The site also includes a built-in Font Awesome Pro 6.5.1 icon browser with 3,500+ icons.
+Two sections, deliberately separate.
+
+**Components** documents 16 Lit 3 web components across two families -- each with a live interactive demo, property table, code examples, and a light/dark theme toggle -- plus a built-in Font Awesome Pro 6.5.1 icon browser with 3,500+ icons.
+
+**Interface** documents the surrounding interface language the components sit inside, distilled from the dashboards it was drawn from and rebuilt on one palette:
+
+| | Page | Covers |
+|---|---|---|
+| 01 | `/interface/charting` | Bars, stacked columns, heatmaps, multi-series lines, sparkline tiles, treemaps, donuts, meters -- inline SVG, no charting dependency |
+| 02 | `/interface/layout` | Banners, KPI tiles, badges, pills, popovers, expandable rows, node cards, dense tables |
+| 03 | `/interface/documents` | Breadcrumbs, metadata badge rows, serif citations, tag groups, split source/text panes |
+| 04 | `/interface/wayfinding` | Corner circle-i affordances, numbered key locations, controls over maps and 3-D viewers, a guided tour that highlights without darkening the page |
+| 05 | `/interface/settings` | The gear glyph and its two surfaces, plus the built-in per-site analytics page |
+| 06 | `/interface/palette` | The eight elegant pastels, the house palette, chart series order, the status ramp |
+
+Every figure is generated, not fetched. The site makes no network request off its own origin.
 
 ## Components
 
@@ -100,7 +115,11 @@ src/
     styles/
       theme.css           # CSS custom properties (light/dark)
       global.css          # Global styles
+      interface.css       # Shared .ifc-* vocabulary for the Interface pages
   hooks.client.ts         # Lit component registration + Panel CSS injection
+tools/
+  oxlint/anti-slop/       # Custom oxlint rule plugin (15 rules + tests)
+  qa/responsive.ts        # Viewport / overflow / off-origin sweep
 magx/
   Panel/                  # Lit panel component source (TypeScript)
   Sparkline/              # Lit sparkline component source (TypeScript)
@@ -115,6 +134,8 @@ static/
 - **Panel CSS injected as global `<style>` tag** -- Panel components read CSS custom properties (`:root` vars) that must pierce Shadow DOM boundaries. Light/dark theme swaps the entire CSS string.
 - **Standalone sparklines use HTML attributes** -- All chart configuration (type, colors, fills, reference lines) is read from element attributes in the constructor, no programmatic setup needed.
 - **Static adapter with prerendering** -- Full SSG via `@sveltejs/adapter-static`. Components hydrate on the client after prerendered HTML loads.
+- **Path aliases live in `kit.alias`, not `tsconfig.paths`** -- SvelteKit writes them into the generated tsconfig *and* hands them to Vite, so the type-checker and the bundler cannot drift. A hand-written `paths` block replaces the generated map wholesale and has to restate `$lib`/`$app` itself, which is how it silently rots.
+- **CSP is generated per page in hash mode** -- every page is prerendered, so there is no server to mint a nonce; SvelteKit hashes its own inline hydration script at build time. Non-CSP security headers are static, in `static/_headers`.
 
 ## Getting Started
 
@@ -128,12 +149,32 @@ bun run dev
 # Production build
 bun run build
 
-# Preview production build locally
+# Preview production build locally (:4173)
 bun run preview
 
-# Deploy to Cloudflare Pages
+# Type-check (svelte-check, must be zero)
+bun run check
+
+# Lint (oxlint + the anti-slop rule plugin in tools/oxlint)
+bun run lint
+
+# Unit-test the lint rules
+bun run test
+
+# Responsive + client-hygiene sweep: every route at four viewports,
+# checking horizontal overflow, console errors and off-origin requests.
+# Needs `bun run preview` running in another shell.
+bun run qa
+
+# Build and deploy to Cloudflare Workers
 bun run deploy
 ```
+
+### Build version
+
+The header and every page footer carry a `MM.NN.sha5` stamp -- major.minor from
+`package.json`, then five characters of the commit that built it. It answers one
+question: is this page the one just deployed, or the one the browser kept?
 
 ## Demo Theme Toggle
 

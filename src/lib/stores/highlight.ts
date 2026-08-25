@@ -5,12 +5,12 @@ import { accentSwatches, accentValues, DEFAULT_ACCENT, accentDark } from '$lib/d
 const STORAGE_KEY = 'interface-components-accent';
 
 /**
- * The site opens on mint — series 04 of the chart order — and stays there until
+ * The site opens on mint — the last of the eight elegant pastels — and stays there until
  * someone picks otherwise. It used to reseed on every load, which was lively but
  * meant the mark was a different colour every visit; a library's own chrome is
  * the one thing that should not.
  *
- * The picker's options have changed twice (purple → amber/teal → chart series),
+ * The picker's options have changed twice (purple → amber/teal → the eight pastels),
  * so rather than keep a growing list of retired hexes, a stored value is simply
  * checked against the palette that exists *now*. Anything the picker can no
  * longer offer — a purple from the first set, the amber from the second — falls

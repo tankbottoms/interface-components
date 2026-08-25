@@ -8,3 +8,4 @@ build
 bun.lock
 cf-deployment.md
 *.output
+update-check/

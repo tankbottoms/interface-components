@@ -1,8 +1,8 @@
 {
   "name": "interface-components",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "description": "Documentation and live demos for magx draggable panel components and sparkline charts, built with Lit 3 and SvelteKit.",
-  "author": "Mark Phillips",
+  "author": "M.P.",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -12,6 +12,9 @@
     "preview": "bunx --bun vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --threshold error",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --threshold error --watch",
+    "lint": "oxlint",
+    "test": "node --experimental-strip-types --test tools/oxlint/anti-slop/rules/*.test.ts",
+    "qa": "bun run tools/qa/responsive.ts",
     "deploy": "bun run build && bunx wrangler deploy"
   },
   "devDependencies": {

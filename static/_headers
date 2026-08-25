@@ -1,0 +1,20 @@
+# Served by Cloudflare Workers static assets for every path.
+#
+# The Content-Security-Policy itself is NOT here: SvelteKit emits it per page
+# with the hashes of its own inline hydration scripts (see `kit.csp` in
+# svelte.config.js), which a static header file cannot compute. These are the
+# headers that are the same on every response.
+/*
+  # The site never needs to be framed, and there is nothing to click-jack.
+  X-Frame-Options: DENY
+  # No MIME sniffing — .js that arrives as text/plain stays inert.
+  X-Content-Type-Options: nosniff
+  # Send the origin off-site, never the path. Which page of a component
+  # library someone came from is not the destination's business.
+  Referrer-Policy: strict-origin-when-cross-origin
+  # A documentation site asks for none of these. Denying by name is what makes
+  # a later request for one visible in review.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains

@@ -801,7 +801,25 @@
 	gap: 6px;
 }
 
-@media (max-width: 900px) {
+/*
+ * Two tiers, not one. A single 900px step sent a four-up grid straight to one
+ * column, so an iPad in portrait (768pt) laid out exactly like a phone and gave
+ * back roughly half its width as margin. The tablet tier halves instead: 3- and
+ * 4-up become two columns, 2-up stays two, and only below 640 does everything
+ * become a single column — which is the width where two columns genuinely stop
+ * fitting a badge row or a hex label.
+ */
+@media (max-width: 1024px) {
+	.ifc-grid-3,
+	.ifc-grid-4 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+	.ifc-split {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+@media (max-width: 640px) {
 	.ifc-grid-2,
 	.ifc-grid-3,
 	.ifc-grid-4,

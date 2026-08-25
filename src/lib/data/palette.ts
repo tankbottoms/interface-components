@@ -19,22 +19,35 @@ export interface Swatch {
 	fill: string;
 	/** Darkened companion — lines, strokes, legend keys, text on pastel. */
 	stroke: string;
+	/**
+	 * The stroke, lifted in luminance for dark paper. Only the eight elegant
+	 * pastels carry one, because only they are offered as a site accent; the
+	 * house pastels are chart fills and never become chrome.
+	 */
+	dark?: string;
 	/** CSS custom property name (without the leading `--`). */
 	token: string;
 	/** Where the colour came from. */
 	origin: 'pastels' | 'house' | 'postcrime' | 'gpumon';
 }
 
-/** The supplied "8 Elegant Pastels" sheet, in sheet order. */
+/**
+ * The supplied "8 Elegant Pastels" sheet, **in sheet order**.
+ *
+ * This order is the site's palette: it is what section 02 publishes, what the
+ * header picker offers, and the sequence the accent list is generated from
+ * below. Chart series deliberately re-sort it (see `chartSeries`) — that is a
+ * legibility concern local to a plot, not a change to the palette itself.
+ */
 export const elegantPastels: Swatch[] = [
-	{ name: 'Orchid Mist', fill: '#F4E1FC', stroke: '#9A6BB0', token: 'pastel-orchid', origin: 'pastels' },
-	{ name: 'Violet', fill: '#F0BEFA', stroke: '#A855C4', token: 'pastel-violet', origin: 'pastels' },
-	{ name: 'Peach', fill: '#FCDCC7', stroke: '#C97E45', token: 'pastel-peach', origin: 'pastels' },
-	{ name: 'Vanilla', fill: '#FCF7DC', stroke: '#B39B3C', token: 'pastel-vanilla', origin: 'pastels' },
-	{ name: 'Blush', fill: '#FFE6E6', stroke: '#C77070', token: 'pastel-blush', origin: 'pastels' },
-	{ name: 'Rose', fill: '#FFC2D0', stroke: '#C75F81', token: 'pastel-rose', origin: 'pastels' },
-	{ name: 'Aqua', fill: '#AFEFFD', stroke: '#2E8FA6', token: 'pastel-aqua', origin: 'pastels' },
-	{ name: 'Mint', fill: '#E0FFF1', stroke: '#3E9B72', token: 'pastel-mint', origin: 'pastels' }
+	{ name: 'Orchid Mist', fill: '#F4E1FC', stroke: '#9A6BB0', dark: '#C6A2DA', token: 'pastel-orchid', origin: 'pastels' },
+	{ name: 'Violet', fill: '#F0BEFA', stroke: '#A855C4', dark: '#D49AE6', token: 'pastel-violet', origin: 'pastels' },
+	{ name: 'Peach', fill: '#FCDCC7', stroke: '#C97E45', dark: '#EDA875', token: 'pastel-peach', origin: 'pastels' },
+	{ name: 'Vanilla', fill: '#FCF7DC', stroke: '#B39B3C', dark: '#E3C86A', token: 'pastel-vanilla', origin: 'pastels' },
+	{ name: 'Blush', fill: '#FFE6E6', stroke: '#C77070', dark: '#EDA1A1', token: 'pastel-blush', origin: 'pastels' },
+	{ name: 'Rose', fill: '#FFC2D0', stroke: '#C75F81', dark: '#EE9AB4', token: 'pastel-rose', origin: 'pastels' },
+	{ name: 'Aqua', fill: '#AFEFFD', stroke: '#2E8FA6', dark: '#67C9E0', token: 'pastel-aqua', origin: 'pastels' },
+	{ name: 'Mint', fill: '#E0FFF1', stroke: '#3E9B72', dark: '#6FD6A6', token: 'pastel-mint', origin: 'pastels' }
 ];
 
 /**
@@ -82,36 +95,31 @@ export const statusColors = {
 } as const;
 
 /**
- * Site highlight options offered in the header picker.
+ * Site highlight options offered in the header picker — the eight elegant
+ * pastels, in sheet order.
  *
- * These are the eight elegant pastels *in chart-series order* — the same eight,
- * in the same sequence, that section 04 of the palette page publishes as
- * `--chart-1` … `--chart-8`. One ordered set of hues now drives both the charts
- * and the site chrome, so the accent a reader picks is always a colour they
- * have already seen carrying data on the page.
+ * Derived from `elegantPastels` rather than written out again: the previous
+ * hand-copied list drifted the moment the sheet was touched, and it encoded a
+ * second, competing order for the same eight hues. One array is the palette;
+ * everything else is a view of it.
  *
- * The value taken is the **stroke**, not the pastel fill: an accent has to
+ * The value taken is each pastel's **stroke**, not its fill: an accent has to
  * survive being 1px of 10px text on paper, and the fills are far too light for
  * that. `dark` is the companion the accent takes on dark paper — the same hue
  * lifted in luminance, because the strokes that read on cream go muddy on navy.
  * One hue, two luminances — the same trade the pastels already make in
  * theme.css.
  */
-export const accentSwatches = [
-	{ name: 'Aqua', color: '#2E8FA6', dark: '#67C9E0' },
-	{ name: 'Rose', color: '#C75F81', dark: '#EE9AB4' },
-	{ name: 'Vanilla', color: '#B39B3C', dark: '#E3C86A' },
-	{ name: 'Mint', color: '#3E9B72', dark: '#6FD6A6' },
-	{ name: 'Peach', color: '#C97E45', dark: '#EDA875' },
-	{ name: 'Violet', color: '#A855C4', dark: '#D49AE6' },
-	{ name: 'Blush', color: '#C77070', dark: '#EDA1A1' },
-	{ name: 'Orchid', color: '#9A6BB0', dark: '#C6A2DA' }
-];
+export const accentSwatches = elegantPastels.map((s) => ({
+	name: s.name,
+	color: s.stroke,
+	dark: s.dark ?? s.stroke
+}));
 
 /** Every accent the picker will accept, lower-cased, for migrating a stored value. */
 export const accentValues = new Set(accentSwatches.map((a) => a.color.toLowerCase()));
 
-/** Mint — series 04, and the colour the site opens on. */
+/** Mint — the last of the eight, and the colour the site opens on. */
 export const DEFAULT_ACCENT = '#3E9B72';
 export const DEFAULT_ACCENT_DARK = '#6FD6A6';
 

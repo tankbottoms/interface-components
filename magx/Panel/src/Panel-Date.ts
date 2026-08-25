@@ -69,6 +69,9 @@ export class MagxPanelDate extends MagxPanelBaseElement {
     private _hapticTap(e: Event): void {
         const sw = e.target as HTMLInputElement;
         requestAnimationFrame(() => { sw.checked = false; });
+        // SAFETY: `.haptic-overlay` is a div this component renders itself, so the
+        // only element that can match is an HTMLElement. The `if` covers the
+        // render-not-yet-run case, which is the only way the query returns null.
         const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
         if (overlay) overlay.style.display = 'none';
         const input = this.shadowRoot?.getElementById(this.id) as HTMLInputElement;
@@ -77,6 +80,7 @@ export class MagxPanelDate extends MagxPanelBaseElement {
 
     private _handleBlur(): void {
         this._removeFocus();
+        // SAFETY: same overlay, same guarantee — see `_hapticTap` above.
         const overlay = this.shadowRoot?.querySelector('.haptic-overlay') as HTMLElement;
         if (overlay) overlay.style.display = '';
     }
