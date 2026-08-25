@@ -73,7 +73,7 @@
 					x2={x(hover)}
 					y1="0"
 					y2={height}
-					stroke="var(--rule)"
+					stroke="var(--ink-soft)"
 					stroke-width="0.6"
 					vector-effect="non-scaling-stroke"
 				/>

@@ -62,7 +62,7 @@
 					height={cell - 1.5}
 					fill="var(--stroke-{token})"
 					fill-opacity={0.08 + (v / max) * 0.84}
-					stroke={hover && hover.r === r && hover.c === c ? 'var(--rule)' : 'var(--rule-hair)'}
+					stroke={hover && hover.r === r && hover.c === c ? 'var(--ink-soft)' : 'var(--rule-hair)'}
 					stroke-width={hover && hover.r === r && hover.c === c ? 1.4 : 0.5}
 					role="presentation"
 					onmousemove={(e) => enter(e, r, c)}

@@ -160,7 +160,6 @@
 		background: var(--color-bg-secondary);
 		padding: var(--spacing-lg);
 		margin-bottom: var(--spacing-xl);
-		box-shadow: 2px 2px 0 var(--color-shadow);
 	}
 	.card-header {
 		display: flex;
@@ -217,7 +216,7 @@
 		display: flex;
 		gap: 0;
 		margin-bottom: var(--spacing-md);
-		border-bottom: 2px solid var(--color-border);
+		border-bottom: 1px solid var(--color-border);
 	}
 	.fa-tab {
 		display: flex;
@@ -232,7 +231,7 @@
 		background: none;
 		border: none;
 		border-bottom: 2px solid transparent;
-		margin-bottom: -2px;
+		margin-bottom: -1px;
 		color: var(--color-text-muted);
 		cursor: pointer;
 	}
@@ -247,14 +246,23 @@
 	.fa-tab i {
 		font-size: 0.85rem;
 	}
+	/* Same reasoning as SearchBar: an edge to type against, not a box. */
 	.fa-search {
 		display: flex;
 		align-items: center;
 		gap: var(--spacing-sm);
 		margin-bottom: var(--spacing-md);
-		border: 1px solid var(--color-border);
-		background: var(--color-bg-alt);
-		padding: 0.4rem 0.6rem;
+		border: 0;
+		border-bottom: 1px solid var(--color-border);
+		background: transparent;
+		padding: 0.4rem 2px;
+		transition: border-color 0.14s ease;
+	}
+	.fa-search:focus-within {
+		border-bottom-color: var(--color-accent);
+	}
+	.fa-search:focus-within i {
+		color: var(--color-accent);
 	}
 	.fa-search i {
 		color: var(--color-text-muted);
@@ -348,7 +356,6 @@
 		border: 1px solid var(--color-accent);
 		padding: var(--spacing-xs) var(--spacing-md);
 		text-decoration: none;
-		box-shadow: 2px 2px 0 var(--color-shadow);
 	}
 	.fa-explorer-link:hover {
 		background: var(--color-accent);
@@ -382,7 +389,10 @@
 		max-width: 92vw;
 		max-height: 85vh;
 		background: var(--color-bg-secondary);
-		border: 2px solid var(--color-border-dark);
+		border: 1px solid var(--color-border);
+		/* Floats over the page, so this is one of the few places a shadow is
+		   telling the truth about depth. */
+		box-shadow: var(--elev);
 		overflow-y: auto;
 		z-index: 1;
 	}

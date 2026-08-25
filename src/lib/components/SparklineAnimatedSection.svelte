@@ -64,7 +64,7 @@
 	.anim {
 		margin: var(--spacing-xl) 0;
 		padding-top: var(--spacing-xl);
-		border-top: 2px solid var(--color-border);
+		border-top: 1px solid var(--color-border);
 	}
 	.anim-title {
 		font-size: 1.1rem;

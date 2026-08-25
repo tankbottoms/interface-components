@@ -973,7 +973,7 @@
 		min-width: 220px;
 		border: 1px solid var(--rule);
 		background: var(--paper-pane);
-		box-shadow: var(--brutal-shadow);
+		box-shadow: var(--elev);
 		padding: 6px;
 	}
 	.popover.align-right {
@@ -1090,7 +1090,7 @@
 		min-width: 208px;
 		background: var(--tip-paper, var(--paper-card));
 		border: 1px solid var(--rule);
-		box-shadow: var(--brutal-shadow);
+		box-shadow: var(--elev);
 		padding: 3px;
 		animation: lp-menu-in 0.12s ease-out;
 	}

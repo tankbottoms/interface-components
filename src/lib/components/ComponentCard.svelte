@@ -70,7 +70,6 @@
 		background: var(--color-bg-secondary);
 		padding: var(--spacing-lg);
 		margin-bottom: var(--spacing-xl);
-		box-shadow: 2px 2px 0 var(--color-shadow);
 		scroll-margin-top: calc(var(--header-height) + var(--spacing-md));
 	}
 	.card-header {

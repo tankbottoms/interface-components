@@ -471,7 +471,7 @@
 	.hero {
 		margin-bottom: var(--spacing-xl);
 		padding-bottom: var(--spacing-xl);
-		border-bottom: 2px solid var(--color-border);
+		border-bottom: 1px solid var(--color-border);
 	}
 	.hero-title {
 		font-size: 1.5rem;
@@ -513,7 +513,6 @@
 		padding: var(--spacing-xs) var(--spacing-sm);
 		border: 1px solid var(--color-border);
 		background: var(--color-bg-alt);
-		box-shadow: 2px 2px 0 var(--color-shadow);
 	}
 	.stat i {
 		color: var(--color-accent);

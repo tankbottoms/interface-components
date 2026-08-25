@@ -68,12 +68,14 @@
 		padding: 5px 11px 5px 9px;
 		cursor: pointer;
 		transition:
-			box-shadow 0.14s ease,
+			border-color 0.14s ease,
+			background 0.14s ease,
 			color 0.14s ease;
 	}
 	.tour-badge:hover,
 	.tour-badge.on {
-		box-shadow: var(--brutal-shadow);
+		border-color: var(--color-accent);
+		background: color-mix(in srgb, var(--color-accent) 8%, var(--paper));
 		color: var(--color-accent);
 	}
 	.tb-dust {

@@ -443,7 +443,7 @@
 		justify-content: center;
 		border: 1px solid var(--rule);
 		background: var(--paper-card);
-		box-shadow: var(--brutal-shadow);
+		box-shadow: var(--elev);
 		transform: rotateX(var(--rx)) rotateY(var(--ry))
 			translateZ(calc(var(--live-pointer-inside, 0) * 18px));
 		transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);

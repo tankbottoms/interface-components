@@ -253,7 +253,7 @@
 		padding: 12px 13px;
 		background: var(--tip-paper, #fff);
 		border: 1px solid var(--rule);
-		box-shadow: var(--brutal-shadow);
+		box-shadow: var(--elev);
 		animation: offer-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 	}
 	@keyframes offer-in {
@@ -380,7 +380,7 @@
 		z-index: 9999;
 		background: var(--tip-paper, #fff);
 		border: 1px solid var(--rule);
-		box-shadow: var(--brutal-shadow);
+		box-shadow: var(--elev);
 		padding: 10px 12px 9px;
 		color: #1a1a1a;
 	}

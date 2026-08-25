@@ -100,7 +100,7 @@
 				x2={cx(hover)}
 				y1={M.top}
 				y2={M.top + innerH}
-				stroke="var(--rule)"
+				stroke="var(--ink-soft)"
 				stroke-dasharray="2 3"
 				stroke-width="0.7"
 			/>
@@ -117,7 +117,7 @@
 		{/if}
 
 		<g class="ifc-axis">
-			<line x1={M.left} x2={W - M.right} y1={M.top + innerH} y2={M.top + innerH} stroke="var(--rule)" />
+			<line x1={M.left} x2={W - M.right} y1={M.top + innerH} y2={M.top + innerH} class="base" />
 			{#each labels as l, i}
 				{#if labels.length <= 14 || i % Math.ceil(labels.length / 12) === 0}
 					<text x={cx(i)} y={height - 7} text-anchor="middle">{l}</text>

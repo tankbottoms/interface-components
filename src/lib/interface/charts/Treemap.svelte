@@ -86,7 +86,7 @@
 					width={Math.max(0, r.w - 1)}
 					height={Math.max(0, r.h - 1)}
 					fill="var(--pastel-{tok(r.i)})"
-					stroke="var(--rule)"
+					stroke="var(--stroke-{tok(r.i)})"
 					stroke-width={hover === r.i ? 1.8 : 0.6}
 					opacity={hover === -1 || hover === r.i ? 1 : 0.55}
 				/>

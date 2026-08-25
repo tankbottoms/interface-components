@@ -83,7 +83,6 @@
 		background: var(--color-bg);
 		color: var(--color-text);
 		cursor: pointer;
-		box-shadow: 2px 2px 0 var(--color-shadow);
 	}
 	.ctl:hover {
 		background: var(--color-accent);

@@ -29,14 +29,28 @@
 </div>
 
 <style>
+	/*
+	 * A filter is not an object on the page — it is an edge you type against.
+	 * The four-sided box plus offset shadow drew a container around a control
+	 * that contains nothing, and at this size the border was most of what the
+	 * eye saw. One hairline underneath does the whole job; focus moves that
+	 * hairline to the accent, which is the only state worth a colour.
+	 */
 	.search-bar {
 		display: flex;
 		align-items: center;
-		border: 1px solid var(--color-border);
-		background: var(--color-bg);
-		box-shadow: 2px 2px 0 var(--color-shadow);
-		padding: 0 var(--spacing-sm);
+		border: 0;
+		border-bottom: 1px solid var(--color-border);
+		background: transparent;
+		padding: 0 2px;
 		gap: var(--spacing-sm);
+		transition: border-color 0.14s ease;
+	}
+	.search-bar:focus-within {
+		border-bottom-color: var(--color-accent);
+	}
+	.search-bar:focus-within .search-icon {
+		color: var(--color-accent);
 	}
 	.search-icon {
 		color: var(--color-text-muted);

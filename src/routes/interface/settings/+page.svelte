@@ -448,7 +448,7 @@
 		width: 268px;
 		background: var(--tip-paper, var(--paper-card));
 		border: 1px solid var(--rule);
-		box-shadow: var(--brutal-shadow);
+		box-shadow: var(--elev);
 		padding: var(--spacing-sm);
 		animation: st-in 0.12s ease-out;
 	}

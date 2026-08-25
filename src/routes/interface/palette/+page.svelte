@@ -318,10 +318,11 @@
 	}
 	.acc:hover {
 		border-color: var(--rule);
+		background: var(--paper-pane);
 	}
 	.acc.on {
-		border-color: var(--rule);
-		box-shadow: var(--brutal-shadow);
+		border-color: var(--color-accent);
+		background: color-mix(in srgb, var(--color-accent) 7%, var(--paper-card));
 	}
 	.acc-chip {
 		width: 22px;

@@ -73,7 +73,7 @@
 				<path
 					d={a.d}
 					fill="var(--pastel-{tok(a.i)})"
-					stroke="var(--rule)"
+					stroke="var(--stroke-{tok(a.i)})"
 					stroke-width={hover === a.i ? 1.6 : 0.7}
 					transform={hover === a.i
 						? `translate(${Math.cos(a.mid) * 4},${Math.sin(a.mid) * 4})`

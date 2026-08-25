@@ -461,7 +461,7 @@
 	.pdf-page {
 		background: #fff;
 		border: 1px solid var(--rule);
-		box-shadow: var(--brutal-shadow);
+		box-shadow: var(--elev);
 		padding: 26px 30px;
 		min-height: 380px;
 	}

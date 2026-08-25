@@ -13,7 +13,7 @@
 	--color-text-muted: #00000099;
 	--color-border: #e7e3dc;
 	--color-border-light: #f3f1ec;
-	--color-border-dark: #00000055;
+	--color-border-dark: #d5d0c8;
 	--color-hover-bg: #f3f1ec;
 	--color-link: #18b4c7;
 	/*
@@ -27,21 +27,43 @@
 	--color-brand: #f5a312;
 	--color-warn: #ff4524;
 	--color-success: #0f8534;
-	--color-shadow: #e7e3dc;
 
 	/* --- Interface section: house-style paper surface ------------------ */
 	--paper: #ffffff;
 	--paper-card: #fbf9f6;
 	--paper-pane: #ffffff;
 	--tip-paper: #fbf9f6;
-	--ink: #000000ee;
-	--ink-muted: #00000099;
-	--ink-soft: #00000055;
-	--ink-note: #00000077;
-	--rule: #000000ee;
-	--rule-soft: #e7e3dc;
-	--rule-hair: #f3f1ec;
-	--brutal-shadow: 3px 3px 0 var(--rule);
+
+	/*
+	 * Ink ramp: body, secondary, tertiary. Warm near-black rather than pure
+	 * black at an alpha — a black knocked back with opacity picks up whatever
+	 * is behind it, so the same "muted" tone drifted between paper and card.
+	 * `--ink-soft` is the smallest readable step on paper; anything fainter
+	 * fails contrast at the 9.5px sizes the dense tables use.
+	 */
+	--ink: #1c1e20;
+	--ink-muted: #5f666d;
+	--ink-soft: #8b9299;
+	--ink-note: #5f666d;
+
+	/*
+	 * Hairlines, three weights: `--rule` separates regions, `--rule-soft`
+	 * separates rows inside a region, `--rule-hair` is the faintest tick.
+	 * None of them are black. A 1px black rule is a graphic element in its own
+	 * right — put a grid of them on a page and the borders read louder than
+	 * the data. Warm grey draws the same boundary and then gets out of the way.
+	 */
+	--rule: #e2ded8;
+	--rule-soft: #eae7e1;
+	--rule-hair: #f1efeb;
+
+	/*
+	 * Elevation for things that float — dropdowns, tooltips, tour cards, a
+	 * simulated sheet of paper. Everything that sits *in* the flow is flat and
+	 * separated by a hairline instead; a hard offset shadow on an inline card
+	 * is the loudest thing on the page and says nothing a border does not.
+	 */
+	--elev: 0 6px 18px rgba(28, 30, 32, 0.09), 0 1px 2px rgba(28, 30, 32, 0.05);
 
 	/* --- 8 Elegant Pastels (fills) ------------------------------------ */
 	--pastel-orchid: #f4e1fc;
@@ -140,7 +162,6 @@
 	--color-brand: #fcdc9c;
 	--color-warn: #ff9b8a;
 	--color-success: #9ece6a;
-	--color-shadow: #414868;
 
 	--paper: #1a1b26;
 	--paper-card: #1f2335;
@@ -153,7 +174,7 @@
 	--rule: #545c7e;
 	--rule-soft: #3b4261;
 	--rule-hair: #2c3049;
-	--brutal-shadow: 3px 3px 0 #2c3049;
+	--elev: 0 8px 22px rgba(0, 0, 0, 0.42), 0 1px 2px rgba(0, 0, 0, 0.3);
 
 	/* Pastels are dimmed for dark paper: same hue, lower luminance, so a
 	   category keeps its identity across the theme flip without glowing. */
@@ -236,7 +257,6 @@
 		--color-brand: #fcdc9c;
 		--color-warn: #ff9b8a;
 		--color-success: #9ece6a;
-		--color-shadow: #414868;
 
 		--paper: #1a1b26;
 		--paper-card: #1f2335;
@@ -249,7 +269,7 @@
 		--rule: #545c7e;
 		--rule-soft: #3b4261;
 		--rule-hair: #2c3049;
-		--brutal-shadow: 3px 3px 0 #2c3049;
+		--elev: 0 8px 22px rgba(0, 0, 0, 0.42), 0 1px 2px rgba(0, 0, 0, 0.3);
 
 		--pastel-orchid: #4a3b52;
 		--pastel-violet: #5c3f66;

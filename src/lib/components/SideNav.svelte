@@ -203,7 +203,6 @@
 		margin-bottom: var(--spacing-sm);
 		border: 1px solid var(--color-border);
 		background: var(--color-bg-alt);
-		box-shadow: 2px 2px 0 var(--color-shadow);
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
 		text-transform: uppercase;

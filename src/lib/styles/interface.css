@@ -17,7 +17,7 @@
 /* --- Page furniture ------------------------------------------------- */
 
 .ifc-page-head {
-	border-bottom: 2px solid var(--rule);
+	border-bottom: 1px solid var(--rule);
 	padding-bottom: var(--spacing-md);
 	margin-bottom: var(--spacing-xl);
 }
@@ -313,9 +313,16 @@
 .ifc-badge.b-lime { background: var(--pastel-lime); border-color: var(--stroke-lime); }
 .ifc-badge.b-teal { background: var(--pastel-teal); border-color: var(--stroke-teal); }
 
-/* Emphasised badge — the hard-shadow "statistics" chip on the postcrime head. */
+/*
+ * Emphasised badge. This used to be the hard-offset "statistics" chip. A drop
+ * shadow on something sitting flat in a header is a lie about depth, and it
+ * was the loudest mark on the page; the same emphasis comes from inverting the
+ * chip, which also survives being printed.
+ */
 .ifc-badge.is-raised {
-	box-shadow: var(--brutal-shadow);
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--paper);
 }
 
 /* Low-key pill used for statutes / keywords / tags. */
@@ -664,6 +671,12 @@
 .ifc-axis path {
 	stroke: var(--rule-hair);
 	shape-rendering: crispEdges;
+}
+/* The one line in an axis group that is a boundary rather than a gridline. It
+ * is a step darker than the grid it terminates and no darker — the baseline is
+ * there to say where zero is, not to frame the plot. */
+.ifc-axis line.base {
+	stroke: var(--rule);
 }
 
 /*

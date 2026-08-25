@@ -80,8 +80,15 @@
 		color: var(--ink);
 		text-decoration: none;
 	}
+	/*
+	 * Hover changes the card the anchor wraps rather than lifting it. `.ifc-card`
+	 * is the child, so the rule reaches through — the anchor itself has no box.
+	 */
+	.idx:hover :global(.ifc-card) {
+		border-color: var(--color-accent);
+		background: color-mix(in srgb, var(--color-accent) 4%, var(--paper-card));
+	}
 	.idx:hover {
-		box-shadow: var(--brutal-shadow);
 		text-decoration: none;
 	}
 	.idx p {

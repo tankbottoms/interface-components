@@ -239,7 +239,7 @@
 		bottom: 0;
 		width: min(300px, 86vw);
 		background: var(--color-bg);
-		border-right: 2px solid var(--color-border-dark);
+		border-right: 1px solid var(--color-border);
 		z-index: 401;
 		display: flex;
 		flex-direction: column;
@@ -299,7 +299,7 @@
 		left: 0;
 		margin-top: 8px;
 		background: var(--color-bg-secondary);
-		border: 2px solid var(--color-border-dark);
+		border: 1px solid var(--color-border);
 		padding: var(--spacing-sm) var(--spacing-md);
 		z-index: 300;
 		min-width: 200px;

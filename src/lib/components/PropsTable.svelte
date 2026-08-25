@@ -70,7 +70,7 @@
 	.props-table th {
 		text-align: left;
 		padding: var(--spacing-xs) var(--spacing-sm);
-		border-bottom: 2px solid var(--color-border-dark);
+		border-bottom: 1px solid var(--color-border-dark);
 		font-weight: 600;
 		font-size: 0.7rem;
 		text-transform: uppercase;
