@@ -677,7 +677,7 @@
 		font-size: 0.75rem;
 		line-height: 1.5;
 		color: var(--color-text-muted);
-		background: var(--color-surface);
+		background: var(--color-bg-alt);
 		border: 1px solid var(--color-border);
 		border-radius: 4px;
 	}

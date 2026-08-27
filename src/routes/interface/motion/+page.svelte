@@ -566,7 +566,7 @@
 		font-size: 0.62rem;
 	}
 	.reveal-read code {
-		color: var(--color-text-dim);
+		color: var(--color-text-muted);
 	}
 	.reveal-read b {
 		font-variant-numeric: tabular-nums;

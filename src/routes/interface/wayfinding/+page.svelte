@@ -439,7 +439,7 @@
 		gap: 6px;
 	}
 	.wf-bad i {
-		color: var(--stroke-pastel-coral, #c06060);
+		color: var(--stroke-coral);
 	}
 	.wf-good {
 		margin-left: auto;

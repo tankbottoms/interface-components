@@ -41,6 +41,13 @@
 			name: 'Palette',
 			icon: 'fa-palette',
 			body: 'The eight elegant pastels, the house palette, chart series order, the status ramp, and the eight accent options behind the header picker.'
+		},
+		{
+			href: '/interface/viewports',
+			tag: '07',
+			name: 'Viewports',
+			icon: 'fa-cube',
+			body: 'Three.js canvases: seven docks ringing the viewer, six camera stances, extent-relative framing, the one-menu collapse on phones, the numbered help overlay, and meter versus census.'
 		}
 	];
 </script>

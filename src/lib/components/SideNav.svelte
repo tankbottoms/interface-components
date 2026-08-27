@@ -32,7 +32,8 @@
 	{ href: '/interface/settings', name: 'Settings & Analytics', icon: 'fa-gear' },
 		{ href: '/interface/motion', name: 'Motion', icon: 'fa-wand-magic-sparkles' },
 		{ href: '/interface/consoles', name: 'Panel Consoles', icon: 'fa-sliders' },
-		{ href: '/interface/palette', name: 'Palette', icon: 'fa-palette' }
+		{ href: '/interface/palette', name: 'Palette', icon: 'fa-palette' },
+		{ href: '/interface/viewports', name: 'Viewports', icon: 'fa-cube' }
 	];
 
 	const onHome = $derived($page.url.pathname === '/');

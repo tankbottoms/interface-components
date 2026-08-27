@@ -8,7 +8,8 @@
   "type": "module",
   "scripts": {
     "dev": "bunx --bun vite dev",
-    "build": "bunx --bun vite build",
+    "audit": "bun run tools/audit/token-lint.ts",
+    "build": "bun run audit && bunx --bun vite build",
     "preview": "bunx --bun vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --threshold error",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --threshold error --watch",
