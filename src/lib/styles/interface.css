@@ -1062,3 +1062,138 @@
 	float: right;
 	font-variant-numeric: tabular-nums;
 }
+
+/* --- Node rows ------------------------------------------------------
+ *
+ * A node is not a tile. A tile is square because its payload is one number;
+ * a node carries an identity, a link state, two utilisations and a trend, and
+ * squeezing five of those into a 230px auto-fill column stacks them into a
+ * column of stubs that reads as five unrelated cards rather than one fleet.
+ * So the node card is a full-width row: identity left, state next to it,
+ * meters in the middle, trend on the right, and the slow-moving facts on a
+ * hairline foot underneath. Reading down the left edge gives you the fleet;
+ * reading across one row gives you the machine.
+ *
+ * The detail vocabulary is the federation monitor's: square pills with a
+ * hairline border, tabular numerals everywhere a number can change, the value
+ * bold and its unit muted and a step smaller, and a dashed rule between the
+ * live figures and the static ones.
+ */
+.ifc-nodes {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--spacing-md);
+}
+/* The hover wrapper is the grid item, so it -- not the card inside it -- has
+   to be the thing that stretches, or the card sits at its content height and
+   the row loses its rectangle. */
+.ifc-nodes > .ifc-hoverable {
+	display: flex;
+	min-width: 0;
+}
+.ifc-nodes > .ifc-hoverable > .ifc-node {
+	flex: 1;
+	min-width: 0;
+}
+.ifc-node {
+	display: grid;
+	grid-template-columns: minmax(190px, 1.1fr) auto minmax(210px, 1.4fr) minmax(150px, 1fr);
+	align-items: center;
+	column-gap: var(--spacing-lg);
+	row-gap: 6px;
+	padding: 10px var(--spacing-md) 8px;
+	font-variant-numeric: tabular-nums;
+}
+.nd-id {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	min-width: 0;
+}
+.nd-name {
+	font-family: var(--font-mono);
+	font-size: 0.76rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	min-width: 0;
+}
+/* Square, hairline, uppercase -- the role is a label on the machine, not a
+   status, so it never takes a status colour. */
+.nd-role {
+	border: 1px solid var(--rule);
+	background: var(--pastel-vanilla);
+	padding: 1px 6px;
+	border-radius: 0;
+	font-size: 0.58rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+.nd-pills {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+.nd-meters {
+	display: grid;
+	gap: 4px;
+	min-width: 0;
+}
+.nd-spark {
+	min-width: 0;
+}
+/* Cores, memory and uptime change on the scale of months. They belong under
+   the rule, in the muted step, with the one that is a timestamp pushed right. */
+.nd-foot {
+	grid-column: 1 / -1;
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-md);
+	margin-top: 2px;
+	padding-top: 5px;
+	border-top: 1px dashed var(--rule-hair);
+	font-family: var(--font-mono);
+	font-size: 0.6rem;
+	color: var(--ink-soft);
+}
+.nd-foot b {
+	font-weight: 700;
+	color: var(--ink-muted);
+}
+.nd-foot .nd-unit {
+	font-size: 0.55rem;
+	font-weight: 600;
+	color: var(--ink-soft);
+}
+.nd-foot .nd-last {
+	margin-left: auto;
+}
+/* Offline is the one state worth a pulse: it is the only one where the numbers
+   on the row are known to be lying. */
+.ifc-node.is-down .nd-name { color: var(--ink-muted); }
+.ifc-node.is-down .ifc-chip-dot { animation: nd-pulse 1.6s ease-in-out infinite; }
+@keyframes nd-pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.ifc-node.is-down .ifc-chip-dot { animation: none; }
+}
+
+/* One row of four columns needs about 760px before the meters start clipping
+   their labels. Under that the row becomes a stack -- still one card per node,
+   which is the part that matters, just read top to bottom. */
+@media (max-width: 780px) {
+	.ifc-node {
+		grid-template-columns: minmax(0, 1fr);
+		align-items: stretch;
+		row-gap: 8px;
+	}
+	.nd-foot { flex-wrap: wrap; row-gap: 2px; }
+}

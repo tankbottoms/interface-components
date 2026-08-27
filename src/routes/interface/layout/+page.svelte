@@ -582,7 +582,7 @@
 		<span class="ifc-sec-title">Node cards &amp; link topology</span>
 		<span class="ifc-sec-hint">status dot · speed pill · load meter</span>
 	</div>
-	<div class="ifc-grid ifc-grid-auto">
+	<div class="ifc-nodes">
 		{#each nodes as n (n.name)}
 			<HoverCard
 				title={n.name}
@@ -597,20 +597,29 @@
 				]}
 				note={n.up ? 'Reporting on the last heartbeat.' : 'Last heartbeat missed — figures are stale.'}
 			>
-				<div class="ifc-card">
-					<div class="ifc-card-hdr">
+				<div class="ifc-card ifc-node" class:is-down={!n.up}>
+					<div class="nd-id">
 						<span class="ifc-chip-dot" class:is-crit={!n.up}></span>
-						<span class="ifc-card-title">{n.name}</span>
-						<span class="ifc-card-meta">{n.role}</span>
+						<span class="nd-name">{n.name}</span>
+						<span class="nd-role">{n.role}</span>
 					</div>
-					<div class="ifc-inline" style="margin-bottom:6px">
+					<div class="nd-pills">
 						<span class="ifc-badge b-{n.up ? 'mint' : 'blush'}">{n.up ? 'online' : 'offline'}</span>
 						<span class="ifc-badge b-cyan">{n.link}</span>
 						<span class="ifc-badge b-vanilla">{n.rtt.toFixed(1)} ms</span>
 					</div>
-					<MeterBar label="LOAD" value={n.load} display={`${n.load.toFixed(0)}%`} />
-					<MeterBar label="DISK" value={n.disk} display={`${n.disk.toFixed(0)}%`} />
-					<MiniSpark values={n.trend} token="teal" unit="%" height={34} />
+					<div class="nd-meters">
+						<MeterBar label="LOAD" value={n.load} display={`${n.load.toFixed(0)}%`} />
+						<MeterBar label="DISK" value={n.disk} display={`${n.disk.toFixed(0)}%`} />
+					</div>
+					<div class="nd-spark">
+						<MiniSpark values={n.trend} token="teal" unit="%" height={34} />
+					</div>
+					<div class="nd-foot">
+						<span><b>{n.cores}</b> <span class="nd-unit">cores</span></span>
+						<span><b>{n.ramGB}</b> <span class="nd-unit">GB</span></span>
+						<span class="nd-last"><b>{n.uptimeD}</b> <span class="nd-unit">d up</span></span>
+					</div>
 				</div>
 			</HoverCard>
 		{/each}
