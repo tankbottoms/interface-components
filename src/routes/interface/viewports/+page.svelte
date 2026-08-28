@@ -94,6 +94,73 @@
 			note: 'Single-file output has no bundler to catch a syntax error for it.'
 		}
 	];
+	/** The sixteen numbered controls, in the ring order the help overlay uses.
+	 *  Wording is verbatim from the reference implementation's own legend, so the
+	 *  documentation cannot drift from the thing it documents. */
+	const help = [
+		{ n: 1, name: 'Fractal', at: 'top', body: 'Which pattern the ground is made of, and how deep it goes. The city starts here.' },
+		{ n: 2, name: 'Map', at: 'top', body: 'The plan reading of that pattern — roads and blocks, no terrain — and the three street separations that shape it.' },
+		{ n: 3, name: 'Tools', at: 'top', body: 'Five drawers of dials — ground, roads, buildings, trees, planting. A change regrows only from the stage it touched.' },
+		{ n: 4, name: 'Palette', at: 'top', body: 'Theme colours — house, monochrome, Miami Vice, or your own four.' },
+		{ n: 5, name: 'Export', at: 'top', body: 'Take it with you — a picture of the stage, the plan as line work, or the model itself.' },
+		{ n: 6, name: 'Mode', at: 'top right', body: 'Viewing looks; editing makes plots pickable and the brush live.' },
+		{ n: 7, name: 'Frame', at: 'top right', body: 'Fit to view, fly past, or take the tour.' },
+		{ n: 8, name: 'Rendering', at: 'top right', body: 'Culling, chunking, adaptive frame rate, decimation — and the meter.' },
+		{ n: 9, name: 'Closer', at: 'right', body: 'Zoom in, zoom out, back to where you began.' },
+		{ n: 10, name: 'Stance', at: 'right', body: 'Orbit, fly, top-down, isometric, paraline, angle.' },
+		{ n: 11, name: 'Extent', at: 'right', body: 'How much ground the fractal is given. Each press halves or doubles it.' },
+		{ n: 12, name: 'Resolution', at: 'right', body: 'Terrain grid, five rungs coarse to fine. Regenerates the world.' },
+		{ n: 13, name: 'Detail', at: 'right', body: 'Polygon budget — thins the scene to keep the frame cheap.' },
+		{ n: 14, name: 'Readout', at: 'bottom right', body: 'Frame rate and the triangles this frame cost.' },
+		{ n: 15, name: 'Plan', at: 'bottom left', body: 'The city from above. Drag a region to send the view there, or paint with the brush.' },
+		{ n: 16, name: 'Layers', at: 'left', body: 'Ground, mark, form, gloss — plus wireframe, normals and water.' },
+	];
+
+	/** Every panel the numbered controls open, shot at the size it opens at. */
+	const menus = [
+		{
+			img: 'menu-tools-ground.png',
+			title: 'Tools → Ground',
+			from: 3,
+			body: 'The drawer the ring opens on. Field, octaves, relief, sea level — each a value with a minus and a plus, no sliders, and the value itself editable in place.',
+		},
+		{
+			img: 'menu-tools-roads.png',
+			title: 'Tools → Roads',
+			from: 3,
+			body: 'Same drawer, different tab, and the preview is live: the panel is wide enough that changing a separation shows you the street grid it produces without closing anything.',
+		},
+		{
+			img: 'menu-tools-trees.png',
+			title: 'Tools → Planting',
+			from: 3,
+			body: 'Species, leaf shape, density and level of detail, with the tree drawn beside the dials. One popup, one fixed size, five tabs — the window never resizes as you move between them.',
+		},
+		{
+			img: 'menu-palette.png',
+			title: 'Tools → Colours',
+			from: 4,
+			body: 'Themes as swatch rows rather than names, wide enough to read all four colours inside the badge. Define… writes a fifth; the choice applies to the scene and the chrome together.',
+		},
+		{
+			img: 'menu-examples.png',
+			title: 'Tools → Examples',
+			from: 3,
+			body: 'Whole settings, not single dials: a city, a town, an island, a dense continent. Each one is the state every tab would have to be set to by hand.',
+		},
+		{
+			img: 'menu-render.png',
+			title: 'Rendering',
+			from: 8,
+			body: 'The cost knobs, kept away from the world knobs: culling, chunk size, target frame rate, decimation. Values edit in place and persist to browser storage.',
+		},
+		{
+			img: 'menu-guide.png',
+			title: 'Guide',
+			from: 3,
+			body: 'Prose, not a tour. What the fractal decides, what the roads decide, and what to reach for first — the one panel that is read rather than operated.',
+		},
+	];
 </script>
 
 <svelte:head>
@@ -119,6 +186,15 @@
 			carry meaning you stop reading labels to find a button.
 		</p>
 	</header>
+
+	<figure class="ifc-fig">
+		<img src="/img/citygen/desktop-plain.png" alt="The citygen viewport at desktop width, controls ringing the canvas, census panels beneath it." />
+		<figcaption>
+			<b>The surface as it ships.</b> One canvas, five edges in use, and nothing floating in the middle
+			of the picture. The strip under the glass is state, not control — mode, the hint line, and what you
+			have placed by hand. The six panels below the viewport are the census, in ordinary page flow.
+		</figcaption>
+	</figure>
 
 	<!-- 01 docks -------------------------------------------------------- -->
 	<div class="ifc-sec">
@@ -212,7 +288,7 @@
 		<a href="/interface/wayfinding">Wayfinding</a> documents a tour that walks a page one stop at a
 		time, which works because a page has a reading order. A viewport does not. So help here marks
 		<em>every</em> control at once with a small numbered circle — orange, thin-ruled, ordered around
-		the ring — over a wireframe of the actual layout. Seeing that there are fourteen controls and
+		the ring — over a wireframe of the actual layout. Seeing that there are sixteen controls and
 		where they are is most of what the help was for.
 	</p>
 	<p class="ifc-sec-note" style="margin-top:var(--spacing-sm)">
@@ -222,9 +298,68 @@
 		them.
 	</p>
 
-	<!-- 05 hud vs census ------------------------------------------------ -->
+	<figure class="ifc-fig">
+		<img src="/img/citygen/desktop-numbered.png" alt="The same viewport with the help overlay on: sixteen small orange numbered circles, one per control cluster." />
+		<figcaption>
+			<b>The same frame with help raised.</b> Sixteen circles, one per cluster rather than one per
+			button — a cluster is the unit a person reaches for. Note where the last three sit: 14 on the
+			meter, 15 on the plan inset, 16 on the layer rail. Those three are read-outs and toggles, not
+			dials, and they are numbered anyway because <em>unnumbered means unexplained</em>.
+		</figcaption>
+	</figure>
+
+	<table class="ifc-table">
+		<thead>
+			<tr><th>#</th><th>Control</th><th>Edge</th><th>What it decides</th></tr>
+		</thead>
+		<tbody>
+			{#each help as h}
+				<tr>
+					<td class="ifc-num">{h.n}</td>
+					<td><strong>{h.name}</strong></td>
+					<td class="ifc-num">{h.at}</td>
+					<td>{h.body}</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+	<p class="ifc-sec-note" style="margin-top:var(--spacing-sm)">
+		The table above is the overlay's own legend, read out of the implementation rather than
+		rewritten for the documentation. Writing it twice is how the two drift apart — and the drift is
+		not theoretical: the meter and the inset shipped numbered 13 and 14 against a legend that called
+		them 14 and 15, which is exactly the class of error a shared source removes.
+	</p>
+
+	<!-- 05 menus --------------------------------------------------------- -->
 	<div class="ifc-sec">
 		<span class="ifc-sec-tag">05</span>
+		<span class="ifc-sec-title">One popup, one size, tabs inside it</span>
+		<span class="ifc-sec-hint">the drawer never resizes as you move between tabs</span>
+	</div>
+	<p class="ifc-sec-note">
+		<strong>What this is.</strong> Every dial in the application lives in one of the panels below.
+		They are all the same width and height, they all open in the same place, and the tabs inside them
+		are glyph + space + word. A panel sized to its own tab makes the window jump every time you move
+		across it, which reads as the application losing its place.
+	</p>
+	<p class="ifc-sec-note" style="margin-top:var(--spacing-sm)">
+		<strong>How it is built.</strong> One dialog element, tabs switched by radio, and a routing table
+		that maps a tool to its tab — so pressing any tool glyph in the ring opens the shared panel
+		<em>already on</em> the right tab. Each panel carries a preview of what its dials do, because a
+		number with no picture beside it is a number you have to guess at.
+	</p>
+	<div class="ifc-fig-grid">
+		{#each menus as m}
+			<figure class="ifc-fig">
+				<img src="/img/citygen/{m.img}" alt={m.title} />
+				<figcaption><b>{m.title}</b> <span class="ifc-num">from {m.from}</span> — {m.body}</figcaption>
+			</figure>
+		{/each}
+	</div>
+
+	<!-- 06 hud vs census ------------------------------------------------ -->
+	<div class="ifc-sec">
+		<span class="ifc-sec-tag">06</span>
 		<span class="ifc-sec-title">Two kinds of number: the meter and the census</span>
 		<span class="ifc-sec-hint">per-frame vs per-generation</span>
 	</div>
@@ -241,9 +376,9 @@
 		the two produces an overlay nobody can read and a table nobody trusts.
 	</p>
 
-	<!-- 06 audits ------------------------------------------------------- -->
+	<!-- 07 audits ------------------------------------------------------- -->
 	<div class="ifc-sec">
-		<span class="ifc-sec-tag">06</span>
+		<span class="ifc-sec-tag">07</span>
 		<span class="ifc-sec-title">The audits, run before anything is built</span>
 		<span class="ifc-sec-hint">bun run audit — wired into build</span>
 	</div>
@@ -275,3 +410,53 @@
 		flags both halves of one rule, and a lint nobody can satisfy is switched off within a week.
 	</p>
 </div>
+
+<style>
+	.ifc-fig {
+		margin: var(--spacing-md) 0 0;
+	}
+
+	.ifc-fig img {
+		display: block;
+		width: 100%;
+		height: auto;
+		border: 1px solid var(--rule);
+		background: var(--paper-card);
+	}
+
+	.ifc-fig figcaption {
+		margin-top: var(--spacing-xs);
+		font-size: 11.5px;
+		line-height: 1.55;
+		color: var(--ink-note);
+	}
+
+	.ifc-fig figcaption b {
+		color: var(--ink);
+		font-weight: 600;
+	}
+
+	.ifc-fig-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--spacing-md);
+		margin-top: var(--spacing-md);
+	}
+
+	.ifc-fig-grid .ifc-fig {
+		margin: 0;
+	}
+
+	.ifc-num {
+		font-family: var(--font-mono);
+		font-size: 10.5px;
+		color: var(--ink-muted);
+		white-space: nowrap;
+	}
+
+	@media (max-width: 720px) {
+		.ifc-fig-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>
